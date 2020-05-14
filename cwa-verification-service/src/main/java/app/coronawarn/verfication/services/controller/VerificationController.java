@@ -22,8 +22,11 @@ package app.coronawarn.verfication.services.controller;
 
 import app.coronawarn.verfication.services.domain.CoronaVerficationAppSession;
 import app.coronawarn.verfication.services.domain.CoronaVerificationState;
+import app.coronawarn.verfication.services.service.HashingService;
+import app.coronawarn.verfication.services.service.VerficationAppSessionService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,6 +46,12 @@ public class VerificationController {
      * The logger.
      */
     private static final Logger LOG = LogManager.getLogger();
+    
+    @Autowired
+    private VerficationAppSessionService appSessionService;
+    
+    @Autowired
+    private HashingService hashingService;    
 
     /**
      * The default constructor.
@@ -60,7 +69,7 @@ public class VerificationController {
      */
     @RequestMapping(headers = {"content-type=application/json"},
             method = RequestMethod.POST, value = "/registrationToken")
-    public ResponseEntity<String> generateRegistrationToken(@RequestBody String hashedGuid) {
+    public String generateRegistrationToken(@RequestBody String hashedGuid) {
         /* TODO: 
         1. Verify whether a Registration Token with the provided GUID already exists, 
             if yes return error
@@ -68,14 +77,8 @@ public class VerificationController {
         3. Store entity AppSession, with hashed Registration Token and hashed GUID
         4. Return Registration Token ID
          */
-        
         String registrationToken = "";
-        
-        try {
-            return new ResponseEntity(registrationToken, HttpStatus.OK);
-        } catch (Exception ex) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+        return registrationToken;
     }
 
     /**
@@ -117,17 +120,22 @@ public class VerificationController {
     @RequestMapping(headers = {"content-type=application/json"},
             method = RequestMethod.POST, value = "/testresult")
     public ResponseEntity<CoronaVerificationState> getTestState(@RequestBody String registrationToken) {
-        /* TODO:
-        1. “Get Test status”
-            - Terminate the external API call
-        2. Verify whether the provided RegistrationToken exists, if not exit with error HTTP 400
-        3. Obtain hashed GUID by Registration Token
-        4. Get Test status from Lab Server
-            - Do call rate limiting, to avoid overload of external API
-            - Call Lab Server 
-        5. Return Result of API Call
-            - Return test result
-         */
+
+        // 1. “Get Test status” - Terminate the external API call
+        // 2. Verify whether the provided RegistrationToken exists, if not exit with error HTTP 400
+        
+        appSessionService.checkRegistrationTokenExists(hashingService.hash(registrationToken));
+        
+        // 3. Obtain hashed GUID by Registration Token
+        // 4. Get Test status from Lab Server
+            // - Do call rate limiting, to avoid overload of external API
+            // - Call Lab Server 
+        // 5. Return Result of API Call
+            // - Return test result
+            
+            
+            
+        
         try {
             return new ResponseEntity(CoronaVerificationState.POSITIVE, HttpStatus.OK);
         } catch (Exception ex) {

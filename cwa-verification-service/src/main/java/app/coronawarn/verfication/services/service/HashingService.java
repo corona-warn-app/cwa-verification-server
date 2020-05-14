@@ -26,28 +26,32 @@ import org.apache.logging.log4j.Logger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import org.springframework.stereotype.Component;
+
 /**
  *
  * @author a12248001
  */
+@Component
 public class HashingService {
-  private static final Logger LOG = LogManager.getLogger();
 
-  /**
-   * Returns the hash of the supplied string
-   *
-   * @param String that will be Hashed
-   * @return the hash of the supplied string
-   */
-  public String hash(String toHash) {
-    MessageDigest digest = null;
-    try {
-      digest = MessageDigest.getInstance("SHA-256");
-    } catch (NoSuchAlgorithmException e) {
-      LOG.error("Failed to use Hashfunction {}", e.getMessage());
+    private static final Logger LOG = LogManager.getLogger();
+
+    /**
+     * Returns the hash of the supplied string
+     *
+     * @param toHash that will be Hashed
+     * @return the hash of the supplied string
+     */
+    public String hash(String toHash) {
+        MessageDigest digest = null;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            LOG.error("Failed to use Hashfunction {}", e.getMessage());
+        }
+        byte[] hashed = digest.digest(
+                toHash.getBytes(StandardCharsets.UTF_8));
+        return hashed.toString();
     }
-    byte[] hashed = digest.digest(
-      toHash.getBytes(StandardCharsets.UTF_8));
-    return  hashed.toString();
-  }
 }

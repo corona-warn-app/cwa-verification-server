@@ -26,20 +26,19 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
 /**
+ * This class represents the AppSession-entity.
+ *
  * @author A303220
  */
 @Entity
 @Table(name = "APP_SESSION")
-public class CoronaVerficationAppSession implements Serializable
-{
+public class CoronaVerificationAppSession implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,10 +58,6 @@ public class CoronaVerficationAppSession implements Serializable
     @Column(name = "TAN_GENERATED_FLAG", columnDefinition = "BIT")
     @Basic
     private boolean tanGenerated;
-
-    @Column(name = "STATUS", columnDefinition = "VARCHAR2(255)")
-    @Enumerated(EnumType.STRING)
-    private CoronaVerificationState verificationState;
 
     @Column(name = "CREATED_ON", columnDefinition = "DATETIME(6)")
     @Basic
@@ -104,14 +99,6 @@ public class CoronaVerficationAppSession implements Serializable
         this.tanGenerated = tanGenerated;
     }
 
-    public CoronaVerificationState getVerificationState() {
-        return verificationState;
-    }
-
-    public void setVerificationState(CoronaVerificationState verificationState) {
-        this.verificationState = verificationState;
-    }
-
     public LocalDateTime getCreatedOn() {
         return createdOn;
     }
@@ -127,7 +114,6 @@ public class CoronaVerficationAppSession implements Serializable
         hash = 37 * hash + Objects.hashCode(this.guidHash);
         hash = 37 * hash + Objects.hashCode(this.registrationTokenHash);
         hash = 37 * hash + (this.tanGenerated ? 1 : 0);
-        hash = 37 * hash + Objects.hashCode(this.verificationState);
         hash = 37 * hash + Objects.hashCode(this.createdOn);
         return hash;
     }
@@ -143,7 +129,7 @@ public class CoronaVerficationAppSession implements Serializable
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CoronaVerficationAppSession other = (CoronaVerficationAppSession) obj;
+        final CoronaVerificationAppSession other = (CoronaVerificationAppSession) obj;
         if (this.tanGenerated != other.tanGenerated) {
             return false;
         }
@@ -156,14 +142,14 @@ public class CoronaVerficationAppSession implements Serializable
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }
-        if (this.verificationState != other.verificationState) {
-            return false;
-        }
         return Objects.equals(this.createdOn, other.createdOn);
     }
 
     @Override
     public String toString() {
-        return "CoronaVerficationAppSession{" + "id=" + id + ", guidHash=" + guidHash + ", registrationTokenHash=" + registrationTokenHash + ", tanGenerated=" + tanGenerated + ", verificationState=" + verificationState + ", createdOn=" + createdOn + ", objVersion=" + objVersion + '}';
+        return "CoronaVerficationAppSession{" + "id=" + id + ", guidHash=" + guidHash + ", "
+                + "registrationTokenHash=" + registrationTokenHash + ", "
+                + "tanGenerated=" + tanGenerated + ", createdOn=" + createdOn + ", "
+                + "objVersion=" + objVersion + '}';
     }
 }

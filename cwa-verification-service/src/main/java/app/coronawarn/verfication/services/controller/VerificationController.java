@@ -20,10 +20,12 @@
  */
 package app.coronawarn.verfication.services.controller;
 
-import app.coronawarn.verfication.services.domain.CoronaVerficationAppSession;
+import app.coronawarn.verfication.services.domain.CoronaVerificationAppSession;
 import app.coronawarn.verfication.services.domain.CoronaVerificationState;
 import app.coronawarn.verfication.services.service.HashingService;
-import app.coronawarn.verfication.services.service.VerficationAppSessionService;
+import app.coronawarn.verfication.services.service.VerificationAppSessionService;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,12 +48,12 @@ public class VerificationController {
      * The logger.
      */
     private static final Logger LOG = LogManager.getLogger();
-    
+
     @Autowired
-    private VerficationAppSessionService appSessionService;
-    
+    private VerificationAppSessionService appSessionService;
+
     @Autowired
-    private HashingService hashingService;    
+    private HashingService hashingService;
 
     /**
      * The default constructor.
@@ -69,16 +71,18 @@ public class VerificationController {
      */
     @RequestMapping(headers = {"content-type=application/json"},
             method = RequestMethod.POST, value = "/registrationToken")
-    public String generateRegistrationToken(@RequestBody String hashedGuid) {
-        /* TODO: 
-        1. Verify whether a Registration Token with the provided GUID already exists, 
-            if yes return error
-        2. Create Registration Token
-        3. Store entity AppSession, with hashed Registration Token and hashed GUID
-        4. Return Registration Token ID
-         */
-        String registrationToken = "";
-        return registrationToken;
+    public ResponseEntity<String> generateRegistrationToken(@RequestBody String hashedGuid) {
+
+        if (appSessionService.checkGuidExists(hashedGuid)) {
+            LOG.warn("The registration token already exists for the hashed guid.");
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } else {
+            LOG.info("Start generating a new registration token for the given hashed guid.");
+            String hashedRegistrationToken = hashingService.hash(UUID.randomUUID().toString());
+            CoronaVerificationAppSession appSession = createAppSession(hashedGuid, hashedRegistrationToken);
+            appSessionService.saveAppSession(appSession);
+            return new ResponseEntity(hashedRegistrationToken, HttpStatus.OK);
+        }
     }
 
     /**
@@ -91,7 +95,7 @@ public class VerificationController {
      */
     @RequestMapping(headers = {"content-type=application/json"},
             method = RequestMethod.POST, value = "/tan")
-    public ResponseEntity<CoronaVerficationAppSession> generateTAN(@RequestBody String registrationToken) {
+    public ResponseEntity<CoronaVerificationAppSession> generateTAN(@RequestBody String registrationToken) {
         /* TODO: 
         1. Verify Registration Token, if Registration Token is invalid, exit with error HTTP 400
         2. Get test result from Lab Sever
@@ -104,7 +108,7 @@ public class VerificationController {
         7. Return TAN string
          */
         try {
-            return new ResponseEntity(new CoronaVerficationAppSession().getRegistrationTokenHash(), HttpStatus.CREATED);
+            return new ResponseEntity(new CoronaVerificationAppSession().getRegistrationTokenHash(), HttpStatus.CREATED);
         } catch (Exception ex) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
@@ -123,19 +127,14 @@ public class VerificationController {
 
         // 1. “Get Test status” - Terminate the external API call
         // 2. Verify whether the provided RegistrationToken exists, if not exit with error HTTP 400
-        
         appSessionService.checkRegistrationTokenExists(hashingService.hash(registrationToken));
-        
+
         // 3. Obtain hashed GUID by Registration Token
         // 4. Get Test status from Lab Server
-            // - Do call rate limiting, to avoid overload of external API
-            // - Call Lab Server 
+        // - Do call rate limiting, to avoid overload of external API
+        // - Call Lab Server 
         // 5. Return Result of API Call
-            // - Return test result
-            
-            
-            
-        
+        // - Return test result
         try {
             return new ResponseEntity(CoronaVerificationState.POSITIVE, HttpStatus.OK);
         } catch (Exception ex) {
@@ -175,5 +174,22 @@ public class VerificationController {
     @RequestMapping(method = RequestMethod.POST, value = "/tan/teletan")
     public ResponseEntity createTeleTAN() {
         return new ResponseEntity(HttpStatus.CREATED);
+    }
+
+    /**
+     * Creates an AppSession-Entity.
+     *
+     * @param hashedGuid
+     * @param hashedRegistrationToken
+     * @return
+     */
+    private CoronaVerificationAppSession createAppSession(String hashedGuid, String hashedRegistrationToken) {
+        LOG.info("Create the app session entity with the created registration token and given guid.");
+        CoronaVerificationAppSession appSession = new CoronaVerificationAppSession();
+        appSession.setCreatedOn(LocalDateTime.now());
+        appSession.setGuidHash(hashedGuid);
+        appSession.setRegistrationTokenHash(hashedRegistrationToken);
+        appSession.setTanGenerated(false);
+        return appSession;
     }
 }

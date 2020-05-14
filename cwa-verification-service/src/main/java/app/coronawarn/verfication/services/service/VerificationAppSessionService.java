@@ -4,9 +4,9 @@
  * (C) 2020, A336717, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
- * copyright owners license this file to you under the Apache 
- * License, Version 2.0 (the "License"); you may not use this 
- * file except in compliance with the License. 
+ * copyright owners license this file to you under the Apache
+ * License, Version 2.0 (the "License"); you may not use this
+ * file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -28,12 +28,14 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.stereotype.Component;
 
 /**
  * This class represents the CoronaVerficationAppSession service.
  *
  * @author A336717, T-Systems International GmbH
  */
+@Component
 public class VerificationAppSessionService
 {
     private static final Logger LOG = LogManager.getLogger();
@@ -49,8 +51,8 @@ public class VerificationAppSessionService
     public void saveAppSession(CoronaVerificationAppSession appSession) {
         LOG.info("VerficationAppSessionService start saveAppSession.");
         appSessionRepository.save(appSession);
-    }    
-    
+    }
+
     /**
      * Check for existing Reg Token in the {@link AppSessionRepository}.
      *
@@ -62,8 +64,8 @@ public class VerificationAppSessionService
         CoronaVerificationAppSession appSession = new CoronaVerificationAppSession();
         appSession.setRegistrationTokenHash(registrationTokenHash);
         return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
-    } 
-    
+    }
+
      /**
      * Check for existing GUID Token in the {@link AppSessionRepository}.
      *
@@ -75,6 +77,6 @@ public class VerificationAppSessionService
         CoronaVerificationAppSession appSession = new CoronaVerificationAppSession();
         appSession.setGuidHash(guid);
         return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
-    } 
-    
+    }
+
 }

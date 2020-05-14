@@ -42,10 +42,24 @@ public class VerficationAppSessionService
     /**
      * Persists the specified entity of {@link CoronaVerficationAppSession} instances.
      *
-     * @param coronaVerfication the verification entity
+     * @param appSession the verification app session entity
      */
     public void saveAppSession(CoronaVerficationAppSession appSession) {
-        LOG.info("VerificationService start saveAppSession.");
+        LOG.info("VerficationAppSessionService start saveAppSession.");
         appSessionRepository.save(appSession);
-    }
+    }    
+    
+    /**
+     * Check for existing Reg Token in the {@link AppSessionRepository}.
+     *
+     * @param registrationTokenHash the hashed registrationToken
+     * @return flag for existing registrationToken
+     */
+    public boolean checkRegistrationTokenExists(String registrationTokenHash) {
+        LOG.info("VerficationAppSessionService start checkRegistrationTokenExists.");
+        CoronaVerficationAppSession appSession = new CoronaVerficationAppSession();
+        appSession.setRegistrationTokenHash(registrationTokenHash);
+        return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
+    } 
+    
 }

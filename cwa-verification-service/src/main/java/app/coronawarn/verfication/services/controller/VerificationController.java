@@ -60,7 +60,7 @@ public class VerificationController {
      */
     @RequestMapping(headers = {"content-type=application/json"},
             method = RequestMethod.POST, value = "/registrationToken")
-    public String generateRegistrationToken(@RequestBody String hashedGuid) {
+    public ResponseEntity<String> generateRegistrationToken(@RequestBody String hashedGuid) {
         /* TODO: 
         1. Verify whether a Registration Token with the provided GUID already exists, 
             if yes return error
@@ -68,8 +68,14 @@ public class VerificationController {
         3. Store entity AppSession, with hashed Registration Token and hashed GUID
         4. Return Registration Token ID
          */
+        
         String registrationToken = "";
-        return registrationToken;
+        
+        try {
+            return new ResponseEntity(registrationToken, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
     }
 
     /**

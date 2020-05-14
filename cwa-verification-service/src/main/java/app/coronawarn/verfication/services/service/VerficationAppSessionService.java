@@ -26,6 +26,8 @@ import app.coronawarn.verfication.services.repository.AppSessionRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 
 /**
  * This class represents the CoronaVerficationAppSession service.

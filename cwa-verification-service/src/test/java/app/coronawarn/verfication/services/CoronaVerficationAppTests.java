@@ -20,10 +20,9 @@
  */
 package app.coronawarn.verfication.services;
 
-import app.coronawarn.verfication.services.domain.CoronaVerficationAppSession;
-import app.coronawarn.verfication.services.domain.CoronaVerificationState;
+import app.coronawarn.verfication.services.domain.CoronaVerificationAppSession;
 import app.coronawarn.verfication.services.repository.AppSessionRepository;
-import app.coronawarn.verfication.services.service.VerficationAppSessionService;
+import app.coronawarn.verfication.services.service.VerificationAppSessionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
@@ -70,7 +69,7 @@ public class CoronaVerficationAppTests {
     private ObjectMapper mapper;
 
     @MockBean
-    private VerficationAppSessionService appSessionService;
+    private VerificationAppSessionService appSessionService;
 
     @Autowired
     private AppSessionRepository repository;
@@ -89,8 +88,7 @@ public class CoronaVerficationAppTests {
 
         repository.deleteAll();
 
-        CoronaVerficationAppSession cv = new CoronaVerficationAppSession();
-        cv.setVerificationState(CoronaVerificationState.NEGATIVE);
+        CoronaVerificationAppSession cv = new CoronaVerificationAppSession();
         cv.setGuidHash(TEST_GUI_HASH);
         cv.setTanGenerated(true);
         cv.setCreatedOn(LocalDateTime.now());
@@ -108,9 +106,8 @@ public class CoronaVerficationAppTests {
 
         assertTrue("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", count == 1);
 
-        CoronaVerficationAppSession coronaVerfication = repository.getOne(count);
+        CoronaVerificationAppSession coronaVerfication = repository.getOne(count);
         assertNotNull(coronaVerfication);
-        assertEquals(CoronaVerificationState.NEGATIVE, coronaVerfication.getVerificationState());
         assertEquals(TEST_GUI_HASH, coronaVerfication.getGuidHash());
         assertTrue(coronaVerfication.isTanGenerated());
         assertEquals(TEST_REG_TOK_HASH, coronaVerfication.getRegistrationTokenHash());

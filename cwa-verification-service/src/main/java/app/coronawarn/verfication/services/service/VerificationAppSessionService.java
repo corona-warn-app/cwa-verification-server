@@ -21,7 +21,7 @@
 
 package app.coronawarn.verfication.services.service;
 
-import app.coronawarn.verfication.services.domain.CoronaVerficationAppSession;
+import app.coronawarn.verfication.services.domain.CoronaVerificationAppSession;
 import app.coronawarn.verfication.services.repository.AppSessionRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,7 +34,7 @@ import org.springframework.data.domain.ExampleMatcher;
  *
  * @author A336717, T-Systems International GmbH
  */
-public class VerficationAppSessionService
+public class VerificationAppSessionService
 {
     private static final Logger LOG = LogManager.getLogger();
 
@@ -46,7 +46,7 @@ public class VerficationAppSessionService
      *
      * @param appSession the verification app session entity
      */
-    public void saveAppSession(CoronaVerficationAppSession appSession) {
+    public void saveAppSession(CoronaVerificationAppSession appSession) {
         LOG.info("VerficationAppSessionService start saveAppSession.");
         appSessionRepository.save(appSession);
     }    
@@ -59,8 +59,21 @@ public class VerficationAppSessionService
      */
     public boolean checkRegistrationTokenExists(String registrationTokenHash) {
         LOG.info("VerficationAppSessionService start checkRegistrationTokenExists.");
-        CoronaVerficationAppSession appSession = new CoronaVerficationAppSession();
+        CoronaVerificationAppSession appSession = new CoronaVerificationAppSession();
         appSession.setRegistrationTokenHash(registrationTokenHash);
+        return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
+    } 
+    
+     /**
+     * Check for existing GUID Token in the {@link AppSessionRepository}.
+     *
+     * @param guid the hashed guid
+     * @return flag for existing guid
+     */
+    public boolean checkGuidExists(String guid) {
+        LOG.info("VerficationAppSessionService start checkRegistrationTokenExists.");
+        CoronaVerificationAppSession appSession = new CoronaVerificationAppSession();
+        appSession.setGuidHash(guid);
         return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
     } 
     

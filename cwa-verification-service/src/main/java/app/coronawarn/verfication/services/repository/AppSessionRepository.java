@@ -22,7 +22,7 @@
 package app.coronawarn.verfication.services.repository;
 
 
-import app.coronawarn.verfication.services.domain.CoronaVerficationAppSession;
+import app.coronawarn.verfication.services.domain.CoronaVerificationAppSession;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -34,5 +34,5 @@ import org.springframework.stereotype.Repository;
  * @author A336717, T-Systems International GmbH
  */
 @Repository
-public interface AppSessionRepository extends JpaRepository<CoronaVerficationAppSession, Long> {
+public interface AppSessionRepository extends JpaRepository<CoronaVerificationAppSession, Long> {
 }

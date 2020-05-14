@@ -23,6 +23,7 @@ package app.coronawarn.verfication.services.service;
 
 import app.coronawarn.verfication.services.domain.CoronaVerificationAppSession;
 import app.coronawarn.verfication.services.repository.AppSessionRepository;
+import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +66,19 @@ public class VerificationAppSessionService
         appSession.setRegistrationTokenHash(registrationTokenHash);
         return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
     }
+    
+    /**
+     * Get existing CoronaVerificationAppSession for Reg Token from {@link AppSessionRepository}.
+     *
+     * @param registrationTokenHash the hashed registrationToken
+     * @return Optional CoronaVerificationAppSession 
+     */
+    public Optional<CoronaVerificationAppSession> getAppSessionByToken(String registrationTokenHash) {
+        LOG.info("VerficationAppSessionService start getAppSessionByToken.");
+        CoronaVerificationAppSession appSession = new CoronaVerificationAppSession();
+        appSession.setRegistrationTokenHash(registrationTokenHash);
+        return appSessionRepository.findOne(Example.of(appSession, ExampleMatcher.matching()));
+    }    
 
      /**
      * Check for existing GUID Token in the {@link AppSessionRepository}.

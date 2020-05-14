@@ -32,6 +32,8 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 /**
+ * The entity of the transaction number (TAN).
+ *
  * @author A303220
  */
 @Entity

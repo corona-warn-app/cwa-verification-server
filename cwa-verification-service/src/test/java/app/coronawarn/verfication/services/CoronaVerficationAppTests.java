@@ -1,7 +1,7 @@
 /*
  * Corona-Warn-App / cwa-verification
  *
- * (C) 2020, A336717, T-Systems International GmbH
+ * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
  * copyright owners license this file to you under the Apache 
@@ -22,10 +22,11 @@ package app.coronawarn.verfication.services;
 
 import app.coronawarn.verfication.services.domain.CoronaVerificationAppSession;
 import app.coronawarn.verfication.services.repository.AppSessionRepository;
+import app.coronawarn.verfication.services.service.LabServerService;
 import app.coronawarn.verfication.services.service.VerificationAppSessionService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import static org.junit.Assert.assertEquals;
@@ -33,6 +34,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import static org.mockito.BDDMockito.given;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,6 +45,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -58,24 +61,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest(properties = {"log4j.configurationFile=log4j2-test.xml"})
 @TestPropertySource("classpath:test.properties")
-public class CoronaVerficationAppTests {
+public class CoronaVerficationAppTests
+{
 
     static final Logger LOG = LogManager.getLogger();
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper mapper;
-
     @MockBean
     private VerificationAppSessionService appSessionService;
+
+    @MockBean
+    private LabServerService labServerService;
 
     @Autowired
     private AppSessionRepository repository;
 
     public static final String TEST_GUI_HASH = "12542154785411";
     public static final String TEST_REG_TOK_HASH = "1234567890";
+    public static final String TEST_LAB_RESULT = "positive";
 
     /**
      * Test call generateTAN via Conroller with MockMvc from Spring Test.
@@ -86,35 +91,67 @@ public class CoronaVerficationAppTests {
     public void callGenerateTANViaController() throws Exception {
         LOG.info("CoronaVerficationAppTests callGenerateTANViaController() ");
 
-        repository.deleteAll();
-
-        CoronaVerificationAppSession cv = new CoronaVerificationAppSession();
-        cv.setGuidHash(TEST_GUI_HASH);
-        cv.setTanGenerated(true);
-        cv.setCreatedOn(LocalDateTime.now());
-        cv.setRegistrationTokenHash(TEST_REG_TOK_HASH);
-
-        repository.save(cv);
+        prepareAppSessionTestData();
 
         mockMvc.perform(post("/tan").contentType(MediaType.APPLICATION_JSON).content(TEST_GUI_HASH))
                 .andExpect(status().isCreated());
 
         // List<CoronaVerficationAppSession> verfications = repository.findAll();
-
         long count = repository.count();
         LOG.info("Got {} verfication entries from db repository.", count);
-
         assertTrue("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", count == 1);
 
-        CoronaVerificationAppSession coronaVerfication = repository.getOne(count);
-        assertNotNull(coronaVerfication);
-        assertEquals(TEST_GUI_HASH, coronaVerfication.getGuidHash());
-        assertTrue(coronaVerfication.isTanGenerated());
-        assertEquals(TEST_REG_TOK_HASH, coronaVerfication.getRegistrationTokenHash());
+        List<CoronaVerificationAppSession> coronaVerficationList = repository.findAll();
+        assertNotNull(coronaVerficationList);
+        assertEquals(TEST_GUI_HASH, coronaVerficationList.get(0).getGuidHash());
+        assertTrue(coronaVerficationList.get(0).isTanGenerated());
+        assertEquals(TEST_REG_TOK_HASH, coronaVerficationList.get(0).getRegistrationTokenHash());
     }
 
-    private String getAsJsonFormat(Object o) throws JsonProcessingException {
-        String jsonRepresentation = mapper.writeValueAsString(o);
-        return jsonRepresentation;
+    /**
+     * Test call getTestState.
+     *
+     * @throws Exception if the test cannot be performed.
+     */
+    @Test
+    public void callGetTestStateViaController() throws Exception {
+        LOG.info("CoronaVerficationAppTests callGetTestStateViaController() ");
+
+        given(this.appSessionService.getAppSessionByToken(TEST_REG_TOK_HASH)).willReturn(Optional.of(getAppSessionTestData()));
+        given(this.labServerService.callLabServerResult(TEST_GUI_HASH)).willReturn(TEST_LAB_RESULT);
+
+        mockMvc.perform(post("/testresult").contentType(MediaType.APPLICATION_JSON).content(TEST_REG_TOK_HASH))
+                .andExpect(status().isOk())
+                .andExpect(content().string(TEST_LAB_RESULT));
+    }
+    
+    /**
+     * Test call getTestState with empty GUID.
+     *
+     * @throws Exception if the test cannot be performed.
+     */
+    @Test
+    public void callGetTestStateViaControllerBadRequest() throws Exception {
+        LOG.info("CoronaVerficationAppTests callGetTestStateViaController() ");
+
+        given(this.appSessionService.getAppSessionByToken(TEST_REG_TOK_HASH)).willReturn(Optional.empty());
+        given(this.labServerService.callLabServerResult(TEST_GUI_HASH)).willReturn(TEST_LAB_RESULT);
+
+        mockMvc.perform(post("/testresult").contentType(MediaType.APPLICATION_JSON).content(TEST_REG_TOK_HASH))
+                .andExpect(status().isBadRequest());
+    }    
+
+    private void prepareAppSessionTestData() {
+        repository.deleteAll();
+        repository.save(getAppSessionTestData());
+    }
+
+    private CoronaVerificationAppSession getAppSessionTestData() {
+        CoronaVerificationAppSession cv = new CoronaVerificationAppSession();
+        cv.setGuidHash(TEST_GUI_HASH);
+        cv.setTanGenerated(true);
+        cv.setCreatedOn(LocalDateTime.now());
+        cv.setRegistrationTokenHash(TEST_REG_TOK_HASH);
+        return cv;
     }
 }

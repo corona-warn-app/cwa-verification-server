@@ -23,6 +23,7 @@ package app.coronawarn.verfication.services.controller;
 import app.coronawarn.verfication.services.domain.CoronaVerificationAppSession;
 import app.coronawarn.verfication.services.domain.CoronaVerificationState;
 import app.coronawarn.verfication.services.service.HashingService;
+import app.coronawarn.verfication.services.service.LabServerService;
 import app.coronawarn.verfication.services.service.VerificationAppSessionService;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -55,6 +56,9 @@ public class VerificationController {
 
     @Autowired
     private HashingService hashingService;
+    
+    @Autowired
+    private LabServerService labServerService;    
 
     /**
      * The default constructor.
@@ -126,30 +130,16 @@ public class VerificationController {
             method = RequestMethod.POST, value = "/testresult")
     public ResponseEntity<CoronaVerificationState> getTestState(@RequestBody String registrationToken) {
 
-        // 1. “Get Test status” - Terminate the external API call  ------------ nachfragen???
-        // 2. Verify whether the provided RegistrationToken exists, if not exit with error HTTP 400
+        // “Get Test status” - Terminate the external API call  ------------ nachfragen???
         Optional<CoronaVerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken);
-        
         if(actual.isPresent()){
-            
-            // 3. Obtain hashed GUID by Registration Token
-            String guidHash = actual.get().getGuidHash();
-            
-            // 4. Get Test status from Lab Server
-            // - Do call rate limiting, to avoid overload of external API
-            // - Call Lab Server 
-            // 5. Return Result of API Call
-            // - Return test result
-
-            return new ResponseEntity(CoronaVerificationState.POSITIVE, HttpStatus.OK);
+            // - Do call rate limiting, to avoid overload of external API - ---------prüfen
+            String result = labServerService.callLabServerResult(actual.get().getGuidHash());
+            return new ResponseEntity(result, HttpStatus.OK);
         }
         else{
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-
-        
-
-
     }
 
     /**

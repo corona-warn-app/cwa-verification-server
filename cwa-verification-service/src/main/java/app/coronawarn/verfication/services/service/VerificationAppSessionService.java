@@ -1,7 +1,7 @@
 /*
  * Corona-Warn-App / cwa-verification
  *
- * (C) 2020, A336717, T-Systems International GmbH
+ * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
  * copyright owners license this file to you under the Apache
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 /**
  * This class represents the CoronaVerficationAppSession service.
  *
- * @author A336717, T-Systems International GmbH
+ * @author T-Systems International GmbH
  */
 @Component
 public class VerificationAppSessionService

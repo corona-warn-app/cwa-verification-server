@@ -20,6 +20,7 @@
  */
 package app.coronawarn.verfication.services.service;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -30,6 +31,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 public class TanServiceTest {
 
+    /**
+     * Test saveTan.
+     *
+     * @throws Exception if the test cannot be performed.
+     */
+    @Test
+    public void saveTanTest() throws Exception {
+        
+    }
 
   
 }

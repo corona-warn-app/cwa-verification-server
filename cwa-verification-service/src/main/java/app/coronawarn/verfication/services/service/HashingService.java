@@ -20,12 +20,12 @@
  */
 package app.coronawarn.verfication.services.service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 /**
@@ -52,6 +52,6 @@ public class HashingService {
         }
         byte[] hashed = digest.digest(
                 toHash.getBytes(StandardCharsets.UTF_8));
-        return hashed.toString();
+        return Arrays.toString(hashed);
     }
 }

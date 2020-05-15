@@ -18,7 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package app.coronawarn.verfication.services;
+package app.coronawarn.verification.services;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

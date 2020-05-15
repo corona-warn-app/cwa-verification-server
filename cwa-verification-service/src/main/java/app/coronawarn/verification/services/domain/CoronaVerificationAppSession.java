@@ -18,7 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package app.coronawarn.verfication.services.domain;
+package app.coronawarn.verification.services.domain;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

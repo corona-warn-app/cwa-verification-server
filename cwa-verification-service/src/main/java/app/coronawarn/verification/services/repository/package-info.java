@@ -19,9 +19,9 @@
  * under the License.
  *
  *
- * This package contains all domain classes for the cwa verification service.
+ * This package contains all repository classes for the cwa verification service.
  *
  * @author T-Systems International GmbH
  */
 
-package app.coronawarn.verfication.services.domain;
+package app.coronawarn.verification.services.repository;

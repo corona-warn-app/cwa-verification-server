@@ -18,13 +18,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package app.coronawarn.verfication.services.controller;
+package app.coronawarn.verification.services.controller;
 
-import app.coronawarn.verfication.services.domain.CoronaVerificationAppSession;
-import app.coronawarn.verfication.services.domain.CoronaVerificationState;
-import app.coronawarn.verfication.services.service.HashingService;
-import app.coronawarn.verfication.services.service.LabServerService;
-import app.coronawarn.verfication.services.service.VerificationAppSessionService;
+import app.coronawarn.verification.services.domain.CoronaVerificationAppSession;
+import app.coronawarn.verification.services.domain.CoronaVerificationState;
+import app.coronawarn.verification.services.service.HashingService;
+import app.coronawarn.verification.services.service.LabServerService;
+import app.coronawarn.verification.services.service.VerificationAppSessionService;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;

@@ -19,10 +19,10 @@
  * under the License.
  */
 
-package app.coronawarn.verfication.services.service;
+package app.coronawarn.verification.services.service;
 
-import app.coronawarn.verfication.services.domain.CoronaVerificationAppSession;
-import app.coronawarn.verfication.services.repository.AppSessionRepository;
+import app.coronawarn.verification.services.domain.CoronaVerificationAppSession;
+import app.coronawarn.verification.services.repository.AppSessionRepository;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -18,16 +18,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package app.coronawarn.verfication.services.domain;
+
+package app.coronawarn.verification.services.repository;
+
+
+import app.coronawarn.verification.services.domain.CoronaVerificationAppSession;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 
 /**
- * The possible states of the corona test.
+ *
+ * This class represents the AppSession repository.
+ *
+ * @author T-Systems International GmbH
  */
-public enum CoronaVerificationState
-{
-    PENDING,
-    NEGATIVE,
-    POSITIVE,
-    INVALID,
-    FAILED
+@Repository
+public interface AppSessionRepository extends JpaRepository<CoronaVerificationAppSession, Long> {
 }

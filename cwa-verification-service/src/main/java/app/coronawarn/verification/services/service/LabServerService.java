@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package app.coronawarn.verfication.services.service;
+package app.coronawarn.verification.services.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

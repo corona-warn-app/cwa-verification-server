@@ -18,7 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package app.coronawarn.verfication.services.service;
+package app.coronawarn.verification.services.service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

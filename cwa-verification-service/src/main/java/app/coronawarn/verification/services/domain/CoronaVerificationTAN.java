@@ -4,9 +4,9 @@
  * (C) 2020, A303220, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
- * copyright owners license this file to you under the Apache 
- * License, Version 2.0 (the "License"); you may not use this 
- * file except in compliance with the License. 
+ * copyright owners license this file to you under the Apache
+ * License, Version 2.0 (the "License"); you may not use this
+ * file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -18,7 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package app.coronawarn.verfication.services.domain;
+package app.coronawarn.verification.services.domain;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -31,14 +31,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
-/**
- * The entity of the transaction number (TAN).
- *
- * @author A303220
- */
 @Entity
 @Table(name = "TAN")
-public class CoronaVerficationTAN implements Serializable {
+public class CoronaVerificationTAN implements Serializable {
 
     @Column(name = "ID", nullable = false, precision = 19)
     @Id
@@ -154,7 +149,7 @@ public class CoronaVerficationTAN implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CoronaVerficationTAN other = (CoronaVerficationTAN) obj;
+        final CoronaVerificationTAN other = (CoronaVerificationTAN) obj;
         if (this.redeemed != other.redeemed) {
             return false;
         }

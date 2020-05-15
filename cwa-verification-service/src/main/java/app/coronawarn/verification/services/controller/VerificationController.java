@@ -24,6 +24,7 @@ import app.coronawarn.verification.services.domain.CoronaVerificationAppSession;
 import app.coronawarn.verification.services.domain.CoronaVerificationState;
 import app.coronawarn.verification.services.service.HashingService;
 import app.coronawarn.verification.services.service.LabServerService;
+import app.coronawarn.verification.services.service.TanService;
 import app.coronawarn.verification.services.service.VerificationAppSessionService;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -43,7 +44,8 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
-public class VerificationController {
+public class VerificationController
+{
 
     /**
      * The logger.
@@ -55,9 +57,12 @@ public class VerificationController {
 
     @Autowired
     private HashingService hashingService;
-    
+
     @Autowired
-    private LabServerService labServerService;    
+    private LabServerService labServerService;
+
+    @Autowired
+    private TanService tanService;
 
     /**
      * The default constructor.
@@ -130,14 +135,12 @@ public class VerificationController {
             method = RequestMethod.POST, value = "/testresult")
     public ResponseEntity<CoronaVerificationState> getTestState(@RequestBody String registrationToken) {
 
-        // “Get Test status” - Terminate the external API call  ------------ nachfragen???
         Optional<CoronaVerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken);
-        if(actual.isPresent()){
-            // - Do call rate limiting, to avoid overload of external API - ---------prüfen
+        if (actual.isPresent()) {
+            //TODO  - call rate limiting, to avoid overload of external API - --------- check by Julius
             String result = labServerService.callLabServerResult(actual.get().getGuidHash());
             return new ResponseEntity(result, HttpStatus.OK);
-        }
-        else{
+        } else {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
     }
@@ -151,18 +154,28 @@ public class VerificationController {
      */
     @RequestMapping(headers = {"content-type=application/json"},
             method = RequestMethod.POST, value = "/tan/verify")
-    public ResponseEntity verifyTAN(@RequestBody String tan) {
+    public ResponseEntity<String> verifyTAN(@RequestBody String tan) {
         /*TODO: 
-        1. Verify parameter TAN for syntax constraints
-        2. Obtain entity TAN by provided tan string
-        3. If entity TAN does not exist, exit with error HTTP 404
-        4. If current time is not between entity TAN.vaildFrom and TAN.validUntil,
-        exit with error HTTP 404
+        1.	Verify parameter TAN for syntax constraints
+        2.	Obtain entity TAN by provided tan string
+        3.	If entity TAN does not exist, exit with error HTTP 404
+        4.	If entity TAN redeemed is true exit with error HTTP 404
+        5.	If current time is not between entity TAN.vaildFrom and TAN.validUntil, exit with error HTTP 404
+        6.	Mark the TAN as redeemed
+
          */
-        try {
-            return new ResponseEntity(HttpStatus.OK);
-        } catch (Exception ex) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+
+        //TODO syntax constraints from Julius
+        boolean verified = tanService.syntaxVerification(tan);
+        boolean tanExist = tanService.checkTANAlreadyExist(tan);
+        boolean tanExpiry = tanService.checkTANExpiration(tan);
+        boolean tanRedeemed = tanService.checkTANRedeemed(tan);
+
+        if (verified && tanExist && tanExpiry && tanRedeemed){
+            return new ResponseEntity("valid", HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity("invalid", HttpStatus.NOT_FOUND);
         }
     }
 

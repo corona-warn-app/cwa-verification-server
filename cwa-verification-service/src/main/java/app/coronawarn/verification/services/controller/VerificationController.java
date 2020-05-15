@@ -82,10 +82,11 @@ public class VerificationController {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } else {
             LOG.info("Start generating a new registration token for the given hashed guid.");
-            String hashedRegistrationToken = hashingService.hash(UUID.randomUUID().toString());
+            String registrationToken = UUID.randomUUID().toString();
+            String hashedRegistrationToken = hashingService.hash(registrationToken);
             CoronaVerificationAppSession appSession = createAppSession(hashedGuid, hashedRegistrationToken);
             appSessionService.saveAppSession(appSession);
-            return new ResponseEntity(hashedRegistrationToken, HttpStatus.OK);
+            return new ResponseEntity(registrationToken, HttpStatus.OK);
         }
     }
 

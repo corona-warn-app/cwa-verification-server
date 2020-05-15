@@ -13,3 +13,4 @@ RUN cp ${WORK_DIR}/target/cwa-verification-service*.jar /usr/tsi/verification-se
 FROM gcr.io/distroless/java:11
 COPY --from=build /usr/tsi/verification-service/verification.jar .
 CMD ["verification.jar"]
+EXPOSE 8080

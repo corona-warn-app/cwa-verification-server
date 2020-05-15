@@ -149,36 +149,29 @@ public class VerificationController
      * This method verifies the transaction number (TAN).
      *
      * @param tan - the transaction number, which needs to be verified
-     * @return HTTP-Status 200, if the verification was successfull. Otherwise
-     * it will return HTTP 404.
+     * @return HTTP-Status 200, if the verification was successfull. 
+     * Otherwise it will return HTTP 404.
      */
-    @RequestMapping(headers = {"content-type=application/json"},
-            method = RequestMethod.POST, value = "/tan/verify")
+    @RequestMapping(headers = {"content-type=application/json"}, method = RequestMethod.POST, value = "/tan/verify")
     public ResponseEntity<String> verifyTAN(@RequestBody String tan) {
 
+        HttpStatus ret = HttpStatus.NOT_FOUND;
         //TODO syntax constraints from Julius
         boolean verified = tanService.syntaxVerification(tan);
 
-        if (verified){
+        if (verified) {
+            //TODO change in one DB call
             boolean tanExist = tanService.checkTANAlreadyExist(tan);
-            if(tanExist){
+            if (tanExist) {
                 boolean tanExpiry = tanService.checkTANExpiration(tan);
                 boolean tanRedeemed = tanService.checkTANRedeemed(tan);
-                if(tanExpiry && !tanRedeemed){
+                if (tanExpiry && !tanRedeemed) {
                     tanService.markTANRedeemed(tan);
-                    return new ResponseEntity("valid", HttpStatus.OK);
-                }
-                else{
-                    return new ResponseEntity("invalid", HttpStatus.NOT_FOUND);
+                    ret = HttpStatus.OK;
                 }
             }
-            else{
-                return new ResponseEntity("invalid", HttpStatus.NOT_FOUND);
-            }
         }
-        else {
-            return new ResponseEntity("invalid", HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity(ret);
     }
 
     /**

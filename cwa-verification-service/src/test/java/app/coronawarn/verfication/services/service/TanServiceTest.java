@@ -1,7 +1,7 @@
 /*
  * Corona-Warn-App / cwa-verification
  *
- * (C) 2020, A12248001, T-Systems International GmbH
+ * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
  * copyright owners license this file to you under the Apache
@@ -26,7 +26,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  *
- * @author a12248001
  */
 @RunWith(SpringRunner.class)
 public class TanServiceTest {
@@ -38,8 +37,8 @@ public class TanServiceTest {
      */
     @Test
     public void saveTanTest() throws Exception {
-        
+
     }
 
-  
+
 }

@@ -1,7 +1,7 @@
 /*
  * Corona-Warn-App / cwa-verification
  *
- * (C) 2020, A12248001, T-Systems International GmbH
+ * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
  * copyright owners license this file to you under the Apache
@@ -30,7 +30,6 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author a12248001
  */
 @Component
 public class HashingService {

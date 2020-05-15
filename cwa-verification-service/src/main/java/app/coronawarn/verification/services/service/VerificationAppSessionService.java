@@ -18,11 +18,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package app.coronawarn.verification.services.service;
 
 import app.coronawarn.verification.services.domain.CoronaVerificationAppSession;
 import app.coronawarn.verification.services.repository.AppSessionRepository;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,15 +37,33 @@ import org.springframework.stereotype.Component;
  * @author T-Systems International GmbH
  */
 @Component
-public class VerificationAppSessionService
-{
+public class VerificationAppSessionService {
+
     private static final Logger LOG = LogManager.getLogger();
 
     @Autowired
     private AppSessionRepository appSessionRepository;
 
     /**
-     * Persists the specified entity of {@link CoronaVerficationAppSession} instances.
+     * Creates an AppSession-Entity.
+     *
+     * @param hashedGuid
+     * @param hashedRegistrationToken
+     * @return
+     */
+    public CoronaVerificationAppSession generateAppSession(String hashedGuid, String hashedRegistrationToken) {
+        LOG.info("Create the app session entity with the created registration token and given guid.");
+        CoronaVerificationAppSession appSession = new CoronaVerificationAppSession();
+        appSession.setCreatedOn(LocalDateTime.now());
+        appSession.setGuidHash(hashedGuid);
+        appSession.setRegistrationTokenHash(hashedRegistrationToken);
+        appSession.setTanGenerated(false);
+        return appSession;
+    }
+
+    /**
+     * Persists the specified entity of {@link CoronaVerficationAppSession}
+     * instances.
      *
      * @param appSession the verification app session entity
      */
@@ -66,21 +84,22 @@ public class VerificationAppSessionService
         appSession.setRegistrationTokenHash(registrationTokenHash);
         return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
     }
-    
+
     /**
-     * Get existing CoronaVerificationAppSession for Reg Token from {@link AppSessionRepository}.
+     * Get existing CoronaVerificationAppSession for Reg Token from
+     * {@link AppSessionRepository}.
      *
      * @param registrationTokenHash the hashed registrationToken
-     * @return Optional CoronaVerificationAppSession 
+     * @return Optional CoronaVerificationAppSession
      */
     public Optional<CoronaVerificationAppSession> getAppSessionByToken(String registrationTokenHash) {
         LOG.info("VerficationAppSessionService start getAppSessionByToken.");
         CoronaVerificationAppSession appSession = new CoronaVerificationAppSession();
         appSession.setRegistrationTokenHash(registrationTokenHash);
         return appSessionRepository.findOne(Example.of(appSession, ExampleMatcher.matching()));
-    }    
+    }
 
-     /**
+    /**
      * Check for existing GUID Token in the {@link AppSessionRepository}.
      *
      * @param guid the hashed guid

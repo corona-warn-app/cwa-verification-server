@@ -40,7 +40,7 @@ public class CoronaVerificationTAN implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "TAN_HASH", columnDefinition = "VARCHAR2(64)")
+    @Column(name = "TAN_HASH", columnDefinition = "VARCHAR2(255)")
     @Basic
     private String tanHash;
 
@@ -59,6 +59,10 @@ public class CoronaVerificationTAN implements Serializable {
     @Column(name = "REDEEMED", columnDefinition = "BIT")
     @Basic
     private boolean redeemed;
+
+    @Column(name = "TYPE", columnDefinition = "VARCHAR2(255)")
+    @Basic
+    private String type;
 
     @Column(name = "CREATED_ON", columnDefinition = "DATETIME(6)")
     @Basic
@@ -116,6 +120,14 @@ public class CoronaVerificationTAN implements Serializable {
         this.redeemed = redeemed;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public LocalDateTime getCreatedOn() {
         return createdOn;
     }
@@ -127,14 +139,15 @@ public class CoronaVerificationTAN implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 37 * hash + Objects.hashCode(this.id);
-        hash = 37 * hash + Objects.hashCode(this.tanHash);
-        hash = 37 * hash + Objects.hashCode(this.validFrom);
-        hash = 37 * hash + Objects.hashCode(this.validUntil);
-        hash = 37 * hash + Objects.hashCode(this.sourceOfTrust);
-        hash = 37 * hash + (this.redeemed ? 1 : 0);
-        hash = 37 * hash + Objects.hashCode(this.createdOn);
-        hash = 37 * hash + (int) (this.objVersion ^ (this.objVersion >>> 32));
+        hash = 53 * hash + Objects.hashCode(this.id);
+        hash = 53 * hash + Objects.hashCode(this.tanHash);
+        hash = 53 * hash + Objects.hashCode(this.validFrom);
+        hash = 53 * hash + Objects.hashCode(this.validUntil);
+        hash = 53 * hash + Objects.hashCode(this.sourceOfTrust);
+        hash = 53 * hash + (this.redeemed ? 1 : 0);
+        hash = 53 * hash + Objects.hashCode(this.type);
+        hash = 53 * hash + Objects.hashCode(this.createdOn);
+        hash = 53 * hash + (int) (this.objVersion ^ (this.objVersion >>> 32));
         return hash;
     }
 
@@ -159,6 +172,9 @@ public class CoronaVerificationTAN implements Serializable {
         if (!Objects.equals(this.sourceOfTrust, other.sourceOfTrust)) {
             return false;
         }
+        if (!Objects.equals(this.type, other.type)) {
+            return false;
+        }
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }
@@ -173,10 +189,11 @@ public class CoronaVerificationTAN implements Serializable {
 
     @Override
     public String toString() {
-        return "CoronaVerficationTAN{" + "id=" + id + ", tanHash=" + tanHash + ", "
-                + "validFrom=" + validFrom + ", validUntil=" + validUntil + ", "
-                + "sourceOfTrust=" + sourceOfTrust + ", redeemed=" + redeemed + ", "
-                + "createdOn=" + createdOn + ", objVersion=" + objVersion + '}';
+        return "CoronaVerificationTAN{" + "id=" + id + ", tanHash=" + tanHash
+                + ", validFrom=" + validFrom + ", validUntil=" + validUntil
+                + ", sourceOfTrust=" + sourceOfTrust + ", redeemed=" + redeemed
+                + ", type=" + type + ", createdOn=" + createdOn
+                + ", objVersion=" + objVersion + '}';
     }
 
 }

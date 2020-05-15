@@ -25,9 +25,19 @@ package app.coronawarn.verification.services.domain;
  */
 public enum CoronaVerificationState
 {
-    PENDING,
-    NEGATIVE,
-    POSITIVE,
-    INVALID,
-    FAILED
+    PENDING(0),
+    NEGATIVE(1),
+    POSITIVE(2),
+    INVALID(3);
+    
+    private final int stateValue;
+
+    private CoronaVerificationState(Integer stateValue) {
+        this.stateValue = stateValue;
+    }
+
+    public int getStateValue() {
+        return stateValue;
+    }
+    
 }

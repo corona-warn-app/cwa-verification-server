@@ -21,6 +21,7 @@
 
 package app.coronawarn.verification.services.service;
 
+import app.coronawarn.verification.services.domain.CoronaVerificationState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,8 +53,8 @@ public class LabServerService
      * @param guidHash
      * @return lab server result
      */
-    public String callLabServerResult(String guidHash) {
+    public Integer callLabServerResult(String guidHash) {
         LOG.info("LabServerService start callLabServerResult.");
-        return restTemplate.postForObject( uri, guidHash, String.class);
+        return restTemplate.postForObject( uri, guidHash, Integer.class);
     }
 }

@@ -32,5 +32,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CoronaVerficationTANRepository extends JpaRepository<CoronaVerificationTAN, Long> {
-  boolean              existsByTanHash(String tanHash);
+
+    boolean existsByTanHash(String tanHash);
 }

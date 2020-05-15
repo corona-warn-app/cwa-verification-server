@@ -22,6 +22,8 @@ package app.coronawarn.verification.services.controller;
 
 import app.coronawarn.verification.services.domain.CoronaVerificationAppSession;
 import app.coronawarn.verification.services.domain.CoronaVerificationState;
+import app.coronawarn.verification.services.domain.CoronaVerificationTAN;
+import app.coronawarn.verification.services.domain.TANRequest;
 import app.coronawarn.verification.services.service.HashingService;
 import app.coronawarn.verification.services.service.LabServerService;
 import app.coronawarn.verification.services.service.TanService;
@@ -89,39 +91,83 @@ public class VerificationController
             LOG.info("Start generating a new registration token for the given hashed guid.");
             String registrationToken = UUID.randomUUID().toString();
             String hashedRegistrationToken = hashingService.hash(registrationToken);
-            CoronaVerificationAppSession appSession = createAppSession(hashedGuid, hashedRegistrationToken);
+            CoronaVerificationAppSession appSession = appSessionService.generateAppSession(hashedGuid, hashedRegistrationToken);
             appSessionService.saveAppSession(appSession);
             return new ResponseEntity(registrationToken, HttpStatus.OK);
         }
     }
 
     /**
-     * This method generates a transaction number (TAN), if the state of the
-     * corona test is positive.
+     * This method generates a transaction number (REGISTRATION_TOKEN), if the
+     * state of the corona test is positive.
      *
-     * @param registrationToken
-     * @return A generated TAN (with the HTTP-state 201 Created). Otherwise the
-     * HTTP-state 400 (Bad Request) will be returned, if an error occures.
+     * @param request The request with the two parameters: key and keyType.
+     * @return A generated REGISTRATION_TOKEN (with the HTTP-state 201 Created).
+     * Otherwise the HTTP-state 400 (Bad Request) will be returned, if an error
+     * occures.
      */
     @RequestMapping(headers = {"content-type=application/json"},
             method = RequestMethod.POST, value = "/tan")
-    public ResponseEntity<CoronaVerificationAppSession> generateTAN(@RequestBody String registrationToken) {
-        /* TODO: 
+    public ResponseEntity<String> generateTAN(@RequestBody TANRequest request) {
+        /* TODO:
         1. Verify Registration Token, if Registration Token is invalid, exit with error HTTP 400
         2. Get test result from Lab Sever
         3. Verify whether test result is positive, otherwise exit with error HTTP 400
-        4. generate TAN
-            a) Generate random TAN
-                - Check collision with existing TANs, if yes regenerate
-        5. Persist TAN as entity TAN
-        6. Update entity AppSession, mark as “used for TAN generation”
-        7. Return TAN string
+        4. generate REGISTRATION_TOKEN
+        a) Generate random REGISTRATION_TOKEN
+        - Check collision with existing TANs, if yes regenerate
+        5. Persist REGISTRATION_TOKEN as entity REGISTRATION_TOKEN
+        6. Update entity AppSession, mark as “used for REGISTRATION_TOKEN generation”
+        7. Return REGISTRATION_TOKEN string
+        
+        Anpassungen noch von Alex übernehmen:
+        Body: { 
+            "key": "<<key>>",
+            "keyType": “teleTAN||Token” 
+            }
+
          */
-        try {
-            return new ResponseEntity(new CoronaVerificationAppSession().getRegistrationTokenHash(), HttpStatus.CREATED);
-        } catch (Exception ex) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        String key = request.getKey();
+        CoronaVerificationTAN generatedTAN;
+        switch(request.getKeyType()) {
+            case TOKEN: 
+                Integer covidTestResult = getTestState(key).getBody();
+                if (covidTestResult != null) {
+                    
+                    //HASH HERE!!
+                    CoronaVerificationAppSession appSession = 
+                            appSessionService.getAppSessionByToken(key).get();
+                    if (covidTestResult.equals(CoronaVerificationState.POSITIVE.getStateValue())
+                            && !appSession.isTanGenerated()) {
+                        generatedTAN = tanService.generateCoronaVerificationTAN();
+                        appSession.setTanGenerated(true);
+                        appSessionService.saveAppSession(appSession);
+                        return new ResponseEntity(generatedTAN, HttpStatus.CREATED);
+                    }
+                }
+                break;
+            case TELETAN:
+                /* TODO: TeleTAN
+                    1.	Verify teleTAN
+                        - If validation fails return HTTP 400
+                    2. Generate TAN
+                    3. Mark teleTAN as redeemed
+                    4. Return TAN with HTTP 201
+                */
+                //hash here!!
+                Optional<CoronaVerificationTAN> teleTANEntity = tanService.getTANByHashedTAN(key);
+                if (teleTANEntity.isPresent() && !teleTANEntity.get().isRedeemed()) {
+                    generatedTAN = tanService.generateCoronaVerificationTAN();
+                    CoronaVerificationTAN teleTAN = teleTANEntity.get();
+                    teleTAN.setRedeemed(true);
+                    tanService.saveTan(teleTAN);
+                    return new ResponseEntity(generatedTAN, HttpStatus.CREATED);
+                }
+                break;
+            default: 
+                break;
         }
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -133,14 +179,15 @@ public class VerificationController
      */
     @RequestMapping(headers = {"content-type=application/json"},
             method = RequestMethod.POST, value = "/testresult")
-    public ResponseEntity<CoronaVerificationState> getTestState(@RequestBody String registrationToken) {
+    public ResponseEntity<Integer> getTestState(@RequestBody String registrationToken) {
 
         Optional<CoronaVerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken);
         if (actual.isPresent()) {
             //TODO  - call rate limiting, to avoid overload of external API - --------- check by Julius
-            String result = labServerService.callLabServerResult(actual.get().getGuidHash());
+            Integer result = labServerService.callLabServerResult(actual.get().getGuidHash());
             return new ResponseEntity(result, HttpStatus.OK);
         } else {
+            LOG.info("The registration token is invalid.");
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
     }
@@ -182,22 +229,5 @@ public class VerificationController
     @RequestMapping(method = RequestMethod.POST, value = "/tan/teletan")
     public ResponseEntity createTeleTAN() {
         return new ResponseEntity(HttpStatus.CREATED);
-    }
-
-    /**
-     * Creates an AppSession-Entity.
-     *
-     * @param hashedGuid
-     * @param hashedRegistrationToken
-     * @return
-     */
-    private CoronaVerificationAppSession createAppSession(String hashedGuid, String hashedRegistrationToken) {
-        LOG.info("Create the app session entity with the created registration token and given guid.");
-        CoronaVerificationAppSession appSession = new CoronaVerificationAppSession();
-        appSession.setCreatedOn(LocalDateTime.now());
-        appSession.setGuidHash(hashedGuid);
-        appSession.setRegistrationTokenHash(hashedRegistrationToken);
-        appSession.setTanGenerated(false);
-        return appSession;
     }
 }

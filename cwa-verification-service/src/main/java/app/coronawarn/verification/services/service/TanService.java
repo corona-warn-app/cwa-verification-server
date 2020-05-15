@@ -182,7 +182,7 @@ public class TanService
 
     private boolean hashTanAndCheckAvailability(String tan) {
         String tanHash = hashingService.hash(tan);
-        return tanRepository.existsByTanHash(tanHash);
+        return !tanRepository.existsByTanHash(tanHash);
     }
 
     private CoronaVerificationTAN generateCoronaVerificationTAN(String tan) {
@@ -196,6 +196,21 @@ public class TanService
         coronaVerificationTAN.setRedeemed(false);
 
         return coronaVerificationTAN;
+    }
+    
+    
+    /**
+     * Get existing CoronaVerificationTAN for hashed TAN from
+     * {@link CoronaVerificationTANRepository}.
+     *
+     * @param hashedTAN the hashed TAN
+     * @return Optional CoronaVerificationTAN
+     */
+    public Optional<CoronaVerificationTAN> getTANByHashedTAN(String hashedTAN) {
+        LOG.info("VerficationTANService start getTANByHashedTAN.");
+        CoronaVerificationTAN tanEntity = new CoronaVerificationTAN();
+        tanEntity.setTanHash(hashedTAN);
+        return tanRepository.findOne(Example.of(tanEntity, ExampleMatcher.matching()));
     }
 
 }

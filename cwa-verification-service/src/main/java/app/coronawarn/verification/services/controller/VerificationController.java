@@ -155,24 +155,26 @@ public class VerificationController
     @RequestMapping(headers = {"content-type=application/json"},
             method = RequestMethod.POST, value = "/tan/verify")
     public ResponseEntity<String> verifyTAN(@RequestBody String tan) {
-        /*TODO: 
-        1.	Verify parameter TAN for syntax constraints
-        2.	Obtain entity TAN by provided tan string
-        3.	If entity TAN does not exist, exit with error HTTP 404
-        4.	If entity TAN redeemed is true exit with error HTTP 404
-        5.	If current time is not between entity TAN.vaildFrom and TAN.validUntil, exit with error HTTP 404
-        6.	Mark the TAN as redeemed
-
-         */
 
         //TODO syntax constraints from Julius
         boolean verified = tanService.syntaxVerification(tan);
-        boolean tanExist = tanService.checkTANAlreadyExist(tan);
-        boolean tanExpiry = tanService.checkTANExpiration(tan);
-        boolean tanRedeemed = tanService.checkTANRedeemed(tan);
 
-        if (verified && tanExist && tanExpiry && tanRedeemed){
-            return new ResponseEntity("valid", HttpStatus.OK);
+        if (verified){
+            boolean tanExist = tanService.checkTANAlreadyExist(tan);
+            if(tanExist){
+                boolean tanExpiry = tanService.checkTANExpiration(tan);
+                boolean tanRedeemed = tanService.checkTANRedeemed(tan);
+                if(tanExpiry && !tanRedeemed){
+                    tanService.markTANRedeemed(tan);
+                    return new ResponseEntity("valid", HttpStatus.OK);
+                }
+                else{
+                    return new ResponseEntity("invalid", HttpStatus.NOT_FOUND);
+                }
+            }
+            else{
+                return new ResponseEntity("invalid", HttpStatus.NOT_FOUND);
+            }
         }
         else {
             return new ResponseEntity("invalid", HttpStatus.NOT_FOUND);

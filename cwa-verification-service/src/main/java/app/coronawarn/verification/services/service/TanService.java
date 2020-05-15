@@ -23,11 +23,14 @@ package app.coronawarn.verification.services.service;
 import app.coronawarn.verification.services.domain.CoronaVerificationTAN;
 import app.coronawarn.verification.services.repository.CoronaVerficationTANRepository;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
 
 /**
@@ -90,7 +93,15 @@ public class TanService
      * @return TAN expiration flag
      */
     public boolean checkTANExpiration(String tan) {
-        return true;
+        LOG.info("TanService start checkTANExpiration.");
+        CoronaVerificationTAN verificationTAN = new CoronaVerificationTAN();
+        verificationTAN.setTanHash(hashingService.hash(tan));
+        Optional<CoronaVerificationTAN> actual =  tanRepository.findOne(Example.of(verificationTAN, ExampleMatcher.matching()));
+        //TODO check if actual.isPresent()
+        LocalDateTime dateTimeUntil = actual.get().getValidUntil();
+        LocalDateTime dateTimeFrom = actual.get().getValidFrom();
+        LocalDateTime dateTimeNow = LocalDateTime.now();
+        return !(dateTimeNow.isBefore(dateTimeFrom) || dateTimeNow.isAfter(dateTimeUntil));
     }
 
     /**
@@ -100,8 +111,28 @@ public class TanService
      * @return TAN redeemed flag
      */
     public boolean checkTANRedeemed(String tan) {
-        return true;
+        LOG.info("TanService start checkTANRedeemed.");
+        CoronaVerificationTAN verificationTAN = new CoronaVerificationTAN();
+        verificationTAN.setTanHash(hashingService.hash(tan));
+        Optional<CoronaVerificationTAN> actual =  tanRepository.findOne(Example.of(verificationTAN, ExampleMatcher.matching()));
+        //TODO check if actual.isPresent()
+        return actual.get().isRedeemed();
     }
+    
+    /**
+     * Mark TAN entity as redeemed and save. 
+     *
+     * @param tan the TAN
+     */
+    public void markTANRedeemed(String tan) {
+        LOG.info("TanService start markTANRedeemed.");
+        CoronaVerificationTAN verificationTAN = new CoronaVerificationTAN();
+        verificationTAN.setTanHash(hashingService.hash(tan));
+        Optional<CoronaVerificationTAN> actual =  tanRepository.findOne(Example.of(verificationTAN, ExampleMatcher.matching()));
+        //TODO check if actual.isPresent()
+        actual.get().setRedeemed(true);
+        tanRepository.save(actual.get());        
+    }    
 
     /**
      * Returns the a Valid Tan String

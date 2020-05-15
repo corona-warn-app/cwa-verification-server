@@ -1,7 +1,7 @@
 /*
  * Corona-Warn-App / cwa-verification
  *
- * (C) 2020, A12248001, T-Systems International GmbH
+ * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
  * copyright owners license this file to you under the Apache
@@ -34,7 +34,6 @@ import java.util.UUID;
 /**
  * This class represents the TanService service.
  *
- * @author a12248001
  */
 @Component
 public class TanService {

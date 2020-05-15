@@ -2,7 +2,7 @@ FROM maven:3.6.3-jdk-11 as build
 
 ARG WORK_DIR=/.
 
-COPY . ${WORK_DIR}/
+COPY . ${WORK_DIR}
 WORKDIR ${WORK_DIR}
 
 RUN mkdir -p /root/.m2 /usr/tsi/verification-service

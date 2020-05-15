@@ -1,7 +1,7 @@
 /*
  * Corona-Warn-App / cwa-verification
  *
- * (C) 2020, A34639288, T-Systems International GmbH
+ * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
  * copyright owners license this file to you under the Apache 
@@ -41,7 +41,6 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * This class represents the rest controller for the verification service.
  *
- * @author A34639288
  */
 @RestController
 public class VerificationController {

@@ -8,7 +8,7 @@ WORKDIR ${WORK_DIR}
 RUN mkdir -p /root/.m2 /usr/tsi/verification-service
 RUN cd ${WORK_DIR}
 RUN mvn -B -DskipTests=true ${MAVEN_ARGS} clean install
-RUN cp ${WORK_DIR}/services/verification-service/target/verification-service-*.jar /usr/tsi/verification-service
+RUN cp ${WORK_DIR}/target/verification-service-*.jar /usr/tsi/verification-service
 
 FROM gcr.io/distroless/java:11
 COPY --from=build /usr/tsi/verification-service/verification-service*.jar .

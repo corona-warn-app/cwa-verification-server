@@ -24,7 +24,6 @@ import app.coronawarn.verification.services.domain.CoronaVerificationAppSession;
 import app.coronawarn.verification.services.domain.CoronaVerificationState;
 import app.coronawarn.verification.services.domain.CoronaVerificationTAN;
 import app.coronawarn.verification.services.domain.TANRequest;
-import app.coronawarn.verification.services.service.HashingService;
 import app.coronawarn.verification.services.service.LabServerService;
 import app.coronawarn.verification.services.service.TanService;
 import app.coronawarn.verification.services.service.VerificationAppSessionService;
@@ -58,9 +57,6 @@ public class VerificationController
     private VerificationAppSessionService appSessionService;
 
     @Autowired
-    private HashingService hashingService;
-
-    @Autowired
     private LabServerService labServerService;
 
     @Autowired
@@ -90,8 +86,7 @@ public class VerificationController
         } else {
             LOG.info("Start generating a new registration token for the given hashed guid.");
             String registrationToken = UUID.randomUUID().toString();
-            String hashedRegistrationToken = hashingService.hash(registrationToken);
-            CoronaVerificationAppSession appSession = appSessionService.generateAppSession(hashedGuid, hashedRegistrationToken);
+            CoronaVerificationAppSession appSession = appSessionService.generateAppSession(hashedGuid, registrationToken);
             appSessionService.saveAppSession(appSession);
             return new ResponseEntity(registrationToken, HttpStatus.OK);
         }

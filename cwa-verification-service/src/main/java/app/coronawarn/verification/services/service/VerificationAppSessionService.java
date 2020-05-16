@@ -51,15 +51,15 @@ public class VerificationAppSessionService {
      * Creates an AppSession-Entity.
      *
      * @param hashedGuid
-     * @param hashedRegistrationToken
+     * @param registrationToken
      * @return
      */
-    public CoronaVerificationAppSession generateAppSession(String hashedGuid, String hashedRegistrationToken) {
+    public CoronaVerificationAppSession generateAppSession(String hashedGuid, String registrationToken) {
         LOG.info("Create the app session entity with the created registration token and given guid.");
         CoronaVerificationAppSession appSession = new CoronaVerificationAppSession();
         appSession.setCreatedOn(LocalDateTime.now());
         appSession.setGuidHash(hashedGuid);
-        appSession.setRegistrationTokenHash(hashedRegistrationToken);
+        appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
         appSession.setTanGenerated(false);
         return appSession;
     }

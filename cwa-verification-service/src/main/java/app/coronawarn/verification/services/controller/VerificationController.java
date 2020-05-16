@@ -109,36 +109,15 @@ public class VerificationController
     @RequestMapping(headers = {"content-type=application/json"},
             method = RequestMethod.POST, value = "/tan")
     public ResponseEntity<String> generateTAN(@RequestBody TANRequest request) {
-        /* TODO:
-        1. Verify Registration Token, if Registration Token is invalid, exit with error HTTP 400
-        2. Get test result from Lab Sever
-        3. Verify whether test result is positive, otherwise exit with error HTTP 400
-        4. generate REGISTRATION_TOKEN
-        a) Generate random REGISTRATION_TOKEN
-        - Check collision with existing TANs, if yes regenerate
-        5. Persist REGISTRATION_TOKEN as entity REGISTRATION_TOKEN
-        6. Update entity AppSession, mark as “used for REGISTRATION_TOKEN generation”
-        7. Return REGISTRATION_TOKEN string
-        
-        Anpassungen noch von Alex übernehmen:
-        Body: { 
-            "key": "<<key>>",
-            "keyType": “teleTAN||Token” 
-            }
 
-         */
         String key = request.getKey();
-        CoronaVerificationTAN generatedTAN;
-        switch(request.getKeyType()) {
-            case TOKEN: 
+        String generatedTAN;
+        switch (request.getKeyType()) {
+            case TOKEN:
                 Integer covidTestResult = getTestState(key).getBody();
                 if (covidTestResult != null) {
-                    
-                    //HASH HERE!!
-                    CoronaVerificationAppSession appSession = 
-                            appSessionService.getAppSessionByToken(key).get();
-                    if (covidTestResult.equals(CoronaVerificationState.POSITIVE.getStateValue())
-                            && !appSession.isTanGenerated()) {
+                    CoronaVerificationAppSession appSession = appSessionService.getAppSessionByToken(key).get();
+                    if (covidTestResult.equals(CoronaVerificationState.POSITIVE.getStateValue()) && !appSession.isTanGenerated()) {
                         generatedTAN = tanService.generateCoronaVerificationTAN();
                         appSession.setTanGenerated(true);
                         appSessionService.saveAppSession(appSession);
@@ -147,15 +126,7 @@ public class VerificationController
                 }
                 break;
             case TELETAN:
-                /* TODO: TeleTAN
-                    1.	Verify teleTAN
-                        - If validation fails return HTTP 400
-                    2. Generate TAN
-                    3. Mark teleTAN as redeemed
-                    4. Return TAN with HTTP 201
-                */
-                //hash here!!
-                Optional<CoronaVerificationTAN> teleTANEntity = tanService.getTANByHashedTAN(key);
+                Optional<CoronaVerificationTAN> teleTANEntity = tanService.getEntityByTAN(key);
                 if (teleTANEntity.isPresent() && !teleTANEntity.get().isRedeemed()) {
                     generatedTAN = tanService.generateCoronaVerificationTAN();
                     CoronaVerificationTAN teleTAN = teleTANEntity.get();
@@ -164,7 +135,7 @@ public class VerificationController
                     return new ResponseEntity(generatedTAN, HttpStatus.CREATED);
                 }
                 break;
-            default: 
+            default:
                 break;
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -193,32 +164,34 @@ public class VerificationController
     }
 
     /**
-     * This method verifies the transaction number (TAN).
+     * This provided REST method verifies the transaction number (TAN).
      *
      * @param tan - the transaction number, which needs to be verified
      * @return HTTP-Status 200, if the verification was successfull. 
-     * Otherwise it will return HTTP 404.
+     * Otherwise return HTTP 404.
      */
     @RequestMapping(headers = {"content-type=application/json"}, method = RequestMethod.POST, value = "/tan/verify")
     public ResponseEntity<String> verifyTAN(@RequestBody String tan) {
 
-        HttpStatus ret = HttpStatus.NOT_FOUND;
-        //TODO syntax constraints from Julius
-        boolean verified = tanService.syntaxVerification(tan);
+        boolean verified = false;
+        //TODO TAN syntax constraints from Julius
+        boolean syntaxVerified = tanService.syntaxVerification(tan);
 
-        if (verified) {
-            //TODO change in one DB call
-            boolean tanExist = tanService.checkTANAlreadyExist(tan);
-            if (tanExist) {
-                boolean tanExpiry = tanService.checkTANExpiration(tan);
-                boolean tanRedeemed = tanService.checkTANRedeemed(tan);
-                if (tanExpiry && !tanRedeemed) {
-                    tanService.markTANRedeemed(tan);
-                    ret = HttpStatus.OK;
+        if (syntaxVerified) {
+            Optional<CoronaVerificationTAN> optional = tanService.getEntityByTAN(tan);
+            if (optional.isPresent()) {
+                CoronaVerificationTAN cvtan = optional.get();
+                LocalDateTime dateTimeNow = LocalDateTime.now();
+                boolean tanTimeValid = dateTimeNow.isAfter(cvtan.getValidFrom()) && dateTimeNow.isBefore(cvtan.getValidUntil());
+                boolean tanRedeemed = cvtan.isRedeemed();
+                if (tanTimeValid && !tanRedeemed) {
+                    cvtan.setRedeemed(true);
+                    tanService.saveTan(cvtan);
+                    verified = true;
                 }
             }
         }
-        return new ResponseEntity(ret);
+        return new ResponseEntity(verified ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -228,6 +201,7 @@ public class VerificationController
      */
     @RequestMapping(method = RequestMethod.POST, value = "/tan/teletan")
     public ResponseEntity createTeleTAN() {
+        //TODO implement
         return new ResponseEntity(HttpStatus.CREATED);
     }
 }

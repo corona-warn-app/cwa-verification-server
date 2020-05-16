@@ -20,10 +20,7 @@
  */
 package app.coronawarn.verification.services.service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -43,14 +40,15 @@ public class HashingService {
      * @return the hash of the supplied string
      */
     public String hash(String toHash) {
-        MessageDigest digest = null;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            LOG.error("Failed to use Hashfunction {}", e.getMessage());
-        }
-        byte[] hashed = digest.digest(
-                toHash.getBytes(StandardCharsets.UTF_8));
-        return Arrays.toString(hashed);
+//        MessageDigest digest = null;
+//        try {
+//            digest = MessageDigest.getInstance("SHA-256");
+//        } catch (NoSuchAlgorithmException e) {
+//            LOG.error("Failed to use Hashfunction {}", e.getMessage());
+//        }
+//        byte[] hashed = digest.digest(
+//                toHash.getBytes(StandardCharsets.UTF_8));
+//        return Arrays.toString(hashed);
+        return DigestUtils.sha256Hex(toHash);
     }
 }

@@ -43,6 +43,9 @@ public class VerificationAppSessionService {
 
     @Autowired
     private AppSessionRepository appSessionRepository;
+    
+    @Autowired
+    private HashingService hashingService;    
 
     /**
      * Creates an AppSession-Entity.
@@ -89,13 +92,13 @@ public class VerificationAppSessionService {
      * Get existing CoronaVerificationAppSession for Reg Token from
      * {@link AppSessionRepository}.
      *
-     * @param registrationTokenHash the hashed registrationToken
+     * @param registrationToken the registrationToken
      * @return Optional CoronaVerificationAppSession
      */
-    public Optional<CoronaVerificationAppSession> getAppSessionByToken(String registrationTokenHash) {
+    public Optional<CoronaVerificationAppSession> getAppSessionByToken(String registrationToken) {
         LOG.info("VerficationAppSessionService start getAppSessionByToken.");
         CoronaVerificationAppSession appSession = new CoronaVerificationAppSession();
-        appSession.setRegistrationTokenHash(registrationTokenHash);
+        appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
         return appSessionRepository.findOne(Example.of(appSession, ExampleMatcher.matching()));
     }
 

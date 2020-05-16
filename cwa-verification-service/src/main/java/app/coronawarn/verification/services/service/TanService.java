@@ -57,11 +57,12 @@ public class TanService
     /**
      * This Method generates a valid Tan and persists it
      *
-     * @return CoronaVerificationTAN of the generated Tan
+     * @return the generated Tan
      */
-    public CoronaVerificationTAN generateCoronaVerificationTAN() {
+    public String generateCoronaVerificationTAN() {
         String tan = generateValidTan();
-        return persistTan(tan);
+        persistTan(tan);
+        return tan;
     }
 
     /**
@@ -85,54 +86,6 @@ public class TanService
     public boolean syntaxVerification(String tan) {
         return true;
     }
-
-    /**
-     * Check TAN Expiration.
-     *
-     * @param tan the TAN
-     * @return TAN expiration flag
-     */
-    public boolean checkTANExpiration(String tan) {
-        LOG.info("TanService start checkTANExpiration.");
-        CoronaVerificationTAN verificationTAN = new CoronaVerificationTAN();
-        verificationTAN.setTanHash(hashingService.hash(tan));
-        Optional<CoronaVerificationTAN> actual =  tanRepository.findOne(Example.of(verificationTAN, ExampleMatcher.matching()));
-        //TODO check if actual.isPresent()
-        LocalDateTime dateTimeUntil = actual.get().getValidUntil();
-        LocalDateTime dateTimeFrom = actual.get().getValidFrom();
-        LocalDateTime dateTimeNow = LocalDateTime.now();
-        return !(dateTimeNow.isBefore(dateTimeFrom) || dateTimeNow.isAfter(dateTimeUntil));
-    }
-
-    /**
-     * Check TAN redeemed.
-     *
-     * @param tan the TAN
-     * @return TAN redeemed flag
-     */
-    public boolean checkTANRedeemed(String tan) {
-        LOG.info("TanService start checkTANRedeemed.");
-        CoronaVerificationTAN verificationTAN = new CoronaVerificationTAN();
-        verificationTAN.setTanHash(hashingService.hash(tan));
-        Optional<CoronaVerificationTAN> actual =  tanRepository.findOne(Example.of(verificationTAN, ExampleMatcher.matching()));
-        //TODO check if actual.isPresent()
-        return actual.get().isRedeemed();
-    }
-    
-    /**
-     * Mark TAN entity as redeemed and save. 
-     *
-     * @param tan the TAN
-     */
-    public void markTANRedeemed(String tan) {
-        LOG.info("TanService start markTANRedeemed.");
-        CoronaVerificationTAN verificationTAN = new CoronaVerificationTAN();
-        verificationTAN.setTanHash(hashingService.hash(tan));
-        Optional<CoronaVerificationTAN> actual =  tanRepository.findOne(Example.of(verificationTAN, ExampleMatcher.matching()));
-        //TODO check if actual.isPresent()
-        actual.get().setRedeemed(true);
-        tanRepository.save(actual.get());        
-    }    
 
     /**
      * Returns the a Valid Tan String
@@ -198,18 +151,17 @@ public class TanService
         return coronaVerificationTAN;
     }
     
-    
     /**
-     * Get existing CoronaVerificationTAN for hashed TAN from
+     * Get existing CoronaVerificationTAN by TAN from
      * {@link CoronaVerificationTANRepository}.
      *
-     * @param hashedTAN the hashed TAN
+     * @param tan the TAN
      * @return Optional CoronaVerificationTAN
      */
-    public Optional<CoronaVerificationTAN> getTANByHashedTAN(String hashedTAN) {
+    public Optional<CoronaVerificationTAN> getEntityByTAN(String tan) {
         LOG.info("VerficationTANService start getTANByHashedTAN.");
         CoronaVerificationTAN tanEntity = new CoronaVerificationTAN();
-        tanEntity.setTanHash(hashedTAN);
+        tanEntity.setTanHash(hashingService.hash(tan));
         return tanRepository.findOne(Example.of(tanEntity, ExampleMatcher.matching()));
     }
 

@@ -40,7 +40,7 @@ public class CoronaVerificationTAN implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "TAN_HASH", columnDefinition = "VARCHAR2(255)")
+    @Column(name = "TAN_HASH", columnDefinition = "VARCHAR2(64)")
     @Basic
     private String tanHash;
 

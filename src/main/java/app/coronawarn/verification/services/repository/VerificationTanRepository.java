@@ -20,7 +20,7 @@
  */
 package app.coronawarn.verification.services.repository;
 
-import app.coronawarn.verification.services.domain.VerificationTAN;
+import app.coronawarn.verification.services.domain.VerificationTan;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Repository;
  * @author T-Systems International GmbH
  */
 @Repository
-public interface VerificationTANRepository extends JpaRepository<VerificationTAN, Long> {
+public interface VerificationTanRepository extends JpaRepository<VerificationTan, Long> {
 
     boolean existsByTanHash(String tanHash);
 }

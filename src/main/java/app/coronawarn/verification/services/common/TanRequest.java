@@ -25,7 +25,7 @@ import java.util.Objects;
 /**
  * This class represents a tan request.
  */
-public class TANRequest {
+public class TanRequest {
 
     /**
      * The key which can be a teletan or a regestration token.
@@ -35,7 +35,7 @@ public class TANRequest {
     /**
      * The type of key, which can be "token" or "teleTAN".
      */
-    private TANKeyType keyType;
+    private TanKeyType keyType;
 
     public String getKey() {
         return key;
@@ -45,11 +45,11 @@ public class TANRequest {
         this.key = key;
     }
 
-    public TANKeyType getKeyType() {
+    public TanKeyType getKeyType() {
         return keyType;
     }
 
-    public void setKeyType(TANKeyType tanType) {
+    public void setKeyType(TanKeyType tanType) {
         this.keyType = tanType;
     }
     
@@ -72,7 +72,7 @@ public class TANRequest {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final TANRequest other = (TANRequest) obj;
+        final TanRequest other = (TanRequest) obj;
         if (!Objects.equals(this.key, other.key)) {
             return false;
         }

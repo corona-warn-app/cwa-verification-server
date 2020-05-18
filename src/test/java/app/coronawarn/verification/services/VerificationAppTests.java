@@ -21,9 +21,9 @@
 package app.coronawarn.verification.services;
 
 import app.coronawarn.verification.services.domain.VerificationAppSession;
-import app.coronawarn.verification.services.domain.VerificationTAN;
-import app.coronawarn.verification.services.common.TANKeyType;
-import app.coronawarn.verification.services.common.TANRequest;
+import app.coronawarn.verification.services.domain.VerificationTan;
+import app.coronawarn.verification.services.common.TanKeyType;
+import app.coronawarn.verification.services.common.TanRequest;
 import app.coronawarn.verification.services.service.LabServerService;
 import app.coronawarn.verification.services.service.TanService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -110,9 +110,9 @@ public class VerificationAppTests {
 
         prepareAppSessionTestData();
 
-        TANRequest request = new TANRequest();
+        TanRequest request = new TanRequest();
         request.setKey(TEST_REG_TOK);
-        request.setKeyType(TANKeyType.TOKEN);
+        request.setKeyType(TanKeyType.TOKEN);
 
         given(this.labServerService.callLabServerResult(TEST_GUI_HASH)).willReturn(TEST_LAB_POSITIVE_RESULT);
 
@@ -200,12 +200,12 @@ public class VerificationAppTests {
         LOG.info("VerficationAppTests callVerifyTAN()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
-        given(this.tanService.getEntityByTAN(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
+        given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
 
         mockMvc.perform(post("/tan/verify").contentType(MediaType.APPLICATION_JSON).content(TEST_TAN))
                 .andExpect(status().isOk());
 
-        assertTrue("Is TAN redeemed?", this.tanService.getEntityByTAN(TEST_TAN).get().isRedeemed());
+        assertTrue("Is TAN redeemed?", this.tanService.getEntityByTan(TEST_TAN).get().isRedeemed());
     }
 
     /**
@@ -218,7 +218,7 @@ public class VerificationAppTests {
         LOG.info("VerficationAppTests callVerifyTANByVerificationTANIsEmpty()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
-        // without mock tanService.getEntityByTAN so this method will return empty entity
+        // without mock tanService.getEntityByTan so this method will return empty entity
 
         mockMvc.perform(post("/tan/verify").contentType(MediaType.APPLICATION_JSON).content(TEST_TAN))
                 .andExpect(status().isNotFound());
@@ -234,7 +234,7 @@ public class VerificationAppTests {
         LOG.info("VerficationAppTests callVerifyTANByTanSyntaxFailed()");
 
         // without mock tanService.syntaxVerification so this method will return false
-        given(this.tanService.getEntityByTAN(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
+        given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
 
         mockMvc.perform(post("/tan/verify").contentType(MediaType.APPLICATION_JSON).content(TEST_TAN))
                 .andExpect(status().isNotFound());
@@ -250,10 +250,10 @@ public class VerificationAppTests {
         LOG.info("VerficationAppTests callVerifyTANByTanSyntaxFailed()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
-        VerificationTAN cvtan = getVerificationTANTestData();
+        VerificationTan cvtan = getVerificationTANTestData();
         // setValidFrom later 2 days then now
         cvtan.setValidFrom(LocalDateTime.now().plusDays(2));
-        given(this.tanService.getEntityByTAN(TEST_TAN)).willReturn(Optional.of(cvtan));
+        given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
         mockMvc.perform(post("/tan/verify").contentType(MediaType.APPLICATION_JSON).content(TEST_TAN))
                 .andExpect(status().isNotFound());
@@ -269,10 +269,10 @@ public class VerificationAppTests {
         LOG.info("VerficationAppTests callVerifyTANByTanSyntaxFailed()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
-        VerificationTAN cvtan = getVerificationTANTestData();
+        VerificationTan cvtan = getVerificationTANTestData();
         // setValidUntil earlier 2 days then now
         cvtan.setValidUntil(LocalDateTime.now().minusDays(2));
-        given(this.tanService.getEntityByTAN(TEST_TAN)).willReturn(Optional.of(cvtan));
+        given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
         mockMvc.perform(post("/tan/verify").contentType(MediaType.APPLICATION_JSON).content(TEST_TAN))
                 .andExpect(status().isNotFound());
@@ -288,10 +288,10 @@ public class VerificationAppTests {
         LOG.info("VerficationAppTests callVerifyTANByIsRedeemed()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
-        VerificationTAN cvtan = getVerificationTANTestData();
+        VerificationTan cvtan = getVerificationTANTestData();
         // tan is redeemed
         cvtan.setRedeemed(true);
-        given(this.tanService.getEntityByTAN(TEST_TAN)).willReturn(Optional.of(cvtan));
+        given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
         mockMvc.perform(post("/tan/verify").contentType(MediaType.APPLICATION_JSON).content(TEST_TAN))
                 .andExpect(status().isNotFound());
@@ -311,8 +311,8 @@ public class VerificationAppTests {
         return cv;
     }
 
-    private VerificationTAN getVerificationTANTestData() {
-        VerificationTAN cvtan = new VerificationTAN();
+    private VerificationTan getVerificationTANTestData() {
+        VerificationTan cvtan = new VerificationTan();
         cvtan.setCreatedOn(LocalDateTime.now());
         cvtan.setRedeemed(false);
         cvtan.setSourceOfTrust(TEST_SOT);

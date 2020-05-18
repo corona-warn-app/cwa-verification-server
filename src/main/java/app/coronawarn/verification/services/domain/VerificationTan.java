@@ -36,7 +36,7 @@ import javax.persistence.Version;
  */
 @Entity
 @Table(name = "TAN")
-public class VerificationTAN implements Serializable {
+public class VerificationTan implements Serializable {
 
     @Column(name = "ID", nullable = false, precision = 19)
     @Id
@@ -165,7 +165,7 @@ public class VerificationTAN implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final VerificationTAN other = (VerificationTAN) obj;
+        final VerificationTan other = (VerificationTan) obj;
         if (this.redeemed != other.redeemed) {
             return false;
         }

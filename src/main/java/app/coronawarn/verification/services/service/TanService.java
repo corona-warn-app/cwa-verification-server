@@ -20,8 +20,8 @@
  */
 package app.coronawarn.verification.services.service;
 
-import app.coronawarn.verification.services.common.TANType;
-import app.coronawarn.verification.services.domain.VerificationTAN;
+import app.coronawarn.verification.services.common.TanType;
+import app.coronawarn.verification.services.domain.VerificationTan;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
-import app.coronawarn.verification.services.repository.VerificationTANRepository;
+import app.coronawarn.verification.services.repository.VerificationTanRepository;
 
 /**
  * This class represents the TanService service.
@@ -55,7 +55,7 @@ public class TanService {
      * The {@link VerficationTANRepository}.
      */
     @Autowired
-    VerificationTANRepository tanRepository;
+    VerificationTanRepository tanRepository;
 
     /**
      * The {@link HashingService}.
@@ -65,23 +65,23 @@ public class TanService {
 
     /**
      * This Method generates a valid TAN and persists it.
+     * Returns the generated TAN.
      *
-     * @return the generated TAN
+     * @return
      */
-    public String generateVerificationTAN() {
+    public String generateVerificationTan() {
         String tan = generateValidTan();
-        persistTan(tan, TANType.TAN);
+        persistTan(tan, TanType.TAN);
         return tan;
     }
 
     /**
-     * This Method tries to create a valid TAN from the parameter and persists
-     * it, if the TAN is valid.
+     * Saves a {@link VerificationTan} into the database.
      *
-     * @param tan that will be hashed and persisted
-     * @return the hash of the supplied string
+     * @param tan {@link VerificationTan}
+     * @return {@link VerificationTan}
      */
-    public VerificationTAN saveTan(VerificationTAN tan) {
+    public VerificationTan saveTan(VerificationTan tan) {
         return tanRepository.save(tan);
     }
 
@@ -108,7 +108,6 @@ public class TanService {
             newTan = generateTanFromUUID();
             validTan = hashTanAndCheckAvailability(newTan);
         }
-        LOG.debug("Generated new Tan %s", newTan);
         return newTan;
     }
 
@@ -118,26 +117,25 @@ public class TanService {
      * @param tan the TAN
      * @return flag for existing TAN
      */
-    public boolean checkTANAlreadyExist(String tan) {
+    public boolean checkTanAlreadyExist(String tan) {
         return hashTanAndCheckAvailability(tan);
     }
 
     /**
-     * This method generates a {@link VerificationTAN} - entity and saves it.
+     * This method generates a {@link VerificationTan} - entity and saves it.
      *
      * @param tan
      * @param tanType
      * @return
      */
-    private VerificationTAN persistTan(String tan, TANType tanType) {
-        VerificationTAN newTan = generateVerificationTAN(tan, tanType);
+    private VerificationTan persistTan(String tan, TanType tanType) {
+        VerificationTan newTan = TanService.this.generateVerificationTan(tan, tanType);
         return tanRepository.save(newTan);
     }
 
     /**
-     * Returns the hash of the supplied string
-     *
-     * @return the hash of the supplied string
+     * Returns the hash of the supplied string.
+     * @return 
      */
     public String generateTeleTan() {
         //TODO clarify generation of Teletan
@@ -154,11 +152,11 @@ public class TanService {
         return !tanRepository.existsByTanHash(tanHash);
     }
 
-    private VerificationTAN generateVerificationTAN(String tan, TANType tanType) {
+    private VerificationTan generateVerificationTan(String tan, TanType tanType) {
         LocalDateTime from = LocalDateTime.now();
         LocalDateTime until = from.plusSeconds(TAN_VALID_IN_SECONDS);
 
-        VerificationTAN verificationTAN = new VerificationTAN();
+        VerificationTan verificationTAN = new VerificationTan();
         verificationTAN.setTanHash(hashingService.hash(tan));
         verificationTAN.setValidFrom(from);
         verificationTAN.setValidUntil(until);
@@ -169,15 +167,15 @@ public class TanService {
     }
 
     /**
-     * Get existing VerificationTAN by TAN from
-     * {@link VerificationTANRepository}.
+     * Get existing VerificationTan by TAN from
+     * {@link VerificationTanRepository}.
      *
      * @param tan the TAN
-     * @return Optional VerificationTAN
+     * @return Optional VerificationTan
      */
-    public Optional<VerificationTAN> getEntityByTAN(String tan) {
-        LOG.info("VerficationTANService start getEntityByTAN.");
-        VerificationTAN tanEntity = new VerificationTAN();
+    public Optional<VerificationTan> getEntityByTan(String tan) {
+        LOG.info("VerficationTANService start getEntityByTan.");
+        VerificationTan tanEntity = new VerificationTan();
         tanEntity.setTanHash(hashingService.hash(tan));
         return tanRepository.findOne(Example.of(tanEntity, ExampleMatcher.matching()));
     }

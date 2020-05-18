@@ -21,9 +21,9 @@
 package app.coronawarn.verification.services.controller;
 
 import app.coronawarn.verification.services.common.LabTestResult;
-import app.coronawarn.verification.services.common.TANRequest;
+import app.coronawarn.verification.services.common.TanRequest;
 import app.coronawarn.verification.services.domain.VerificationAppSession;
-import app.coronawarn.verification.services.domain.VerificationTAN;
+import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.service.AppSessionService;
 import app.coronawarn.verification.services.service.LabServerService;
 import app.coronawarn.verification.services.service.TanService;
@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -75,8 +76,7 @@ public class VerificationController
      * @param hashedGuid
      * @return the created registration token.
      */
-    @RequestMapping(headers = {"content-type=application/json"},
-            method = RequestMethod.POST, value = "/registrationToken")
+    @PostMapping("/registrationToken")
     public ResponseEntity<String> generateRegistrationToken(@RequestBody String hashedGuid) {
 
         if (appSessionService.checkGuidExists(hashedGuid)) {
@@ -100,9 +100,8 @@ public class VerificationController
      * Otherwise the HTTP-state 400 (Bad Request) will be returned, if an error
      * occures.
      */
-    @RequestMapping(headers = {"content-type=application/json"},
-            method = RequestMethod.POST, value = "/tan")
-    public ResponseEntity<String> generateTAN(@RequestBody TANRequest request) {
+    @PostMapping("/tan")
+    public ResponseEntity<String> generateTAN(@RequestBody TanRequest request) {
 
         String key = request.getKey();
         String generatedTAN;
@@ -112,7 +111,7 @@ public class VerificationController
                 if (covidTestResult != null) {
                     VerificationAppSession appSession = appSessionService.getAppSessionByToken(key).get();
                     if (covidTestResult.equals(LabTestResult.POSITIVE.getTestResult()) && !appSession.isTanGenerated()) {
-                        generatedTAN = tanService.generateVerificationTAN();
+                        generatedTAN = tanService.generateVerificationTan();
                         appSession.setTanGenerated(true);
                         appSessionService.saveAppSession(appSession);
                         return new ResponseEntity(generatedTAN, HttpStatus.CREATED);
@@ -120,10 +119,10 @@ public class VerificationController
                 }
                 break;
             case TELETAN:
-                Optional<VerificationTAN> teleTANEntity = tanService.getEntityByTAN(key);
+                Optional<VerificationTan> teleTANEntity = tanService.getEntityByTan(key);
                 if (teleTANEntity.isPresent() && !teleTANEntity.get().isRedeemed()) {
-                    generatedTAN = tanService.generateVerificationTAN();
-                    VerificationTAN teleTAN = teleTANEntity.get();
+                    generatedTAN = tanService.generateVerificationTan();
+                    VerificationTan teleTAN = teleTANEntity.get();
                     teleTAN.setRedeemed(true);
                     tanService.saveTan(teleTAN);
                     return new ResponseEntity(generatedTAN, HttpStatus.CREATED);
@@ -145,8 +144,7 @@ public class VerificationController
      * @return the test result / status of the COVID-19 test, which can be
      * POSITIVE, NEGATIVE, INVALID, PENDING or FAILED
      */
-    @RequestMapping(headers = {"content-type=application/json"},
-            method = RequestMethod.POST, value = "/testresult")
+    @PostMapping("/testresult")
     public ResponseEntity<Integer> getTestState(@RequestBody String registrationToken) {
 
         Optional<VerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken);
@@ -167,7 +165,7 @@ public class VerificationController
      * @return HTTP-Status 200, if the verification was successfull. 
      * Otherwise return HTTP 404.
      */
-    @RequestMapping(headers = {"content-type=application/json"}, method = RequestMethod.POST, value = "/tan/verify")
+    @PostMapping("/tan/verify")
     public ResponseEntity<String> verifyTAN(@RequestBody String tan) {
 
         boolean verified = false;
@@ -175,9 +173,9 @@ public class VerificationController
         boolean syntaxVerified = tanService.syntaxVerification(tan);
 
         if (syntaxVerified) {
-            Optional<VerificationTAN> optional = tanService.getEntityByTAN(tan);
+            Optional<VerificationTan> optional = tanService.getEntityByTan(tan);
             if (optional.isPresent()) {
-                VerificationTAN cvtan = optional.get();
+                VerificationTan cvtan = optional.get();
                 LocalDateTime dateTimeNow = LocalDateTime.now();
                 boolean tanTimeValid = dateTimeNow.isAfter(cvtan.getValidFrom()) && dateTimeNow.isBefore(cvtan.getValidUntil());
                 boolean tanRedeemed = cvtan.isRedeemed();
@@ -196,7 +194,7 @@ public class VerificationController
      *
      * @return a created teletan
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/tan/teletan")
+    @PostMapping("/tan/teletan")
     public ResponseEntity createTeleTAN() {
         //TODO implement
         return new ResponseEntity(HttpStatus.CREATED);

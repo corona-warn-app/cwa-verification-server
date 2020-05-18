@@ -23,7 +23,7 @@ package app.coronawarn.verification.services.common;
 /**
  * This class represent the different key types of transaction numbers (TANs).
  */
-public enum TANKeyType {
+public enum TanKeyType {
 
     /**
      * The key type registration token.

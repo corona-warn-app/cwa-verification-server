@@ -23,7 +23,7 @@ package app.coronawarn.verification.services.common;
 /**
  * This class represents the different types of tans.
  */
-public enum TANType {
+public enum TanType {
     /**
      * The general tan.
      */

@@ -22,8 +22,8 @@
 package app.coronawarn.verification.services.client;
 
 import feign.Headers;
-import feign.RequestLine;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * This class represents the Labor Server service client.
@@ -31,14 +31,13 @@ import org.springframework.cloud.openfeign.FeignClient;
  * @author T-Systems International GmbH
  */
 
-@FeignClient(name="LabServerService", url= "${uri.endpoint.labserver.result}")
+@FeignClient(name="labServerService", url= "${uri.endpoint.labserver}")
 public interface LabServerService
 {
-    @RequestLine("POST /api/v1/app/result")
-    // @PostMapping(value = "/api/v1/app/result")
+    @PostMapping(value = "/api/v1/app/result")
     @Headers({
         "Accept: application/json",
         "Content-Type: application/json"
     })
-    int result(Guid guid);
+    TestResult result(Guid guid);
 }

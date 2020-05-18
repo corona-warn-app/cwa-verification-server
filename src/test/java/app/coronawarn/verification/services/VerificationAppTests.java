@@ -22,6 +22,7 @@ package app.coronawarn.verification.services;
 
 import app.coronawarn.verification.services.client.Guid;
 import app.coronawarn.verification.services.client.LabServerService;
+import app.coronawarn.verification.services.client.TestResult;
 import app.coronawarn.verification.services.common.TanKeyType;
 import app.coronawarn.verification.services.common.TanRequest;
 import app.coronawarn.verification.services.domain.VerificationAppSession;
@@ -53,7 +54,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -88,7 +89,7 @@ public class VerificationAppTests {
     public static final String TEST_GUI_HASH = "12542154785411";
     public static final String TEST_REG_TOK = "1234567890";
     public static final String TEST_REG_TOK_HASH = "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646";
-    public static final Integer TEST_LAB_POSITIVE_RESULT = 2; //Positive
+    public static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2);
 
     public static final String TEST_TAN = "1ea6ce8a-9740-11ea-bb37-0242ac130002";
     public static final String TEST_SOT = "connectedLab17";
@@ -167,12 +168,11 @@ public class VerificationAppTests {
 
         prepareAppSessionTestData();
 
-        //given(this.appSessionService.getAppSessionByToken(TEST_REG_TOK)).willReturn(Optional.of(getAppSessionTestData()));
         given(this.labServerService.result(new Guid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
         mockMvc.perform(post("/testresult").contentType(MediaType.APPLICATION_JSON).content(TEST_REG_TOK))
                 .andExpect(status().isOk())
-                .andExpect(content().string(String.valueOf(TEST_LAB_POSITIVE_RESULT)));
+                .andExpect(jsonPath("$").value(TEST_LAB_POSITIVE_RESULT.getTestResult()));
     }
 
     /**

@@ -25,14 +25,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * This class represents the GUID.
+ * This class represents the TestResult.
  *
  * @author T-Systems International GmbH
  */
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Guid {
-	private String id;
+public class TestResult
+{
+    private int testResult;
 }

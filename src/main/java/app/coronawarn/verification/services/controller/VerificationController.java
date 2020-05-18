@@ -22,6 +22,7 @@ package app.coronawarn.verification.services.controller;
 
 import app.coronawarn.verification.services.client.Guid;
 import app.coronawarn.verification.services.client.LabServerService;
+import app.coronawarn.verification.services.client.TestResult;
 import app.coronawarn.verification.services.common.LabTestResult;
 import app.coronawarn.verification.services.common.TanRequest;
 import app.coronawarn.verification.services.domain.VerificationAppSession;
@@ -148,9 +149,9 @@ public class VerificationController
 
         Optional<VerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken);
         if (actual.isPresent()) {
-            //TODO  - call rate limiting, to avoid overload of external API - --------- check by Julius
-            Integer result = labServerService.result(new Guid(actual.get().getGuidHash()));
-            return new ResponseEntity(result, HttpStatus.OK);
+            //TODO Exception Handling 404 from LabServer
+            TestResult result = labServerService.result(new Guid(actual.get().getGuidHash()));
+            return new ResponseEntity(result.getTestResult(), HttpStatus.OK);
         } else {
             LOG.info("The registration token is invalid.");
             return new ResponseEntity(HttpStatus.BAD_REQUEST);

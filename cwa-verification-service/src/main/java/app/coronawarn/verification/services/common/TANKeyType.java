@@ -18,7 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package app.coronawarn.verification.services.domain;
+package app.coronawarn.verification.services.common;
 
 /**
  * This class represent the different key types of transaction numbers (TANs).

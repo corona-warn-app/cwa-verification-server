@@ -20,11 +20,10 @@
  */
 package app.coronawarn.verification.services;
 
-import app.coronawarn.verification.services.domain.CoronaVerificationAppSession;
-import app.coronawarn.verification.services.domain.CoronaVerificationTAN;
-import app.coronawarn.verification.services.domain.TANKeyType;
-import app.coronawarn.verification.services.domain.TANRequest;
-import app.coronawarn.verification.services.repository.AppSessionRepository;
+import app.coronawarn.verification.services.domain.VerificationAppSession;
+import app.coronawarn.verification.services.domain.VerificationTAN;
+import app.coronawarn.verification.services.common.TANKeyType;
+import app.coronawarn.verification.services.common.TANRequest;
 import app.coronawarn.verification.services.service.LabServerService;
 import app.coronawarn.verification.services.service.TanService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -54,6 +53,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import app.coronawarn.verification.services.repository.VerificationAppSessionRepository;
 
 /**
  *
@@ -63,8 +63,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest(properties = {"log4j.configurationFile=log4j2-test.xml"})
 @TestPropertySource("classpath:test.properties")
-public class CoronaVerificationAppTests
-{
+public class VerificationAppTests {
 
     static final Logger LOG = LogManager.getLogger();
 
@@ -73,7 +72,6 @@ public class CoronaVerificationAppTests
 
 //    @MockBean
 //    private VerificationAppSessionService appSessionService;
-
     @MockBean
     private LabServerService labServerService;
 
@@ -81,7 +79,7 @@ public class CoronaVerificationAppTests
     private TanService tanService;
 
     @Autowired
-    private AppSessionRepository appSessionrepository;
+    private VerificationAppSessionRepository appSessionrepository;
 
     @Autowired
     private ObjectMapper mapper;
@@ -95,9 +93,9 @@ public class CoronaVerificationAppTests
     public static final String TEST_SOT = "connectedLab17";
     public static final String TEST_HASHED_TAN = "16154ea91c2c59d6ef9d0e7f902a59283b1e7ff9111570d20139a4e6b1832876";
     public static final String TEST_TAN_TYPE = "TAN";
-    
+
     @BeforeEach
-    void setUp(){
+    void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
@@ -108,7 +106,7 @@ public class CoronaVerificationAppTests
      */
     @Test
     public void callGenerateTAN() throws Exception {
-        LOG.info("CoronaVerficationAppTests callGenerateTAN()");
+        LOG.info("VerficationAppTests callGenerateTAN()");
 
         prepareAppSessionTestData();
 
@@ -125,13 +123,13 @@ public class CoronaVerificationAppTests
         LOG.info("Got {} verfication entries from db repository.", count);
         assertTrue("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", count == 1);
 
-        List<CoronaVerificationAppSession> coronaVerficationList = appSessionrepository.findAll();
-        assertNotNull(coronaVerficationList);
-        assertEquals(TEST_GUI_HASH, coronaVerficationList.get(0).getGuidHash());
-        assertTrue(coronaVerficationList.get(0).isTanGenerated());
-        assertEquals(TEST_REG_TOK_HASH, coronaVerficationList.get(0).getRegistrationTokenHash());
+        List<VerificationAppSession> verficationList = appSessionrepository.findAll();
+        assertNotNull(verficationList);
+        assertEquals(TEST_GUI_HASH, verficationList.get(0).getGuidHash());
+        assertTrue(verficationList.get(0).isTanGenerated());
+        assertEquals(TEST_REG_TOK_HASH, verficationList.get(0).getRegistrationTokenHash());
     }
-    
+
     /**
      * Test get registration token.
      *
@@ -139,7 +137,7 @@ public class CoronaVerificationAppTests
      */
     @Test
     public void callGetRegistrationToken() throws Exception {
-        LOG.info("CoronaVerficationAppTests callGetRegistrationToken() ");
+        LOG.info("VerficationAppTests callGetRegistrationToken() ");
 
         mockMvc.perform(post("/registrationToken").contentType(MediaType.APPLICATION_JSON).content(TEST_GUI_HASH))
                 .andExpect(status().isOk());
@@ -148,12 +146,12 @@ public class CoronaVerificationAppTests
         LOG.info("Got {} verfication entries from db repository.", count);
         assertTrue("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", count == 1);
 
-        List<CoronaVerificationAppSession> coronaVerficationList = appSessionrepository.findAll();
-        assertNotNull(coronaVerficationList);
-        assertEquals(TEST_GUI_HASH, coronaVerficationList.get(0).getGuidHash());
-        assertFalse(coronaVerficationList.get(0).isTanGenerated());
-        assertNotNull(coronaVerficationList.get(0).getRegistrationTokenHash());
-    }    
+        List<VerificationAppSession> verficationList = appSessionrepository.findAll();
+        assertNotNull(verficationList);
+        assertEquals(TEST_GUI_HASH, verficationList.get(0).getGuidHash());
+        assertFalse(verficationList.get(0).isTanGenerated());
+        assertNotNull(verficationList.get(0).getRegistrationTokenHash());
+    }
 
     /**
      * Test getTestState.
@@ -162,8 +160,8 @@ public class CoronaVerificationAppTests
      */
     @Test
     public void callGetTestState() throws Exception {
-        LOG.info("CoronaVerficationAppTests callGetTestState()");
-        
+        LOG.info("VerficationAppTests callGetTestState()");
+
         prepareAppSessionTestData();
 
         //given(this.appSessionService.getAppSessionByToken(TEST_REG_TOK)).willReturn(Optional.of(getAppSessionTestData()));
@@ -181,8 +179,8 @@ public class CoronaVerificationAppTests
      */
     @Test
     public void callGetTestStateByAppSessionIsEmpty() throws Exception {
-        LOG.info("CoronaVerficationAppTests callGetTestStateByAppSessionIsEmpty()");
-        
+        LOG.info("VerficationAppTests callGetTestStateByAppSessionIsEmpty()");
+
         //clean the repo
         appSessionrepository.deleteAll();
 
@@ -199,10 +197,10 @@ public class CoronaVerificationAppTests
      */
     @Test
     public void callVerifyTAN() throws Exception {
-        LOG.info("CoronaVerficationAppTests callVerifyTAN()");
+        LOG.info("VerficationAppTests callVerifyTAN()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
-        given(this.tanService.getEntityByTAN(TEST_TAN)).willReturn(Optional.of(getCoronaVerificationTANTestData()));
+        given(this.tanService.getEntityByTAN(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
 
         mockMvc.perform(post("/tan/verify").contentType(MediaType.APPLICATION_JSON).content(TEST_TAN))
                 .andExpect(status().isOk());
@@ -217,7 +215,7 @@ public class CoronaVerificationAppTests
      */
     @Test
     public void callVerifyTANByVerificationTANIsEmpty() throws Exception {
-        LOG.info("CoronaVerficationAppTests callVerifyTANByVerificationTANIsEmpty()");
+        LOG.info("VerficationAppTests callVerifyTANByVerificationTANIsEmpty()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
         // without mock tanService.getEntityByTAN so this method will return empty entity
@@ -233,10 +231,10 @@ public class CoronaVerificationAppTests
      */
     @Test
     public void callVerifyTANByTanSyntaxFailed() throws Exception {
-        LOG.info("CoronaVerficationAppTests callVerifyTANByTanSyntaxFailed()");
+        LOG.info("VerficationAppTests callVerifyTANByTanSyntaxFailed()");
 
         // without mock tanService.syntaxVerification so this method will return false
-        given(this.tanService.getEntityByTAN(TEST_TAN)).willReturn(Optional.of(getCoronaVerificationTANTestData()));
+        given(this.tanService.getEntityByTAN(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
 
         mockMvc.perform(post("/tan/verify").contentType(MediaType.APPLICATION_JSON).content(TEST_TAN))
                 .andExpect(status().isNotFound());
@@ -249,10 +247,10 @@ public class CoronaVerificationAppTests
      */
     @Test
     public void callVerifyTANByExpiredTimeFrom() throws Exception {
-        LOG.info("CoronaVerficationAppTests callVerifyTANByTanSyntaxFailed()");
+        LOG.info("VerficationAppTests callVerifyTANByTanSyntaxFailed()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
-        CoronaVerificationTAN cvtan = getCoronaVerificationTANTestData();
+        VerificationTAN cvtan = getVerificationTANTestData();
         // setValidFrom later 2 days then now
         cvtan.setValidFrom(LocalDateTime.now().plusDays(2));
         given(this.tanService.getEntityByTAN(TEST_TAN)).willReturn(Optional.of(cvtan));
@@ -268,10 +266,10 @@ public class CoronaVerificationAppTests
      */
     @Test
     public void callVerifyTANByExpiredTimeUntil() throws Exception {
-        LOG.info("CoronaVerficationAppTests callVerifyTANByTanSyntaxFailed()");
+        LOG.info("VerficationAppTests callVerifyTANByTanSyntaxFailed()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
-        CoronaVerificationTAN cvtan = getCoronaVerificationTANTestData();
+        VerificationTAN cvtan = getVerificationTANTestData();
         // setValidUntil earlier 2 days then now
         cvtan.setValidUntil(LocalDateTime.now().minusDays(2));
         given(this.tanService.getEntityByTAN(TEST_TAN)).willReturn(Optional.of(cvtan));
@@ -287,10 +285,10 @@ public class CoronaVerificationAppTests
      */
     @Test
     public void callVerifyTANByIsRedeemed() throws Exception {
-        LOG.info("CoronaVerficationAppTests callVerifyTANByIsRedeemed()");
+        LOG.info("VerficationAppTests callVerifyTANByIsRedeemed()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
-        CoronaVerificationTAN cvtan = getCoronaVerificationTANTestData();
+        VerificationTAN cvtan = getVerificationTANTestData();
         // tan is redeemed
         cvtan.setRedeemed(true);
         given(this.tanService.getEntityByTAN(TEST_TAN)).willReturn(Optional.of(cvtan));
@@ -304,8 +302,8 @@ public class CoronaVerificationAppTests
         appSessionrepository.save(getAppSessionTestData());
     }
 
-    private CoronaVerificationAppSession getAppSessionTestData() {
-        CoronaVerificationAppSession cv = new CoronaVerificationAppSession();
+    private VerificationAppSession getAppSessionTestData() {
+        VerificationAppSession cv = new VerificationAppSession();
         cv.setGuidHash(TEST_GUI_HASH);
         cv.setTanGenerated(false);
         cv.setCreatedOn(LocalDateTime.now());
@@ -313,8 +311,8 @@ public class CoronaVerificationAppTests
         return cv;
     }
 
-    private CoronaVerificationTAN getCoronaVerificationTANTestData() {
-        CoronaVerificationTAN cvtan = new CoronaVerificationTAN();
+    private VerificationTAN getVerificationTANTestData() {
+        VerificationTAN cvtan = new VerificationTAN();
         cvtan.setCreatedOn(LocalDateTime.now());
         cvtan.setRedeemed(false);
         cvtan.setSourceOfTrust(TEST_SOT);

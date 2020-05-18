@@ -21,7 +21,7 @@
 
 package app.coronawarn.verification.services.service;
 
-import app.coronawarn.verification.services.domain.CoronaVerificationState;
+import app.coronawarn.verification.services.common.LabTestResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +48,7 @@ public class LabServerService
 
 
     /**
-     * Persists the specified entity of {@link CoronaVerficationAppSession} instances.
+     * Persists the specified entity of {@link VerficationAppSession} instances.
      *
      * @param guidHash
      * @return lab server result

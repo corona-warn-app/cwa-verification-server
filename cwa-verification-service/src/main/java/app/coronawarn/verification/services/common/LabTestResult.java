@@ -18,26 +18,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package app.coronawarn.verification.services.domain;
+package app.coronawarn.verification.services.common;
 
 /**
- * The possible states of the corona test.
+ * The possible result states of the COVID-19 lab-test.
  */
-public enum CoronaVerificationState
-{
+public enum LabTestResult {
     PENDING(0),
     NEGATIVE(1),
     POSITIVE(2),
     INVALID(3);
-    
-    private final int stateValue;
 
-    private CoronaVerificationState(Integer stateValue) {
-        this.stateValue = stateValue;
+    /**
+     * The identifier for the test result from the lab-server.
+     */
+    private final int testResult;
+
+    /**
+     * The constructor.
+     *
+     * @param stateValue
+     */
+    private LabTestResult(Integer stateValue) {
+        this.testResult = stateValue;
     }
 
-    public int getStateValue() {
-        return stateValue;
+    public int getTestResult() {
+        return testResult;
     }
-    
+
 }

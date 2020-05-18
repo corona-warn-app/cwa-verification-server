@@ -1,7 +1,7 @@
 /*
  * Corona-Warn-App / cwa-verification
  *
- * (C) 2020, A303220, T-Systems International GmbH
+ * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
  * copyright owners license this file to you under the Apache 
@@ -33,12 +33,10 @@ import javax.persistence.Version;
 
 /**
  * This class represents the AppSession-entity.
- *
- * @author A303220
  */
 @Entity
 @Table(name = "APP_SESSION")
-public class CoronaVerificationAppSession implements Serializable {
+public class VerificationAppSession implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -129,7 +127,7 @@ public class CoronaVerificationAppSession implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CoronaVerificationAppSession other = (CoronaVerificationAppSession) obj;
+        final VerificationAppSession other = (VerificationAppSession) obj;
         if (this.tanGenerated != other.tanGenerated) {
             return false;
         }
@@ -147,7 +145,7 @@ public class CoronaVerificationAppSession implements Serializable {
 
     @Override
     public String toString() {
-        return "CoronaVerficationAppSession{" + "id=" + id + ", guidHash=" + guidHash + ", "
+        return "VerficationAppSession{" + "id=" + id + ", guidHash=" + guidHash + ", "
                 + "registrationTokenHash=" + registrationTokenHash + ", "
                 + "tanGenerated=" + tanGenerated + ", createdOn=" + createdOn + ", "
                 + "objVersion=" + objVersion + '}';

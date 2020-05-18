@@ -1,7 +1,7 @@
 /*
  * Corona-Warn-App / cwa-verification
  *
- * (C) 2020, A303220, T-Systems International GmbH
+ * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
  * copyright owners license this file to you under the Apache
@@ -31,9 +31,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+/**
+ * This class represents the TAN - entity.
+ */
 @Entity
 @Table(name = "TAN")
-public class CoronaVerificationTAN implements Serializable {
+public class VerificationTAN implements Serializable {
 
     @Column(name = "ID", nullable = false, precision = 19)
     @Id
@@ -162,7 +165,7 @@ public class CoronaVerificationTAN implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CoronaVerificationTAN other = (CoronaVerificationTAN) obj;
+        final VerificationTAN other = (VerificationTAN) obj;
         if (this.redeemed != other.redeemed) {
             return false;
         }
@@ -189,7 +192,7 @@ public class CoronaVerificationTAN implements Serializable {
 
     @Override
     public String toString() {
-        return "CoronaVerificationTAN{" + "id=" + id + ", tanHash=" + tanHash
+        return "VerificationTAN{" + "id=" + id + ", tanHash=" + tanHash
                 + ", validFrom=" + validFrom + ", validUntil=" + validUntil
                 + ", sourceOfTrust=" + sourceOfTrust + ", redeemed=" + redeemed
                 + ", type=" + type + ", createdOn=" + createdOn

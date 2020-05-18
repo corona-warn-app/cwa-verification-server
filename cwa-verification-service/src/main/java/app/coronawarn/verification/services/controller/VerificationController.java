@@ -20,13 +20,13 @@
  */
 package app.coronawarn.verification.services.controller;
 
-import app.coronawarn.verification.services.domain.CoronaVerificationAppSession;
-import app.coronawarn.verification.services.domain.CoronaVerificationState;
-import app.coronawarn.verification.services.domain.CoronaVerificationTAN;
-import app.coronawarn.verification.services.domain.TANRequest;
+import app.coronawarn.verification.services.domain.VerificationAppSession;
+import app.coronawarn.verification.services.common.LabTestResult;
+import app.coronawarn.verification.services.domain.VerificationTAN;
+import app.coronawarn.verification.services.common.TANRequest;
 import app.coronawarn.verification.services.service.LabServerService;
 import app.coronawarn.verification.services.service.TanService;
-import app.coronawarn.verification.services.service.VerificationAppSessionService;
+import app.coronawarn.verification.services.service.AppSessionService;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,7 +54,7 @@ public class VerificationController
     private static final Logger LOG = LogManager.getLogger();
 
     @Autowired
-    private VerificationAppSessionService appSessionService;
+    private AppSessionService appSessionService;
 
     @Autowired
     private LabServerService labServerService;
@@ -85,19 +85,19 @@ public class VerificationController
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } else {
             LOG.info("Start generating a new registration token for the given hashed guid.");
-            String registrationToken = UUID.randomUUID().toString();
-            CoronaVerificationAppSession appSession = appSessionService.generateAppSession(hashedGuid, registrationToken);
+            String registrationToken = appSessionService.generateRegistrationToken();
+            VerificationAppSession appSession = appSessionService.generateAppSession(hashedGuid, registrationToken);
             appSessionService.saveAppSession(appSession);
             return new ResponseEntity(registrationToken, HttpStatus.OK);
         }
     }
 
     /**
-     * This method generates a transaction number (REGISTRATION_TOKEN), if the
-     * state of the corona test is positive.
+     * This method generates a transaction number by a TeleTAN or Registration Token, if the
+     * state of the COVID-19 lab-test is positive.
      *
      * @param request The request with the two parameters: key and keyType.
-     * @return A generated REGISTRATION_TOKEN (with the HTTP-state 201 Created).
+     * @return A generated TAN (with the HTTP-state 201 Created).
      * Otherwise the HTTP-state 400 (Bad Request) will be returned, if an error
      * occures.
      */
@@ -111,9 +111,9 @@ public class VerificationController
             case TOKEN:
                 Integer covidTestResult = getTestState(key).getBody();
                 if (covidTestResult != null) {
-                    CoronaVerificationAppSession appSession = appSessionService.getAppSessionByToken(key).get();
-                    if (covidTestResult.equals(CoronaVerificationState.POSITIVE.getStateValue()) && !appSession.isTanGenerated()) {
-                        generatedTAN = tanService.generateCoronaVerificationTAN();
+                    VerificationAppSession appSession = appSessionService.getAppSessionByToken(key).get();
+                    if (covidTestResult.equals(LabTestResult.POSITIVE.getTestResult()) && !appSession.isTanGenerated()) {
+                        generatedTAN = tanService.generateVerificationTAN();
                         appSession.setTanGenerated(true);
                         appSessionService.saveAppSession(appSession);
                         return new ResponseEntity(generatedTAN, HttpStatus.CREATED);
@@ -121,14 +121,17 @@ public class VerificationController
                 }
                 break;
             case TELETAN:
-                Optional<CoronaVerificationTAN> teleTANEntity = tanService.getEntityByTAN(key);
+                Optional<VerificationTAN> teleTANEntity = tanService.getEntityByTAN(key);
                 if (teleTANEntity.isPresent() && !teleTANEntity.get().isRedeemed()) {
-                    generatedTAN = tanService.generateCoronaVerificationTAN();
-                    CoronaVerificationTAN teleTAN = teleTANEntity.get();
+                    generatedTAN = tanService.generateVerificationTAN();
+                    VerificationTAN teleTAN = teleTANEntity.get();
                     teleTAN.setRedeemed(true);
                     tanService.saveTan(teleTAN);
                     return new ResponseEntity(generatedTAN, HttpStatus.CREATED);
                 }
+                LOG.info("The given teleTAN is invalid.");
+                
+                
                 break;
             default:
                 break;
@@ -147,7 +150,7 @@ public class VerificationController
             method = RequestMethod.POST, value = "/testresult")
     public ResponseEntity<Integer> getTestState(@RequestBody String registrationToken) {
 
-        Optional<CoronaVerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken);
+        Optional<VerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken);
         if (actual.isPresent()) {
             //TODO  - call rate limiting, to avoid overload of external API - --------- check by Julius
             Integer result = labServerService.callLabServerResult(actual.get().getGuidHash());
@@ -173,9 +176,9 @@ public class VerificationController
         boolean syntaxVerified = tanService.syntaxVerification(tan);
 
         if (syntaxVerified) {
-            Optional<CoronaVerificationTAN> optional = tanService.getEntityByTAN(tan);
+            Optional<VerificationTAN> optional = tanService.getEntityByTAN(tan);
             if (optional.isPresent()) {
-                CoronaVerificationTAN cvtan = optional.get();
+                VerificationTAN cvtan = optional.get();
                 LocalDateTime dateTimeNow = LocalDateTime.now();
                 boolean tanTimeValid = dateTimeNow.isAfter(cvtan.getValidFrom()) && dateTimeNow.isBefore(cvtan.getValidUntil());
                 boolean tanRedeemed = cvtan.isRedeemed();

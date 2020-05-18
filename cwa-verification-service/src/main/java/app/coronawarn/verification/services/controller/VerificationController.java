@@ -20,16 +20,15 @@
  */
 package app.coronawarn.verification.services.controller;
 
-import app.coronawarn.verification.services.domain.VerificationAppSession;
 import app.coronawarn.verification.services.common.LabTestResult;
-import app.coronawarn.verification.services.domain.VerificationTAN;
 import app.coronawarn.verification.services.common.TANRequest;
+import app.coronawarn.verification.services.domain.VerificationAppSession;
+import app.coronawarn.verification.services.domain.VerificationTAN;
+import app.coronawarn.verification.services.service.AppSessionService;
 import app.coronawarn.verification.services.service.LabServerService;
 import app.coronawarn.verification.services.service.TanService;
-import app.coronawarn.verification.services.service.AppSessionService;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

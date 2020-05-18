@@ -21,7 +21,6 @@
 
 package app.coronawarn.verification.services.service;
 
-import app.coronawarn.verification.services.common.LabTestResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;

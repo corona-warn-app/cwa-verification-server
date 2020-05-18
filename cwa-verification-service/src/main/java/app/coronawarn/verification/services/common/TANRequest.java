@@ -20,7 +20,6 @@
  */
 package app.coronawarn.verification.services.common;
 
-import app.coronawarn.verification.services.common.TANKeyType;
 import java.util.Objects;
 
 /**

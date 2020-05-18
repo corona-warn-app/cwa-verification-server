@@ -94,6 +94,8 @@ public class VerificationAppTests {
     public static final String TEST_HASHED_TAN = "16154ea91c2c59d6ef9d0e7f902a59283b1e7ff9111570d20139a4e6b1832876";
     public static final String TEST_TAN_TYPE = "TAN";
 
+    private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -319,7 +321,7 @@ public class VerificationAppTests {
         cvtan.setTanHash(TEST_HASHED_TAN);
         cvtan.setType(TEST_TAN_TYPE);
         cvtan.setValidFrom(LocalDateTime.now().minusDays(5));
-        cvtan.setValidUntil(LocalDateTime.now().plusDays(5));
+        cvtan.setValidUntil(TAN_VALID_UNTIL_IN_DAYS);
         return cvtan;
     }
 

@@ -46,11 +46,11 @@ public class TanService {
      */
     private static final Logger LOG = LogManager.getLogger();
 
-    @Value("${tan.valid.seconds}")
-    Integer TAN_VALID_IN_SECONDS;
-    @Value("${tan.tele.valid.seconds}")
-    Integer TELE_TAN_VALID_IN_SECONDS;
-
+    @Value("${tan.valid.days}")
+    Integer TAN_VALID_IN_DAYS;
+    @Value("${tan.tele.valid.days}")
+    Integer TELE_TAN_VALID_IN_DAYS;
+    
     /**
      * The {@link VerficationTANRepository}.
      */
@@ -154,7 +154,8 @@ public class TanService {
 
     private VerificationTan generateVerificationTan(String tan, TanType tanType) {
         LocalDateTime from = LocalDateTime.now();
-        LocalDateTime until = from.plusSeconds(TAN_VALID_IN_SECONDS);
+        LocalDateTime until = from.plusDays(TAN_VALID_IN_DAYS);
+
 
         VerificationTan verificationTAN = new VerificationTan();
         verificationTAN.setTanHash(hashingService.hash(tan));

@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
-import app.coronawarn.verification.services.repository.VerficationTANRepository;
+import app.coronawarn.verification.services.repository.VerificationTANRepository;
 
 /**
  * This class represents the TanService service.
@@ -55,7 +55,7 @@ public class TanService {
      * The {@link VerficationTANRepository}.
      */
     @Autowired
-    VerficationTANRepository tanRepository;
+    VerificationTANRepository tanRepository;
 
     /**
      * The {@link HashingService}.
@@ -176,7 +176,7 @@ public class TanService {
      * @return Optional VerificationTAN
      */
     public Optional<VerificationTAN> getEntityByTAN(String tan) {
-        LOG.info("VerficationTANService start getTANByHashedTAN.");
+        LOG.info("VerficationTANService start getEntityByTAN.");
         VerificationTAN tanEntity = new VerificationTAN();
         tanEntity.setTanHash(hashingService.hash(tan));
         return tanRepository.findOne(Example.of(tanEntity, ExampleMatcher.matching()));

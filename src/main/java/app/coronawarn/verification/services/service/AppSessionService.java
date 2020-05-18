@@ -52,7 +52,7 @@ public class AppSessionService {
     private VerificationAppSessionRepository appSessionRepository;
 
     /**
-     * The {@link ver
+     * The {@link HashingService}.
      */
     @Autowired
     private HashingService hashingService;
@@ -84,7 +84,7 @@ public class AppSessionService {
     }
 
     /**
-     * Persists the specified entity of {@link CoronaVerficationAppSession}
+     * Persists the specified entity of {@link VerificationAppSession}
      * instances.
      *
      * @param appSession the verification app session entity

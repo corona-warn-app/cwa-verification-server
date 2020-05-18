@@ -18,7 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package app.coronawarn.verification.services.service;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,27 +32,27 @@ import org.springframework.web.client.RestTemplate;
  * @author T-Systems International GmbH
  */
 @Component
-public class LabServerService
-{
+public class LabServerService {
+
     private static final Logger LOG = LogManager.getLogger();
-    
+
     /**
      * The uri of the lab server result service
      */
     @Value("${uri.endpoint.labserver.result}")
-    private String uri;    
-    
+    private String uri;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
-
     /**
-     * Persists the specified entity of {@link VerficationAppSession} instances.
+     * Calls the lab-server and returns the covid-19 test result for the given
+     * hashed guid.
      *
      * @param guidHash
      * @return lab server result
      */
     public Integer callLabServerResult(String guidHash) {
         LOG.info("LabServerService start callLabServerResult.");
-        return restTemplate.postForObject( uri, guidHash, Integer.class);
+        return restTemplate.postForObject(uri, guidHash, Integer.class);
     }
 }

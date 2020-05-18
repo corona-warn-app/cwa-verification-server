@@ -145,7 +145,7 @@ public class VerificationAppSession implements Serializable {
 
     @Override
     public String toString() {
-        return "VerficationAppSession{" + "id=" + id + ", guidHash=" + guidHash + ", "
+        return "VerificationAppSession{" + "id=" + id + ", guidHash=" + guidHash + ", "
                 + "registrationTokenHash=" + registrationTokenHash + ", "
                 + "tanGenerated=" + tanGenerated + ", createdOn=" + createdOn + ", "
                 + "objVersion=" + objVersion + '}';

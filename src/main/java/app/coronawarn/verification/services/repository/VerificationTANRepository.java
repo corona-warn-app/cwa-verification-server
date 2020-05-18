@@ -31,7 +31,7 @@ import org.springframework.stereotype.Repository;
  * @author T-Systems International GmbH
  */
 @Repository
-public interface VerficationTANRepository extends JpaRepository<VerificationTAN, Long> {
+public interface VerificationTANRepository extends JpaRepository<VerificationTAN, Long> {
 
     boolean existsByTanHash(String tanHash);
 }

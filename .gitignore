@@ -104,3 +104,4 @@ cwa-verification-service/.idea/modules.xml
 cwa-verification-service/.idea/misc.xml
 cwa-verification-service/cwa-verfication-service.iml
 cwa-verification-service/.idea/uiDesigner.xml
+/target/

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>app.coronawarn.verification</groupId>
-    <artifactId>cwa-verification-service</artifactId>
+    <artifactId>cwa-verification-servicer</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -24,6 +24,8 @@
         <java.version>11</java.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <lombok.version>1.18.12</lombok.version>
+        <feign.version>11.0</feign.version>
     </properties>
 
     <dependencies>
@@ -53,6 +55,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <version>2.2.2.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>        
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>

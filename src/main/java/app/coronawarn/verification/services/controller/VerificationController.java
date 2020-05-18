@@ -20,12 +20,13 @@
  */
 package app.coronawarn.verification.services.controller;
 
+import app.coronawarn.verification.services.client.Guid;
+import app.coronawarn.verification.services.client.LabServerService;
 import app.coronawarn.verification.services.common.LabTestResult;
 import app.coronawarn.verification.services.common.TanRequest;
 import app.coronawarn.verification.services.domain.VerificationAppSession;
 import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.service.AppSessionService;
-import app.coronawarn.verification.services.service.LabServerService;
 import app.coronawarn.verification.services.service.TanService;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -148,7 +149,7 @@ public class VerificationController
         Optional<VerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken);
         if (actual.isPresent()) {
             //TODO  - call rate limiting, to avoid overload of external API - --------- check by Julius
-            Integer result = labServerService.callLabServerResult(actual.get().getGuidHash());
+            Integer result = labServerService.result(new Guid(actual.get().getGuidHash()));
             return new ResponseEntity(result, HttpStatus.OK);
         } else {
             LOG.info("The registration token is invalid.");

@@ -20,11 +20,13 @@
  */
 package app.coronawarn.verification.services;
 
-import app.coronawarn.verification.services.domain.VerificationAppSession;
-import app.coronawarn.verification.services.domain.VerificationTan;
+import app.coronawarn.verification.services.client.Guid;
+import app.coronawarn.verification.services.client.LabServerService;
 import app.coronawarn.verification.services.common.TanKeyType;
 import app.coronawarn.verification.services.common.TanRequest;
-import app.coronawarn.verification.services.service.LabServerService;
+import app.coronawarn.verification.services.domain.VerificationAppSession;
+import app.coronawarn.verification.services.domain.VerificationTan;
+import app.coronawarn.verification.services.repository.VerificationAppSessionRepository;
 import app.coronawarn.verification.services.service.TanService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,7 +55,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import app.coronawarn.verification.services.repository.VerificationAppSessionRepository;
 
 /**
  *
@@ -116,7 +117,7 @@ public class VerificationAppTests {
         request.setKey(TEST_REG_TOK);
         request.setKeyType(TanKeyType.TOKEN);
 
-        given(this.labServerService.callLabServerResult(TEST_GUI_HASH)).willReturn(TEST_LAB_POSITIVE_RESULT);
+        given(this.labServerService.result(new Guid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
         mockMvc.perform(post("/tan").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(request)))
                 .andExpect(status().isCreated());
@@ -167,7 +168,7 @@ public class VerificationAppTests {
         prepareAppSessionTestData();
 
         //given(this.appSessionService.getAppSessionByToken(TEST_REG_TOK)).willReturn(Optional.of(getAppSessionTestData()));
-        given(this.labServerService.callLabServerResult(TEST_GUI_HASH)).willReturn(TEST_LAB_POSITIVE_RESULT);
+        given(this.labServerService.result(new Guid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
         mockMvc.perform(post("/testresult").contentType(MediaType.APPLICATION_JSON).content(TEST_REG_TOK))
                 .andExpect(status().isOk())
@@ -186,7 +187,7 @@ public class VerificationAppTests {
         //clean the repo
         appSessionrepository.deleteAll();
 
-        given(this.labServerService.callLabServerResult(TEST_GUI_HASH)).willReturn(TEST_LAB_POSITIVE_RESULT);
+        given(this.labServerService.result(new Guid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
         mockMvc.perform(post("/testresult").contentType(MediaType.APPLICATION_JSON).content(TEST_REG_TOK))
                 .andExpect(status().isBadRequest());

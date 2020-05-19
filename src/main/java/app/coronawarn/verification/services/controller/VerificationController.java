@@ -154,6 +154,7 @@ public class VerificationController
                 if (teleTANEntity.isPresent() && !teleTANEntity.get().isRedeemed()) {
                     generatedTAN = tanService.generateVerificationTan();
                     VerificationTan teleTAN = teleTANEntity.get();
+
                     teleTAN.setRedeemed(true);
                     tanService.saveTan(teleTAN);
                     return new ResponseEntity(new Tan(generatedTAN), HttpStatus.CREATED);

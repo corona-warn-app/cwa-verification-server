@@ -32,6 +32,7 @@ import app.coronawarn.verification.services.domain.VerificationAppSession;
 import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.service.AppSessionService;
 import app.coronawarn.verification.services.service.TanService;
+import io.swagger.annotations.ApiOperation;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
@@ -45,18 +46,42 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This class represents the rest controller for the verification service.
+ * This class represents the rest controller for the verification server.
  *
  */
 @RestController
 @RequestMapping("/version/v1")
 public class VerificationController
 {
-
     /**
      * The logger.
      */
     private static final Logger LOG = LogManager.getLogger();
+    
+    /**
+     * The route to the token registration endpoint.
+     */
+    public static final String REGISTRATION_TOKEN_ROUTE = "/registrationToken";
+    
+    /**
+     * The route to the tan generation endpoint.
+     */
+    public static final String TAN_ROUTE = "/tan";
+    
+    /**
+     * The route to the test status of the COVID-19 test endpoint.
+     */
+    public static final String TESTRESULT_ROUTE = "/testresult";    
+    
+    /**
+     * The route to the tan verification endpoint.
+     */
+    public static final String TAN_VERIFY_ROUTE = "/tan/verify";
+    
+    /**
+     * The route to the tele tan generation endpoint.
+     */
+    public static final String TELE_TAN_ROUTE = "/tan/teletan";
 
     @Autowired
     private AppSessionService appSessionService;
@@ -80,7 +105,8 @@ public class VerificationController
      * @param hashedGuid
      * @return RegistrationToken - the created registration token.
      */
-    @PostMapping("/registrationToken")
+    @ApiOperation(value = "Generates and return a registration token", response = RegistrationToken.class)
+    @PostMapping(REGISTRATION_TOKEN_ROUTE)
     public ResponseEntity<RegistrationToken> generateRegistrationToken(@RequestBody HashedGuid hashedGuid) {
 
         if (appSessionService.checkGuidExists(hashedGuid.getHashedGUID())) {
@@ -104,7 +130,8 @@ public class VerificationController
      * Otherwise the HTTP-state 400 (Bad Request) will be returned, if an error
      * occures.
      */
-    @PostMapping("/tan")
+    @ApiOperation(value = "Generates and return a transaction number by a TeleTAN or Registration Token", response = Tan.class)
+    @PostMapping(TAN_ROUTE)
     public ResponseEntity<Tan> generateTAN(@RequestBody TanRequest request) {
 
         String key = request.getKey();
@@ -146,7 +173,8 @@ public class VerificationController
      * @return the test result / status of the COVID-19 test, which can be
      * POSITIVE, NEGATIVE, INVALID, PENDING or FAILED
      */
-    @PostMapping("/testresult")
+    @ApiOperation(value = "Returns the test status of the COVID-19 test", response = TestResult.class)
+    @PostMapping(TESTRESULT_ROUTE)
     public ResponseEntity<TestResult> getTestState(@RequestBody RegistrationToken registrationToken) {
 
         Optional<VerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
@@ -167,7 +195,8 @@ public class VerificationController
      * @return HTTP-Status 200, if the verification was successfull. 
      * Otherwise return HTTP 404.
      */
-    @PostMapping("/tan/verify")
+    @ApiOperation(value = "Verifies the transaction number - TAN.")
+    @PostMapping(TAN_VERIFY_ROUTE)
     public ResponseEntity<Void> verifyTAN(@RequestBody Tan tan) {
 
         boolean verified = false;
@@ -196,7 +225,8 @@ public class VerificationController
      *
      * @return a created teletan
      */
-    @PostMapping("/tan/teletan")
+    @ApiOperation(value = "Creates a TeleTAN")
+    @PostMapping(TELE_TAN_ROUTE)
     public ResponseEntity createTeleTAN() {
         //TODO implement if the clarification about JWT is done
         return new ResponseEntity(HttpStatus.CREATED);

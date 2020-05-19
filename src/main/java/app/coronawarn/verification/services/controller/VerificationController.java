@@ -23,7 +23,10 @@ package app.coronawarn.verification.services.controller;
 import app.coronawarn.verification.services.client.Guid;
 import app.coronawarn.verification.services.client.LabServerService;
 import app.coronawarn.verification.services.client.TestResult;
+import app.coronawarn.verification.services.common.HashedGuid;
 import app.coronawarn.verification.services.common.LabTestResult;
+import app.coronawarn.verification.services.common.RegistrationToken;
+import app.coronawarn.verification.services.common.Tan;
 import app.coronawarn.verification.services.common.TanRequest;
 import app.coronawarn.verification.services.domain.VerificationAppSession;
 import app.coronawarn.verification.services.domain.VerificationTan;
@@ -70,24 +73,23 @@ public class VerificationController
     }
 
     /**
-     * This method generates a registrationToken, which will get stored with the
-     * guid.
+     * This method generates a registrationToken.
      *
      * @param hashedGuid
-     * @return the created registration token.
+     * @return RegistrationToken - the created registration token.
      */
     @PostMapping("/registrationToken")
-    public ResponseEntity<String> generateRegistrationToken(@RequestBody String hashedGuid) {
+    public ResponseEntity<RegistrationToken> generateRegistrationToken(@RequestBody HashedGuid hashedGuid) {
 
-        if (appSessionService.checkGuidExists(hashedGuid)) {
+        if (appSessionService.checkGuidExists(hashedGuid.getHashedGUID())) {
             LOG.warn("The registration token already exists for the hashed guid.");
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } else {
             LOG.info("Start generating a new registration token for the given hashed guid.");
             String registrationToken = appSessionService.generateRegistrationToken();
-            VerificationAppSession appSession = appSessionService.generateAppSession(hashedGuid, registrationToken);
+            VerificationAppSession appSession = appSessionService.generateAppSession(hashedGuid.getHashedGUID(), registrationToken);
             appSessionService.saveAppSession(appSession);
-            return new ResponseEntity(registrationToken, HttpStatus.OK);
+            return new ResponseEntity(new RegistrationToken(registrationToken), HttpStatus.OK);
         }
     }
 
@@ -101,20 +103,20 @@ public class VerificationController
      * occures.
      */
     @PostMapping("/tan")
-    public ResponseEntity<String> generateTAN(@RequestBody TanRequest request) {
+    public ResponseEntity<Tan> generateTAN(@RequestBody TanRequest request) {
 
         String key = request.getKey();
         String generatedTAN;
         switch (request.getKeyType()) {
             case TOKEN:
-                Integer covidTestResult = getTestState(key).getBody();
+                TestResult covidTestResult = getTestState(new RegistrationToken(key)).getBody();
                 if (covidTestResult != null) {
                     VerificationAppSession appSession = appSessionService.getAppSessionByToken(key).get();
-                    if (covidTestResult.equals(LabTestResult.POSITIVE.getTestResult()) && !appSession.isTanGenerated()) {
+                    if (covidTestResult.getTestResult() == LabTestResult.POSITIVE.getTestResult() && !appSession.isTanGenerated()) {
                         generatedTAN = tanService.generateVerificationTan();
                         appSession.setTanGenerated(true);
                         appSessionService.saveAppSession(appSession);
-                        return new ResponseEntity(generatedTAN, HttpStatus.CREATED);
+                        return new ResponseEntity(new Tan(generatedTAN), HttpStatus.CREATED);
                     }
                 }
                 break;
@@ -125,11 +127,9 @@ public class VerificationController
                     VerificationTan teleTAN = teleTANEntity.get();
                     teleTAN.setRedeemed(true);
                     tanService.saveTan(teleTAN);
-                    return new ResponseEntity(generatedTAN, HttpStatus.CREATED);
+                    return new ResponseEntity(new Tan(generatedTAN), HttpStatus.CREATED);
                 }
                 LOG.info("The given teleTAN is invalid.");
-                
-                
                 break;
             default:
                 break;
@@ -145,13 +145,13 @@ public class VerificationController
      * POSITIVE, NEGATIVE, INVALID, PENDING or FAILED
      */
     @PostMapping("/testresult")
-    public ResponseEntity<Integer> getTestState(@RequestBody String registrationToken) {
+    public ResponseEntity<TestResult> getTestState(@RequestBody RegistrationToken registrationToken) {
 
-        Optional<VerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken);
+        Optional<VerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
         if (actual.isPresent()) {
             //TODO Exception Handling 404 from LabServer
             TestResult result = labServerService.result(new Guid(actual.get().getGuidHash()));
-            return new ResponseEntity(result.getTestResult(), HttpStatus.OK);
+            return new ResponseEntity(result, HttpStatus.OK);
         } else {
             LOG.info("The registration token is invalid.");
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -166,14 +166,14 @@ public class VerificationController
      * Otherwise return HTTP 404.
      */
     @PostMapping("/tan/verify")
-    public ResponseEntity<String> verifyTAN(@RequestBody String tan) {
+    public ResponseEntity<Void> verifyTAN(@RequestBody Tan tan) {
 
         boolean verified = false;
         //TODO TAN syntax constraints from Julius
-        boolean syntaxVerified = tanService.syntaxVerification(tan);
+        boolean syntaxVerified = tanService.syntaxVerification(tan.getTan());
 
         if (syntaxVerified) {
-            Optional<VerificationTan> optional = tanService.getEntityByTan(tan);
+            Optional<VerificationTan> optional = tanService.getEntityByTan(tan.getTan());
             if (optional.isPresent()) {
                 VerificationTan cvtan = optional.get();
                 LocalDateTime dateTimeNow = LocalDateTime.now();
@@ -196,7 +196,7 @@ public class VerificationController
      */
     @PostMapping("/tan/teletan")
     public ResponseEntity createTeleTAN() {
-        //TODO implement
+        //TODO implement if the clarification about JWT is done
         return new ResponseEntity(HttpStatus.CREATED);
     }
 }

@@ -4,9 +4,9 @@
  * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
- * copyright owners license this file to you under the Apache 
- * License, Version 2.0 (the "License"); you may not use this 
- * file except in compliance with the License. 
+ * copyright owners license this file to you under the Apache
+ * License, Version 2.0 (the "License"); you may not use this
+ * file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -25,20 +25,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * This class represents a tan request.
+ * This class represents the transaction number.
+ *
+ * @author T-Systems International GmbH
  */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TanRequest {
-
-    /**
-     * The key which can be a teletan or a regestration token.
-     */
-    private String key;
-
-    /**
-     * The type of key, which can be "token" or "teleTAN".
-     */
-    private TanKeyType keyType;    
+public class Tan {
+	private String tan;
 }

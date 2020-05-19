@@ -34,5 +34,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HashedGuid {
-	private String hashedGUID;
+    private String hashedGUID;
 }

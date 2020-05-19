@@ -31,9 +31,8 @@ import org.springframework.web.bind.annotation.PostMapping;
  * @author T-Systems International GmbH
  */
 
-@FeignClient(name="labServerService", url= "${uri.endpoint.labserver}")
-public interface LabServerService
-{
+@FeignClient(name = "labServerService", url = "${uri.endpoint.labserver}")
+public interface LabServerService {
     @PostMapping(value = "/api/v1/app/result")
     @Headers({
         "Accept: application/json",

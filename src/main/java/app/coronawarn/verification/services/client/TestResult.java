@@ -32,7 +32,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TestResult
-{
+public class TestResult {
     private int testResult;
 }

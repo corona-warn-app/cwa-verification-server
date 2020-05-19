@@ -4,9 +4,9 @@
  * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
- * copyright owners license this file to you under the Apache 
- * License, Version 2.0 (the "License"); you may not use this 
- * file except in compliance with the License. 
+ * copyright owners license this file to you under the Apache
+ * License, Version 2.0 (the "License"); you may not use this
+ * file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -33,8 +33,6 @@ import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.service.AppSessionService;
 import app.coronawarn.verification.services.service.TanService;
 import io.swagger.annotations.ApiOperation;
-import java.time.LocalDateTime;
-import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,44 +43,39 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 /**
  * This class represents the rest controller for the verification server.
- *
  */
 @RestController
 @RequestMapping("/version/v1")
-public class VerificationController
-{
-    /**
-     * The logger.
-     */
-    private static final Logger LOG = LogManager.getLogger();
-    
+public class VerificationController {
     /**
      * The route to the token registration endpoint.
      */
     public static final String REGISTRATION_TOKEN_ROUTE = "/registrationToken";
-    
     /**
      * The route to the tan generation endpoint.
      */
     public static final String TAN_ROUTE = "/tan";
-    
     /**
      * The route to the test status of the COVID-19 test endpoint.
      */
-    public static final String TESTRESULT_ROUTE = "/testresult";    
-    
+    public static final String TESTRESULT_ROUTE = "/testresult";
     /**
      * The route to the tan verification endpoint.
      */
     public static final String TAN_VERIFY_ROUTE = "/tan/verify";
-    
     /**
      * The route to the tele tan generation endpoint.
      */
     public static final String TELE_TAN_ROUTE = "/tan/teletan";
-
+    /**
+     * The logger.
+     */
+    private static final Logger LOG = LogManager.getLogger();
     @Autowired
     private AppSessionService appSessionService;
 
@@ -193,7 +186,7 @@ public class VerificationController
      * This provided REST method verifies the transaction number (TAN).
      *
      * @param tan - the transaction number, which needs to be verified
-     * @return HTTP-Status 200, if the verification was successfull. 
+     * @return HTTP-Status 200, if the verification was successfull.
      * Otherwise return HTTP 404.
      */
     @ApiOperation(value = "Verifies the transaction number - TAN.")

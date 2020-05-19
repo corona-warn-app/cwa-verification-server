@@ -1,19 +1,19 @@
 liquibase:
-    enabled: false
+  enabled: false
 spring:
-    datasource:
-        driverClassName: org.h2.Driver
-        password: ''
-        url: jdbc:h2:mem:ELMO;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-        username: sa
-    jpa:
-        database-platform: org.hibernate.dialect.H2Dialect
+  datasource:
+    driverClassName: org.h2.Driver
+    password: ''
+    url: jdbc:h2:mem:ELMO;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
 tan:
-    tele:
-        valid:
-            days: 7
+  tele:
     valid:
-        days: 7
+      days: 7
+  valid:
+    days: 7
 uri:
-    endpoint:
-        labserver: http://labtestresults-test.telekom-healthcare.com:30000
+  endpoint:
+    labserver: http://labtestresults-test.telekom-healthcare.com:30000

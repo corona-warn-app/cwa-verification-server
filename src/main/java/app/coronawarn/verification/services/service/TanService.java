@@ -22,9 +22,7 @@ package app.coronawarn.verification.services.service;
 
 import app.coronawarn.verification.services.common.TanType;
 import app.coronawarn.verification.services.domain.VerificationTan;
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import app.coronawarn.verification.services.repository.VerificationTanRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +30,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
-import app.coronawarn.verification.services.repository.VerificationTanRepository;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * This class represents the TanService service.
- *
  */
 @Component
 public class TanService {
@@ -50,7 +50,7 @@ public class TanService {
     Integer TAN_VALID_IN_DAYS;
     @Value("${tan.tele.valid.days}")
     Integer TELE_TAN_VALID_IN_DAYS;
-    
+
     /**
      * The {@link VerificationTanRepository}.
      */
@@ -135,7 +135,8 @@ public class TanService {
 
     /**
      * Returns the hash of the supplied string.
-     * @return 
+     *
+     * @return
      */
     public String generateTeleTan() {
         //TODO clarify generation of Teletan

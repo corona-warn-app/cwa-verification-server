@@ -4,9 +4,9 @@
  * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
- * copyright owners license this file to you under the Apache 
- * License, Version 2.0 (the "License"); you may not use this 
- * file except in compliance with the License. 
+ * copyright owners license this file to you under the Apache
+ * License, Version 2.0 (the "License"); you may not use this
+ * file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -20,9 +20,6 @@
  */
 package app.coronawarn.verification.services.domain;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,6 +27,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * This class represents the AppSession-entity.
@@ -146,8 +146,8 @@ public class VerificationAppSession implements Serializable {
     @Override
     public String toString() {
         return "VerificationAppSession{" + "id=" + id + ", guidHash=" + guidHash + ", "
-                + "registrationTokenHash=" + registrationTokenHash + ", "
-                + "tanGenerated=" + tanGenerated + ", createdOn=" + createdOn + ", "
-                + "objVersion=" + objVersion + '}';
+            + "registrationTokenHash=" + registrationTokenHash + ", "
+            + "tanGenerated=" + tanGenerated + ", createdOn=" + createdOn + ", "
+            + "objVersion=" + objVersion + '}';
     }
 }

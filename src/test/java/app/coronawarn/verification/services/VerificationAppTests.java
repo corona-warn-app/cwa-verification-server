@@ -4,9 +4,9 @@
  * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
- * copyright owners license this file to you under the Apache 
- * License, Version 2.0 (the "License"); you may not use this 
- * file except in compliance with the License. 
+ * copyright owners license this file to you under the Apache
+ * License, Version 2.0 (the "License"); you may not use this
+ * file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -34,19 +34,11 @@ import app.coronawarn.verification.services.repository.VerificationAppSessionRep
 import app.coronawarn.verification.services.service.TanService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
-import static org.mockito.BDDMockito.given;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -56,12 +48,21 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- *
  * This is the test class for the verification application.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -70,38 +71,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource("classpath:test.properties")
 public class VerificationAppTests {
 
-    static final Logger LOG = LogManager.getLogger();
-
-    @Autowired
-    private MockMvc mockMvc;
-
-//    @MockBean
-//    private VerificationAppSessionService appSessionService;
-    @MockBean
-    private LabServerService labServerService;
-
-    @MockBean
-    private TanService tanService;
-
-    @Autowired
-    private VerificationAppSessionRepository appSessionrepository;
-
-    @Autowired
-    private ObjectMapper mapper;
-
     public static final String TEST_GUI_HASH = "12542154785411";
     public static final String TEST_REG_TOK = "1234567890";
     public static final String TEST_REG_TOK_HASH = "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646";
     public static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2);
-
     public static final String TEST_TAN = "1ea6ce8a-9740-11ea-bb37-0242ac130002";
     public static final String TEST_SOT = "connectedLab17";
     public static final String TEST_HASHED_TAN = "16154ea91c2c59d6ef9d0e7f902a59283b1e7ff9111570d20139a4e6b1832876";
     public static final String TEST_TAN_TYPE = "TAN";
-
+    static final Logger LOG = LogManager.getLogger();
     private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
-    
     private static final String PREFIX_API_VERSION = "/version/v1";
+    @Autowired
+    private MockMvc mockMvc;
+    //    @MockBean
+//    private VerificationAppSessionService appSessionService;
+    @MockBean
+    private LabServerService labServerService;
+    @MockBean
+    private TanService tanService;
+    @Autowired
+    private VerificationAppSessionRepository appSessionrepository;
+    @Autowired
+    private ObjectMapper mapper;
 
     @BeforeEach
     void setUp() {
@@ -126,7 +118,7 @@ public class VerificationAppTests {
         given(this.labServerService.result(new Guid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
         mockMvc.perform(post(PREFIX_API_VERSION + "/tan").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(request)))
-                .andExpect(status().isCreated());
+            .andExpect(status().isCreated());
 
         long count = appSessionrepository.count();
         LOG.info("Got {} verfication entries from db repository.", count);
@@ -149,8 +141,8 @@ public class VerificationAppTests {
         LOG.info("VerficationAppTests callGetRegistrationToken() ");
 
         mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new HashedGuid(TEST_GUI_HASH))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.registrationToken").exists());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.registrationToken").exists());
 
         long count = appSessionrepository.count();
         LOG.info("Got {} verfication entries from db repository.", count);
@@ -177,8 +169,8 @@ public class VerificationAppTests {
         given(this.labServerService.result(new Guid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
         mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.testResult").value(TEST_LAB_POSITIVE_RESULT.getTestResult()));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.testResult").value(TEST_LAB_POSITIVE_RESULT.getTestResult()));
     }
 
     /**
@@ -194,7 +186,7 @@ public class VerificationAppTests {
         appSessionrepository.deleteAll();
 
         mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-                .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest());
     }
 
     /**
@@ -205,14 +197,14 @@ public class VerificationAppTests {
     @Test
     public void callVerifyTAN() throws Exception {
         LOG.info("VerficationAppTests callVerifyTAN()");
-        
+
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
         given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
-        
+
         assertFalse("Is TAN redeemed?", this.tanService.getEntityByTan(TEST_TAN).get().isRedeemed());
 
         mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
-                .andExpect(status().isOk());
+            .andExpect(status().isOk());
 
         assertTrue("Is TAN redeemed?", this.tanService.getEntityByTan(TEST_TAN).get().isRedeemed());
     }
@@ -230,7 +222,7 @@ public class VerificationAppTests {
         // without mock tanService.getEntityByTan so this method will return empty entity
 
         mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
-                .andExpect(status().isNotFound());
+            .andExpect(status().isNotFound());
     }
 
     /**
@@ -246,7 +238,7 @@ public class VerificationAppTests {
         given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
 
         mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
-                .andExpect(status().isNotFound());
+            .andExpect(status().isNotFound());
     }
 
     /**
@@ -265,7 +257,7 @@ public class VerificationAppTests {
         given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
         mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
-                .andExpect(status().isNotFound());
+            .andExpect(status().isNotFound());
     }
 
     /**
@@ -284,7 +276,7 @@ public class VerificationAppTests {
         given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
         mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
-                .andExpect(status().isNotFound());
+            .andExpect(status().isNotFound());
     }
 
     /**
@@ -303,7 +295,7 @@ public class VerificationAppTests {
         given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
         mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
-                .andExpect(status().isNotFound());
+            .andExpect(status().isNotFound());
     }
 
     private void prepareAppSessionTestData() {

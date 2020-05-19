@@ -34,5 +34,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegistrationToken {
-	private String registrationToken;
+    private String registrationToken;
 }

@@ -34,5 +34,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tan {
-	private String tan;
+    private String tan;
 }

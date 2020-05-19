@@ -20,9 +20,6 @@
  */
 package app.coronawarn.verification.services.domain;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,6 +27,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * This class represents the TAN - entity.
@@ -193,10 +193,10 @@ public class VerificationTan implements Serializable {
     @Override
     public String toString() {
         return "VerificationTAN{" + "id=" + id + ", tanHash=" + tanHash
-                + ", validFrom=" + validFrom + ", validUntil=" + validUntil
-                + ", sourceOfTrust=" + sourceOfTrust + ", redeemed=" + redeemed
-                + ", type=" + type + ", createdOn=" + createdOn
-                + ", objVersion=" + objVersion + '}';
+            + ", validFrom=" + validFrom + ", validUntil=" + validUntil
+            + ", sourceOfTrust=" + sourceOfTrust + ", redeemed=" + redeemed
+            + ", type=" + type + ", createdOn=" + createdOn
+            + ", objVersion=" + objVersion + '}';
     }
 
 }

@@ -21,15 +21,16 @@
 package app.coronawarn.verification.services.service;
 
 import app.coronawarn.verification.services.domain.VerificationAppSession;
-import java.time.LocalDateTime;
-import java.util.Optional;
+import app.coronawarn.verification.services.repository.VerificationAppSessionRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
-import app.coronawarn.verification.services.repository.VerificationAppSessionRepository;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 /**

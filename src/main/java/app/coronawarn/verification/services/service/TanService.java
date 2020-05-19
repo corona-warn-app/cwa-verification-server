@@ -52,7 +52,7 @@ public class TanService {
     Integer TELE_TAN_VALID_IN_DAYS;
     
     /**
-     * The {@link VerficationTANRepository}.
+     * The {@link VerificationTanRepository}.
      */
     @Autowired
     VerificationTanRepository tanRepository;
@@ -112,7 +112,7 @@ public class TanService {
     }
 
     /**
-     * Check for existing TAN in the {@link VerficationTANRepository}.
+     * Check for existing TAN in the {@link VerificationTanRepository}.
      *
      * @param tan the TAN
      * @return flag for existing TAN

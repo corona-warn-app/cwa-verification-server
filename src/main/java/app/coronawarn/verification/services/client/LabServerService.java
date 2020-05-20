@@ -21,7 +21,6 @@
 
 package app.coronawarn.verification.services.client;
 
-import feign.Headers;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -33,10 +32,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @FeignClient(name = "labServerService", url = "${uri.endpoint.labserver}")
 public interface LabServerService {
-    @PostMapping(value = "/api/v1/app/result")
-    @Headers({
-        "Accept: application/json",
-        "Content-Type: application/json"
-    })
+    @PostMapping(value = "/api/v1/app/result", consumes = "application/json", produces = "application/json")
     TestResult result(Guid guid);
 }

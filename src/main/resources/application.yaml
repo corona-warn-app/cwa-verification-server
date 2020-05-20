@@ -1,6 +1,8 @@
 liquibase:
   enabled: false
 spring:
+  application:
+    name: verification-server
   datasource:
     driverClassName: org.h2.Driver
     password: ''
@@ -11,9 +13,17 @@ spring:
 tan:
   tele:
     valid:
-      days: 7
+      hours: 1
   valid:
-    days: 7
+    days: 14
 uri:
   endpoint:
     labserver: http://labtestresults-test.telekom-healthcare.com:30000
+    
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic

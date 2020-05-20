@@ -26,7 +26,9 @@ target/
 /.nb-gradle/
 build/
 nbactions.txt
+nbactions.xml
 
 ### VS Code ###
 .vscode/
 
+/nb-configuration.xml

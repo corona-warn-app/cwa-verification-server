@@ -1,0 +1,4 @@
+FROM gcr.io/distroless/java:11
+COPY target/cwa-verification-server-*.jar verification.jar
+CMD ["verification.jar"]
+EXPOSE 8080

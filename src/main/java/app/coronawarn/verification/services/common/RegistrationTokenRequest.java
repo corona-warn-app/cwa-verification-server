@@ -25,14 +25,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * This class represents the hashed GUID.
- *
- * @author T-Systems International GmbH
+ * This class represents a registration token request.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HashedGuid {
+public class RegistrationTokenRequest {
 
-    private String hashedGUID;
+    /**
+     * The key which can be a teletan or a hashed guid.
+     */
+    private String key;
+
+    /**
+     * The type of key, which can be "guidHash" or "teleTAN".
+     */
+    private RegistrationTokenKeyType keyType;
 }

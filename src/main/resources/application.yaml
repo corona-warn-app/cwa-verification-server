@@ -11,9 +11,11 @@ spring:
 tan:
   tele:
     valid:
-      days: 7
+      hours: 1
   valid:
-    days: 7
+    days: 14
+appsession:
+    tancountermax: 2
 uri:
   endpoint:
     labserver: http://labtestresults-test.telekom-healthcare.com:30000

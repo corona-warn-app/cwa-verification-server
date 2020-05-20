@@ -53,6 +53,18 @@ public class VerificationAppSession implements Serializable {
     @Basic
     private String registrationTokenHash;
 
+    @Column(name = "TELE_TAN_HASH", columnDefinition = "VARCHAR2(64)")
+    @Basic
+    private String teleTanHash;
+
+    @Column(name = "TAN_COUNTER", columnDefinition = "INT")
+    @Basic
+    private String tanCounter;
+
+    @Column(name = "SOT", columnDefinition = "VARCHAR(255)")
+    @Basic
+    private String sourceOfTrust;
+
     @Column(name = "TAN_GENERATED_FLAG", columnDefinition = "BIT")
     @Basic
     private boolean tanGenerated;
@@ -105,14 +117,42 @@ public class VerificationAppSession implements Serializable {
         this.createdOn = createdOn;
     }
 
+    public String getTanCounter() {
+        return tanCounter;
+    }
+
+    public void setTanCounter(String tanCounter) {
+        this.tanCounter = tanCounter;
+    }
+
+    public String getSourceOfTrust() {
+        return sourceOfTrust;
+    }
+
+    public void setSourceOfTrust(String sourceOfTrust) {
+        this.sourceOfTrust = sourceOfTrust;
+    }
+
+    public String getTeleTanHash() {
+        return teleTanHash;
+    }
+
+    public void setTeleTanHash(String teleTanHash) {
+        this.teleTanHash = teleTanHash;
+    }
+
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 37 * hash + Objects.hashCode(this.id);
-        hash = 37 * hash + Objects.hashCode(this.guidHash);
-        hash = 37 * hash + Objects.hashCode(this.registrationTokenHash);
-        hash = 37 * hash + (this.tanGenerated ? 1 : 0);
-        hash = 37 * hash + Objects.hashCode(this.createdOn);
+        int hash = 5;
+        hash = 29 * hash + Objects.hashCode(this.id);
+        hash = 29 * hash + Objects.hashCode(this.guidHash);
+        hash = 29 * hash + Objects.hashCode(this.registrationTokenHash);
+        hash = 29 * hash + Objects.hashCode(this.teleTanHash);
+        hash = 29 * hash + Objects.hashCode(this.tanCounter);
+        hash = 29 * hash + Objects.hashCode(this.sourceOfTrust);
+        hash = 29 * hash + (this.tanGenerated ? 1 : 0);
+        hash = 29 * hash + Objects.hashCode(this.createdOn);
+        hash = 29 * hash + (int) (this.objVersion ^ (this.objVersion >>> 32));
         return hash;
     }
 
@@ -137,6 +177,15 @@ public class VerificationAppSession implements Serializable {
         if (!Objects.equals(this.registrationTokenHash, other.registrationTokenHash)) {
             return false;
         }
+        if (!Objects.equals(this.teleTanHash, other.teleTanHash)) {
+            return false;
+        }
+        if (!Objects.equals(this.tanCounter, other.tanCounter)) {
+            return false;
+        }
+        if (!Objects.equals(this.sourceOfTrust, other.sourceOfTrust)) {
+            return false;
+        }
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }
@@ -145,9 +194,11 @@ public class VerificationAppSession implements Serializable {
 
     @Override
     public String toString() {
-        return "VerificationAppSession{" + "id=" + id + ", guidHash=" + guidHash + ", "
-            + "registrationTokenHash=" + registrationTokenHash + ", "
-            + "tanGenerated=" + tanGenerated + ", createdOn=" + createdOn + ", "
-            + "objVersion=" + objVersion + '}';
+        return "VerificationAppSession{" + "id=" + id + ", guidHash=" + guidHash
+                + ", registrationTokenHash=" + registrationTokenHash
+                + ", teleTanHash=" + teleTanHash + ", tanCounter=" + tanCounter
+                + ", sourceOfTrust=" + sourceOfTrust + ", tanGenerated=" + tanGenerated
+                + ", createdOn=" + createdOn + ", objVersion=" + objVersion + '}';
     }
+
 }

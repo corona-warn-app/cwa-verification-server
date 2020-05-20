@@ -47,25 +47,25 @@ public class TanService {
     private static final Logger LOG = LogManager.getLogger();
 
     @Value("${tan.valid.days}")
-    Integer TAN_VALID_IN_DAYS;
-    @Value("${tan.tele.valid.days}")
-    Integer TELE_TAN_VALID_IN_DAYS;
+    private Integer TAN_VALID_IN_DAYS;
+    @Value("${tan.tele.valid.hours}")
+    private Integer TELE_TAN_VALID_IN_HOURS;
 
     /**
      * The {@link VerificationTanRepository}.
      */
     @Autowired
-    VerificationTanRepository tanRepository;
+    private VerificationTanRepository tanRepository;
 
     /**
      * The {@link HashingService}.
      */
     @Autowired
-    HashingService hashingService;
+    private HashingService hashingService;
 
     /**
-     * This Method generates a valid TAN and persists it.
-     * Returns the generated TAN.
+     * This Method generates a valid TAN and persists it. Returns the generated
+     * TAN.
      *
      * @return
      */
@@ -94,6 +94,39 @@ public class TanService {
     //TODO syntax constraints from Julius
     public boolean syntaxVerification(String tan) {
         return true;
+    }
+
+    //TODO syntax constraints from Julius
+    /**
+     * Check Tele-TAN syntax constraints.
+     *
+     * @param teleTan the Tele TAN
+     * @return Tele TAN verification flag
+     */
+    private boolean syntaxTeleTanVerification(String teleTan) {
+        //TODO: Needs to be implemented.
+        return true;
+    }
+
+    /**
+     * Verifies the tele transaction number (Tele TAN).
+     *
+     * @param teleTan
+     * @return
+     */
+    public boolean verifyTeleTan(String teleTan) {
+        boolean verified = false;
+        if (syntaxTeleTanVerification(teleTan)) {
+            Optional<VerificationTan> teleTANEntity = getEntityByTan(teleTan);
+            if (teleTANEntity.isPresent() && !teleTANEntity.get().isRedeemed()) {
+                verified = true;
+            } else {
+                LOG.warn("The Tele TAN is unknown or already redeemed.");
+            }
+        } else {
+            LOG.warn("The Tele TAN is not valid to the syntax constraints.");
+        }
+        return verified;
     }
 
     /**
@@ -156,7 +189,6 @@ public class TanService {
     private VerificationTan generateVerificationTan(String tan, TanType tanType) {
         LocalDateTime from = LocalDateTime.now();
         LocalDateTime until = from.plusDays(TAN_VALID_IN_DAYS);
-
 
         VerificationTan verificationTAN = new VerificationTan();
         verificationTAN.setTanHash(hashingService.hash(tan));

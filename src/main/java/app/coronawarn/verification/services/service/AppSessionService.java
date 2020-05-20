@@ -20,7 +20,11 @@
  */
 package app.coronawarn.verification.services.service;
 
+import app.coronawarn.verification.services.common.AppSessionSourceOfTrust;
+import app.coronawarn.verification.services.common.RegistrationToken;
+import app.coronawarn.verification.services.common.RegistrationTokenKeyType;
 import app.coronawarn.verification.services.domain.VerificationAppSession;
+import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.repository.VerificationAppSessionRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +36,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 /**
  * This class represents the VerficationAppSession service.
@@ -61,27 +67,71 @@ public class AppSessionService {
     /**
      * Creates an AppSession-Entity.
      *
-     * @param hashedGuid
      * @param registrationToken
      * @return
      */
-    public VerificationAppSession generateAppSession(String hashedGuid, String registrationToken) {
+    public VerificationAppSession generateAppSession(String registrationToken) {
         LOG.info("Create the app session entity with the created registration token and given guid.");
         VerificationAppSession appSession = new VerificationAppSession();
         appSession.setCreatedOn(LocalDateTime.now());
-        appSession.setGuidHash(hashedGuid);
         appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
         appSession.setTanGenerated(false);
         return appSession;
     }
 
-    /**
-     * This mehtod generates a randoom registration Token.
+   
+    private String generateRegistrationToken() {
+        return UUID.randomUUID().toString();
+    }
+    
+     /**
+     * This mehtod generates a registration Token by a guid or a teletan.
      *
      * @return
      */
-    public String generateRegistrationToken() {
-        return UUID.randomUUID().toString();
+    public ResponseEntity<RegistrationToken> generateRegistrationToken(String key, RegistrationTokenKeyType keyType){
+        String registrationToken;
+        VerificationAppSession appSession;
+        
+        switch (keyType) {
+            case GUID: 
+                String hashedGuid = key;
+                //TODO: is hashed Guid SHA 256
+                if (checkRegistrationTokenAlreadyExistsForGuid(hashedGuid)) {
+                    LOG.warn("The registration token already exists for the hashed guid.");
+                } else {
+                    LOG.info("Start generating a new registration token for the given hashed guid.");
+                    registrationToken = generateRegistrationToken();
+                    appSession = generateAppSession(registrationToken);
+                    appSession.setGuidHash(hashedGuid);
+                    appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID.getSourceName());
+                    saveAppSession(appSession);
+                    return new ResponseEntity(new RegistrationToken(registrationToken), HttpStatus.CREATED);
+                }
+                break;
+            case TELETAN:
+                /**
+                 * TODO: 
+                 * 1. verify teleTAN already exists.
+                 *          - syntax constraints check?
+                 */
+                String teleTan = key;
+                
+                if(checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
+                    LOG.warn("The registration token already exists for this TeleTAN.");
+                } else {
+                    registrationToken = generateRegistrationToken();
+                    appSession = generateAppSession(registrationToken);
+                    appSession.setTeleTanHash(hashingService.hash(teleTan));
+                    appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN.getSourceName());
+                    saveAppSession(appSession);
+                    return new ResponseEntity(new RegistrationToken(registrationToken), HttpStatus.CREATED);
+                }
+                break;
+            default: 
+                break;
+        } 
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -124,16 +174,30 @@ public class AppSessionService {
     }
 
     /**
-     * Check for existing GUID Token in the
+     * Check for existing hashed GUID Token in the
      * {@link VerificationAppSessionRepository}.
      *
-     * @param guid the hashed guid
+     * @param hashedGuid the hashed guid
      * @return flag for existing guid
      */
-    public boolean checkGuidExists(String guid) {
+    public boolean checkRegistrationTokenAlreadyExistsForGuid(String hashedGuid) {
         LOG.info("VerficationAppSessionService start checkRegistrationTokenExists.");
         VerificationAppSession appSession = new VerificationAppSession();
-        appSession.setGuidHash(guid);
+        appSession.setGuidHash(hashedGuid);
+        return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
+    }
+
+    /**
+     * Check for existing hashed TeleTAN in the
+     * {@link VerificationAppSessionRepository}.
+     *
+     * @param teleTan the teleTAN
+     * @return flag for existing teleTAN
+     */
+    public boolean checkRegistrationTokenAlreadyExistForTeleTan(String teleTan) {
+        LOG.info("VerficationAppSessionService start checkTeleTanAlreadyExistForTeleTan.");
+        VerificationAppSession appSession = new VerificationAppSession();
+        appSession.setRegistrationTokenHash(hashingService.hash(teleTan));
         return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
     }
 

@@ -10,7 +10,6 @@
 
 <p align="center">
   <a href="#development">Development</a> •
-  <a href="#service-apis">Service APIs</a> •
   <a href="#documentation">Documentation</a> •
   <a href="#support-and-feedback">Support</a> •
   <a href="#how-to-contribute">Contribute</a> •

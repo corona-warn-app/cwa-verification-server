@@ -23,11 +23,13 @@ package app.coronawarn.verification.services.controller;
 import app.coronawarn.verification.services.client.Guid;
 import app.coronawarn.verification.services.client.LabServerService;
 import app.coronawarn.verification.services.client.TestResult;
+import app.coronawarn.verification.services.common.AppSessionSourceOfTrust;
 import app.coronawarn.verification.services.common.LabTestResult;
 import app.coronawarn.verification.services.common.RegistrationToken;
 import app.coronawarn.verification.services.common.RegistrationTokenKeyType;
 import app.coronawarn.verification.services.common.Tan;
 import app.coronawarn.verification.services.common.RegistrationTokenRequest;
+import app.coronawarn.verification.services.common.TanSourceOfTrust;
 import app.coronawarn.verification.services.domain.VerificationAppSession;
 import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.service.AppSessionService;
@@ -38,6 +40,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -83,6 +86,9 @@ public class VerificationController {
      */
     public static final String TELE_TAN_ROUTE = "/tan/teletan";
 
+    @Value("${appsession.tancountermax}")
+    private Integer TAN_COUNTER_MAX;
+
     @Autowired
     private AppSessionService appSessionService;
 
@@ -127,52 +133,6 @@ public class VerificationController {
             return appSessionService.generateRegistrationToken(key, keyType);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
-//        
-//        switch (request.getKeyType()) {
-//            case GUID: 
-//                String hashedGuid = request.getKey();
-//                //TODO: is hashed Guid SHA 256
-//                if (appSessionService.checkRegistrationTokenAlreadyExistsForGuid(hashedGuid)) {
-//                    LOG.warn("The registration token already exists for the hashed guid.");
-//                } else {
-//                    LOG.info("Start generating a new registration token for the given hashed guid.");
-//                    registrationToken = appSessionService.generateRegistrationToken();
-//                    appSession = appSessionService.generateAppSession(registrationToken);
-//                    appSession.setGuidHash(hashedGuid);
-//                    appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID.getSourceName());
-//                    appSessionService.saveAppSession(appSession);
-//                    return new ResponseEntity(new RegistrationToken(registrationToken), HttpStatus.CREATED);
-//                }
-//                break;
-//            case TELETAN:
-//                /**
-//                 * TODO: 
-//                 * 1. verify teleTAN already exists.
-//                 *          - syntax constraints check?
-//                 */
-//                String teleTan = request.getKey();
-//                if(tanService.verifyTeleTan(teleTan)) {
-//                    Optional<VerificationTan> teleTANEntity = tanService.getEntityByTan(teleTan);
-//                    if(appSessionService.checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
-//                        LOG.warn("The registration token already exists for this TeleTAN.");
-//                    } else {
-//                        registrationToken = appSessionService.generateRegistrationToken();
-//                        appSession = appSessionService.generateAppSession(registrationToken);
-//                        appSession.setTeleTanHash(hashingService.hash(teleTan));
-//                        appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN.getSourceName());
-//                        appSessionService.saveAppSession(appSession);
-//
-//                        VerificationTan teleTAN = teleTANEntity.get();
-//                        teleTAN.setRedeemed(true);
-//                        tanService.saveTan(teleTAN);
-//                        return new ResponseEntity(new RegistrationToken(registrationToken), HttpStatus.CREATED);
-//                    }
-//                }
-//                break;
-//            default: 
-//                break;
-//        } 
-//        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -183,18 +143,29 @@ public class VerificationController {
      * @return A generated TAN (with the HTTP-state 201 Created). Otherwise the
      * HTTP-state 400 (Bad Request) will be returned, if an error occures.
      */
-    @ApiOperation(value = "Generates and return a transaction number by a Registration Token", response = Tan.class)
+    @ApiOperation(value = "Generates and return a transaction number by a Registration Token",
+            response = Tan.class)
     @PostMapping(TAN_ROUTE)
     public ResponseEntity<Tan> generateTAN(@RequestBody RegistrationToken registrationToken) {
 
-        TestResult covidTestResult = getTestState(registrationToken).getBody();
-        if (covidTestResult != null) {
-            VerificationAppSession appSession = appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken()).get();
-            //TODO: More than one TAN for registration Token possible => !appSession.isTanGenerated() neccessery?
-            if (covidTestResult.getTestResult() == LabTestResult.POSITIVE.getTestResult()
-                    && !appSession.isTanGenerated()) {
-                String generatedTAN = tanService.generateVerificationTan();
-                appSession.setTanGenerated(true);
+        VerificationAppSession appSession = appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken()).get();
+        if (appSession != null) {
+            if (appSession.getTanCounter() < TAN_COUNTER_MAX) {
+                String sourceOfTrust = appSession.getSourceOfTrust();
+                if (AppSessionSourceOfTrust.HASHED_GUID.getSourceName().equals(sourceOfTrust)) {
+                    sourceOfTrust = TanSourceOfTrust.CONNECTED_LAB.getSourceName();
+                    TestResult covidTestResult = labServerService.result(new Guid(appSession.getGuidHash()));
+                    if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()) {
+                        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                    }
+                } else if (AppSessionSourceOfTrust.TELETAN.getSourceName().equals(sourceOfTrust)) {
+                    sourceOfTrust = TanSourceOfTrust.TELETAN.getSourceName();
+                } else {
+                    return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                }
+                String generatedTAN = tanService.generateVerificationTan(sourceOfTrust);
+                Integer tanCounter = appSession.getTanCounter();
+                appSession.setTanCounter(tanCounter++);
                 appSessionService.saveAppSession(appSession);
                 return new ResponseEntity(new Tan(generatedTAN), HttpStatus.CREATED);
             }

@@ -20,6 +20,7 @@
  */
 package app.coronawarn.verification.services.service;
 
+import app.coronawarn.verification.services.common.TanSourceOfTrust;
 import app.coronawarn.verification.services.common.TanType;
 import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.repository.VerificationTanRepository;
@@ -69,9 +70,9 @@ public class TanService {
      *
      * @return
      */
-    public String generateVerificationTan() {
+    public String generateVerificationTan(String sourceOfTrust) {
         String tan = generateValidTan();
-        persistTan(tan, TanType.TAN);
+        persistTan(tan, TanType.TAN, sourceOfTrust);
         return tan;
     }
 
@@ -161,8 +162,9 @@ public class TanService {
      * @param tanType
      * @return
      */
-    private VerificationTan persistTan(String tan, TanType tanType) {
-        VerificationTan newTan = TanService.this.generateVerificationTan(tan, tanType);
+    private VerificationTan persistTan(String tan, TanType tanType,
+            String sourceOfTrust) {
+        VerificationTan newTan = TanService.this.generateVerificationTan(tan, tanType, sourceOfTrust);
         return tanRepository.save(newTan);
     }
 
@@ -186,7 +188,8 @@ public class TanService {
         return !tanRepository.existsByTanHash(tanHash);
     }
 
-    private VerificationTan generateVerificationTan(String tan, TanType tanType) {
+    private VerificationTan generateVerificationTan(String tan, TanType tanType,
+            String sourceOfTrust) {
         LocalDateTime from = LocalDateTime.now();
         LocalDateTime until = from.plusDays(TAN_VALID_IN_DAYS);
 
@@ -194,6 +197,7 @@ public class TanService {
         verificationTAN.setTanHash(hashingService.hash(tan));
         verificationTAN.setValidFrom(from);
         verificationTAN.setValidUntil(until);
+        verificationTAN.setSourceOfTrust(sourceOfTrust);
         verificationTAN.setRedeemed(false);
         verificationTAN.setCreatedOn(LocalDateTime.now());
         verificationTAN.setType(tanType.name());

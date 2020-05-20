@@ -126,7 +126,7 @@ public class VerificationAppTests {
         List<VerificationAppSession> verficationList = appSessionrepository.findAll();
         assertNotNull(verficationList);
         assertEquals(TEST_GUI_HASH, verficationList.get(0).getGuidHash());
-        assertTrue(verficationList.get(0).isTanGenerated());
+        assertEquals(AppSessionSourceOfTrust.HASHED_GUID.getSourceName(), verficationList.get(0).getSourceOfTrust());
         assertEquals(TEST_REG_TOK_HASH, verficationList.get(0).getRegistrationTokenHash());
 
     }
@@ -154,7 +154,6 @@ public class VerificationAppTests {
         List<VerificationAppSession> verificationList = appSessionrepository.findAll();
         assertNotNull(verificationList);
         assertEquals(TEST_GUI_HASH, verificationList.get(0).getGuidHash());
-        assertFalse(verificationList.get(0).isTanGenerated());
         assertEquals(AppSessionSourceOfTrust.HASHED_GUID.getSourceName(), verificationList.get(0).getSourceOfTrust());
         assertNotNull(verificationList.get(0).getRegistrationTokenHash());
     }
@@ -185,7 +184,6 @@ public class VerificationAppTests {
         List<VerificationAppSession> verificationList = appSessionrepository.findAll();
         assertNotNull(verificationList);
         assertEquals(null, verificationList.get(0).getGuidHash());
-        assertFalse(verificationList.get(0).isTanGenerated());
         assertEquals(AppSessionSourceOfTrust.TELETAN.getSourceName(), verificationList.get(0).getSourceOfTrust());
         assertNotNull(verificationList.get(0).getRegistrationTokenHash());
     }
@@ -341,8 +339,9 @@ public class VerificationAppTests {
     private VerificationAppSession getAppSessionTestData() {
         VerificationAppSession cv = new VerificationAppSession();
         cv.setGuidHash(TEST_GUI_HASH);
-        cv.setTanGenerated(false);
         cv.setCreatedOn(LocalDateTime.now());
+        cv.setTanCounter(0);
+        cv.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID.getSourceName());
         cv.setRegistrationTokenHash(TEST_REG_TOK_HASH);
         return cv;
     }

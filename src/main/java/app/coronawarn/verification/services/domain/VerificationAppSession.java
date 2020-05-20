@@ -59,15 +59,11 @@ public class VerificationAppSession implements Serializable {
 
     @Column(name = "TAN_COUNTER", columnDefinition = "INT")
     @Basic
-    private String tanCounter;
+    private Integer tanCounter;
 
     @Column(name = "SOT", columnDefinition = "VARCHAR(255)")
     @Basic
     private String sourceOfTrust;
-
-    @Column(name = "TAN_GENERATED_FLAG", columnDefinition = "BIT")
-    @Basic
-    private boolean tanGenerated;
 
     @Column(name = "CREATED_ON", columnDefinition = "DATETIME(6)")
     @Basic
@@ -101,14 +97,6 @@ public class VerificationAppSession implements Serializable {
         this.registrationTokenHash = registrationTokenHash;
     }
 
-    public boolean isTanGenerated() {
-        return tanGenerated;
-    }
-
-    public void setTanGenerated(boolean tanGenerated) {
-        this.tanGenerated = tanGenerated;
-    }
-
     public LocalDateTime getCreatedOn() {
         return createdOn;
     }
@@ -117,11 +105,11 @@ public class VerificationAppSession implements Serializable {
         this.createdOn = createdOn;
     }
 
-    public String getTanCounter() {
+    public Integer getTanCounter() {
         return tanCounter;
     }
 
-    public void setTanCounter(String tanCounter) {
+    public void setTanCounter(Integer tanCounter) {
         this.tanCounter = tanCounter;
     }
 
@@ -150,7 +138,6 @@ public class VerificationAppSession implements Serializable {
         hash = 29 * hash + Objects.hashCode(this.teleTanHash);
         hash = 29 * hash + Objects.hashCode(this.tanCounter);
         hash = 29 * hash + Objects.hashCode(this.sourceOfTrust);
-        hash = 29 * hash + (this.tanGenerated ? 1 : 0);
         hash = 29 * hash + Objects.hashCode(this.createdOn);
         hash = 29 * hash + (int) (this.objVersion ^ (this.objVersion >>> 32));
         return hash;
@@ -168,9 +155,6 @@ public class VerificationAppSession implements Serializable {
             return false;
         }
         final VerificationAppSession other = (VerificationAppSession) obj;
-        if (this.tanGenerated != other.tanGenerated) {
-            return false;
-        }
         if (!Objects.equals(this.guidHash, other.guidHash)) {
             return false;
         }
@@ -197,7 +181,7 @@ public class VerificationAppSession implements Serializable {
         return "VerificationAppSession{" + "id=" + id + ", guidHash=" + guidHash
                 + ", registrationTokenHash=" + registrationTokenHash
                 + ", teleTanHash=" + teleTanHash + ", tanCounter=" + tanCounter
-                + ", sourceOfTrust=" + sourceOfTrust + ", tanGenerated=" + tanGenerated
+                + ", sourceOfTrust=" + sourceOfTrust
                 + ", createdOn=" + createdOn + ", objVersion=" + objVersion + '}';
     }
 

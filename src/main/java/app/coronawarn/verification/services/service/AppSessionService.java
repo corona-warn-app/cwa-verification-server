@@ -75,7 +75,7 @@ public class AppSessionService {
         VerificationAppSession appSession = new VerificationAppSession();
         appSession.setCreatedOn(LocalDateTime.now());
         appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
-        appSession.setTanGenerated(false);
+        appSession.setTanCounter(0);
         return appSession;
     }
 

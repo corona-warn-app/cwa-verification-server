@@ -29,10 +29,10 @@ import lombok.NoArgsConstructor;
  *
  * @author T-Systems International GmbH
  */
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegistrationToken {
+
     private String registrationToken;
 }

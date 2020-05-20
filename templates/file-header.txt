@@ -3,7 +3,7 @@
  *
  * (C) 2020, YOUR_NAME, YOUR_COMPANY
  *
- * Deutsche Telekom AG, SAP AG and all other contributors /
+ * Deutsche Telekom AG and all other contributors /
  * copyright owners license this file to you under the Apache 
  * License, Version 2.0 (the "License"); you may not use this 
  * file except in compliance with the License. 

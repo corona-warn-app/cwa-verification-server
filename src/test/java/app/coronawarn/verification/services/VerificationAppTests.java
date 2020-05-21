@@ -71,8 +71,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource("classpath:test.properties")
 public class VerificationAppTests {
 
-    public static final String TEST_GUI_HASH = "12542154785411";
-    public static final String TEST_TELETAN = "tele123";
+    public static final String TEST_GUI_HASH = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
+    public static final String TEST_TELETAN = "teie123";
     public static final String TEST_REG_TOK = "1234567890";
     public static final String TEST_REG_TOK_HASH = "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646";
     public static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2);

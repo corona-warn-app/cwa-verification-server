@@ -35,6 +35,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class represents the TanService service.
@@ -46,6 +48,9 @@ public class TanService {
      * The logger.
      */
     private static final Logger LOG = LogManager.getLogger();
+
+    //Todo verify Pattern
+    private static final String TELETAN_PATTERN = "[2-9A-KM-N-P-Za-km-n-p-z]{7}";
 
     @Value("${tan.valid.days}")
     private Integer TAN_VALID_IN_DAYS;
@@ -105,8 +110,12 @@ public class TanService {
      * @return Tele TAN verification flag
      */
     private boolean syntaxTeleTanVerification(String teleTan) {
-        //TODO: Needs to be implemented.
-        return true;
+        Pattern pattern = Pattern.compile(TELETAN_PATTERN);
+        Matcher matcher = pattern.matcher(teleTan);
+        if( matcher.find()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -217,5 +226,4 @@ public class TanService {
         tanEntity.setTanHash(hashingService.hash(tan));
         return tanRepository.findOne(Example.of(tanEntity, ExampleMatcher.matching()));
     }
-
 }

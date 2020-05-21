@@ -40,19 +40,26 @@ There are two ways to build:
  Maven  
  *(optional)*: Docker
  ### Build
->#### Maven  
-    mvn package 
-    mvn run  
+ Whether you cloned or downloaded the 'ziped' souces you will either find the sources in the chosen checkout-directory or get a zip file with the source code, which you can expand in folder of your choice.
+
+ Open a Terminal on you machine pointing to the directory you checked out to.
+>#### if chosing the Maven way  
+    mvn package
+    java -jar target/cwa-verification-server-0.0.1-SNAPSHOT.jar  
+The verification server will start up and run locally on your machine available on port 8080.
 
 >#### Docker  
-    docker build -f|--file <path to dockerfile>
+    docker build -f|--file <path to dockerfile>  -t <imagename>  <path-to-verificationserver-root>
+    docker run -p 127.0.0.1:8080:8080/tcp -it <imagename>
+    
 or simply  
 
-    docker build
+    docker build --pull --rm -f "Dockerfile" -t cwa-verificationserver "."
+    docker run -p 127.0.0.1:8080:8080/tcp -it cwa-verificationserver
 if you are in the root of the checked out repository.
     
 
-
+m
  
 
 

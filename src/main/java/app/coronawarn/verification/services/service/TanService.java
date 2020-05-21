@@ -20,7 +20,6 @@
  */
 package app.coronawarn.verification.services.service;
 
-import app.coronawarn.verification.services.common.TanSourceOfTrust;
 import app.coronawarn.verification.services.common.TanType;
 import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.repository.VerificationTanRepository;
@@ -51,6 +50,7 @@ public class TanService {
 
     //Todo verify Pattern
     private static final String TELETAN_PATTERN = "[2-9A-KM-N-P-Za-km-n-p-z]{7}";
+    private static final Pattern pattern = Pattern.compile(TELETAN_PATTERN);
 
     @Value("${tan.valid.days}")
     private Integer TAN_VALID_IN_DAYS;
@@ -73,7 +73,8 @@ public class TanService {
      * This Method generates a valid TAN and persists it. Returns the generated
      * TAN.
      *
-     * @return
+     * @param sourceOfTrust sets the source of Trust for the Tan
+     * @return Tan a valid tan with given source of Trust
      */
     public String generateVerificationTan(String sourceOfTrust) {
         String tan = generateValidTan();
@@ -110,19 +111,15 @@ public class TanService {
      * @return Tele TAN verification flag
      */
     private boolean syntaxTeleTanVerification(String teleTan) {
-        Pattern pattern = Pattern.compile(TELETAN_PATTERN);
         Matcher matcher = pattern.matcher(teleTan);
-        if( matcher.find()) {
-            return true;
-        }
-        return false;
+        return matcher.find();
     }
 
     /**
      * Verifies the tele transaction number (Tele TAN).
      *
-     * @param teleTan
-     * @return
+     * @param teleTan the Tele TAN to verify
+     * @return verified is teletan is verified
      */
     public boolean verifyTeleTan(String teleTan) {
         boolean verified = false;
@@ -169,7 +166,7 @@ public class TanService {
      *
      * @param tan
      * @param tanType
-     * @return
+     * @return the persisted Tan
      */
     private VerificationTan persistTan(String tan, TanType tanType,
             String sourceOfTrust) {
@@ -180,7 +177,7 @@ public class TanService {
     /**
      * Returns the hash of the supplied string.
      *
-     * @return
+     * @return a new Teletan
      */
     public String generateTeleTan() {
         //TODO clarify generation of Teletan

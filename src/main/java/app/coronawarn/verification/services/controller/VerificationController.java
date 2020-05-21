@@ -113,32 +113,31 @@ public class VerificationController {
      */
     @ApiOperation(value = "Generates and return a registration token", response = RegistrationToken.class)
     @PostMapping(REGISTRATION_TOKEN_ROUTE)
-    public ResponseEntity<RegistrationToken> generateRegistrationToken(@RequestBody(required = false) RegistrationTokenRequest request) {
+    public ResponseEntity<RegistrationToken> generateRegistrationToken(@RequestBody(required = false)
+                                                                               RegistrationTokenRequest request) {
         /*
          * TODO verify this fix for issue  [BSI][20200519] Verbose Error Messages #4
          */
-        if (request==null) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+        if (request != null) {
+            String key = request.getKey();
+            RegistrationTokenKeyType keyType = request.getKeyType();
 
-        String key = request.getKey();
-        RegistrationTokenKeyType keyType = request.getKeyType();
-
-        if (keyType.equals(RegistrationTokenKeyType.TELETAN)) {
-            if (tanService.verifyTeleTan(key)) {
-                ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
-                if (tanService.getEntityByTan(key).isPresent()) {
-                    VerificationTan teleTAN = tanService.getEntityByTan(key).get();
-                    teleTAN.setRedeemed(true);
-                    tanService.saveTan(teleTAN);
-                    return response;
+            if (keyType == RegistrationTokenKeyType.TELETAN) {
+                if (tanService.verifyTeleTan(key)) {
+                    ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
+                    if (tanService.getEntityByTan(key).isPresent()) {
+                        VerificationTan teleTAN = tanService.getEntityByTan(key).get();
+                        teleTAN.setRedeemed(true);
+                        tanService.saveTan(teleTAN);
+                        return response;
+                    }
+                    else {
+                        LOG.warn("Teletan is not found");
+                    }
                 }
-                else {
-                    LOG.warn("Teletan is not found");
-                }
+            } else {
+                return appSessionService.generateRegistrationToken(key, keyType);
             }
-        } else {
-            return appSessionService.generateRegistrationToken(key, keyType);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
@@ -155,7 +154,8 @@ public class VerificationController {
     @PostMapping(TAN_ROUTE)
     public ResponseEntity<Tan> generateTAN(@RequestBody RegistrationToken registrationToken) {
 
-        Optional<VerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
+        Optional<VerificationAppSession> actual =
+            appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
         if (actual.isPresent()) {
             VerificationAppSession appSession = actual.get();
             if (appSession.getTanCounter() <= TAN_COUNTER_MAX) {
@@ -174,7 +174,8 @@ public class VerificationController {
                 }
                 String generatedTAN = tanService.generateVerificationTan(sourceOfTrust);
                 Integer tanCounter = appSession.getTanCounter();
-                appSession.setTanCounter(tanCounter++);
+                tanCounter++;
+                appSession.setTanCounter(tanCounter);
                 appSessionService.saveAppSession(appSession);
                 return new ResponseEntity(new Tan(generatedTAN), HttpStatus.CREATED);
             }

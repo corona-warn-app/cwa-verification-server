@@ -69,8 +69,8 @@ public class AppSessionService {
     /**
      * Creates an AppSession-Entity.
      *
-     * @param registrationToken
-     * @return
+     * @param registrationToken Token for registration
+     * @return appSession for registrationToken
      */
     public VerificationAppSession generateAppSession(String registrationToken) {
         LOG.info("Create the app session entity with the created registration token.");
@@ -93,7 +93,7 @@ public class AppSessionService {
      * @param keyType the key type {@link RegistrationTokenKeyType}
      * @return an {@link ResponseEntity<RegistrationToken>}
      */
-    public ResponseEntity<RegistrationToken> generateRegistrationToken(String key, RegistrationTokenKeyType keyType){
+    public ResponseEntity<RegistrationToken> generateRegistrationToken(String key, RegistrationTokenKeyType keyType) {
         String registrationToken;
         VerificationAppSession appSession;
         

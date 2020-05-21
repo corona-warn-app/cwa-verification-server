@@ -20,7 +20,6 @@
  */
 package app.coronawarn.verification.services.service;
 
-import app.coronawarn.verification.services.common.RegistrationTokenKeyType;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,8 +33,11 @@ import java.util.regex.Pattern;
  */
 @Component
 public class HashingService {
-    private static final String GUID_HASH_PATTERN = "[0-9A-Fa-f]{64}";
     private static final Logger LOG = LogManager.getLogger();
+
+    private static final String GUID_HASH_PATTERN = "[0-9A-Fa-f]{64}";
+    private static final Pattern pattern = Pattern.compile(GUID_HASH_PATTERN);
+
 
     /**
      * Returns the hash of the supplied string
@@ -55,11 +57,7 @@ public class HashingService {
      * @return Boolean if the String Matches the Pattern
      */
     public boolean isHashValid(String toValidate) {
-        Pattern pattern = Pattern.compile(GUID_HASH_PATTERN);
         Matcher matcher = pattern.matcher(toValidate);
-        if( matcher.find()) {
-            return true;
-        }
-        return false;
+        return  matcher.find();
     }
 }

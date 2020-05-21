@@ -1,5 +1,5 @@
 <h1 align="center">
-    Corona-Warn-App Server
+    Corona-Warn-App Verification Server
 </h1>
 
 <p align="center">

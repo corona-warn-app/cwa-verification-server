@@ -56,7 +56,7 @@ You can then open a terminal pointing to the root directory of the verification 
 
     mvn package
     java -jar target/cwa-verification-server-0.0.1-SNAPSHOT.jar  
-    
+
 The verification server will start up and run locally on your machine available on port 8080.
 
 #### Docker based build  
@@ -73,16 +73,17 @@ On the commandline do the following:
 or simply  
 
     docker build --pull --rm -f "Dockerfile" -t cwa-verificationserver "."
-    docker run -p 127.0.0.1:8080:8080/tcp -it cwa-verificationserver
+    docker run -p 127.0.0.1:8080:8080/tcp -it cwa-verificationserver 
+
 if you are in the root of the checked out repository.  
 The dockerimmage will then run on your local machine on port 8080 assuming you configured docker for shared network mode.
->API Documentation  
+#### API Documentation  
 
-Along with the application there comes a swagger api documentation which you can access in your webbrowser:
+Along with the application there comes a swagger2 api documentation which you can access in your webbrowser, when the verification server applications runs:
 
     <base-url>/swagger-ui.html#/verification-controller
 
-mostly like  
+mostly like:  
 
 http://localhost:8080/swagger-ui.html#/verification-controller
      

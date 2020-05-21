@@ -113,7 +113,13 @@ public class VerificationController {
      */
     @ApiOperation(value = "Generates and return a registration token", response = RegistrationToken.class)
     @PostMapping(REGISTRATION_TOKEN_ROUTE)
-    public ResponseEntity<RegistrationToken> generateRegistrationToken(@RequestBody RegistrationTokenRequest request) {
+    public ResponseEntity<RegistrationToken> generateRegistrationToken(@RequestBody(required = false) RegistrationTokenRequest request) {
+        /*
+         * TODO verify this fix for issue  [BSI][20200519] Verbose Error Messages #4
+         */
+        if (request==null) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
 
         String key = request.getKey();
         RegistrationTokenKeyType keyType = request.getKeyType();

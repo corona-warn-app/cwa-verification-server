@@ -50,6 +50,7 @@ public class TanService {
     private static final Logger LOG = LogManager.getLogger();
 
     //Todo verify Pattern
+    private static final Integer TELE_TAN_LENGTH = 7;
     private static final String TELETAN_PATTERN = "[2-9A-KM-N-P-Za-km-n-p-z]{7}";
     private static final Pattern pattern = Pattern.compile(TELETAN_PATTERN);
 
@@ -185,14 +186,14 @@ public class TanService {
         Boolean isTeleTanValid = false;
 
         while (!isTeleTanValid) {
-            generatedTeleTan = RandomString.make(7);
+            generatedTeleTan = RandomString.make(TELE_TAN_LENGTH);
             isTeleTanValid = isTeletanValid(generatedTeleTan);
         }
         //TODO clarify generation of Teletan
         return generatedTeleTan;
     }
 
-    private boolean isTeletanValid(String teleTan){
+    private boolean isTeletanValid(String teleTan) {
         Matcher matcher = pattern.matcher(teleTan);
         return  matcher.find();
     }

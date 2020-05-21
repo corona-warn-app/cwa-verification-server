@@ -187,13 +187,16 @@ public class TanService {
 
         while (!isTeleTanValid) {
             generatedTeleTan = RandomString.make(TELE_TAN_LENGTH);
-            isTeleTanValid = isTeletanValid(generatedTeleTan);
+            isTeleTanValid = isTeleTanValid(generatedTeleTan);
         }
-        //TODO clarify generation of Teletan
         return generatedTeleTan;
     }
-
-    private boolean isTeletanValid(String teleTan) {
+    /**
+     * Returns the if a Tele Tan matches the Pattern requirements
+     * @param teleTan the Tele TAN to check
+     * @return The validity of the Tele TAN
+     */
+    public boolean isTeleTanValid(String teleTan) {
         Matcher matcher = pattern.matcher(teleTan);
         return  matcher.find();
     }

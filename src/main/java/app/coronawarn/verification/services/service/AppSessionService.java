@@ -115,18 +115,22 @@ public class AppSessionService {
                 }
                 break;
             case TELETAN:
-                //TODO check if teletan is valid?
                 String teleTan = key;
-                if (checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
-                    LOG.warn("The registration token already exists for this TeleTAN.");
-                } else {
-                    LOG.info("Start generating a new registration token for the given tele TAN.");
-                    registrationToken = generateRegistrationToken();
-                    appSession = generateAppSession(registrationToken);
-                    appSession.setTeleTanHash(hashingService.hash(teleTan));
-                    appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN.getSourceName());
-                    saveAppSession(appSession);
-                    return new ResponseEntity(new RegistrationToken(registrationToken), HttpStatus.CREATED);
+                if(tanService.isTeleTanValid(teleTan)){
+                    if (checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
+                        LOG.warn("The registration token already exists for this TeleTAN.");
+                    } else {
+                        LOG.info("Start generating a new registration token for the given tele TAN.");
+                        registrationToken = generateRegistrationToken();
+                        appSession = generateAppSession(registrationToken);
+                        appSession.setTeleTanHash(hashingService.hash(teleTan));
+                        appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN.getSourceName());
+                        saveAppSession(appSession);
+                        return new ResponseEntity(new RegistrationToken(registrationToken), HttpStatus.CREATED);
+                    }
+                }
+                else {
+                    LOG.warn("The Tele Tan supplied is not valid.");
                 }
                 break;
             default: 

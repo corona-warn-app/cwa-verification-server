@@ -23,6 +23,7 @@ package app.coronawarn.verification.services.service;
 import app.coronawarn.verification.services.common.TanType;
 import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.repository.VerificationTanRepository;
+import net.bytebuddy.utility.RandomString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,8 +181,20 @@ public class TanService {
      * @return a new Teletan
      */
     public String generateTeleTan() {
+        String generatedTeleTan = "";
+        Boolean isTeleTanValid = false;
+
+        while (!isTeleTanValid) {
+            generatedTeleTan = RandomString.make(7);
+            isTeleTanValid = isTeletanValid(generatedTeleTan);
+        }
         //TODO clarify generation of Teletan
-        return null;
+        return generatedTeleTan;
+    }
+
+    private boolean isTeletanValid(String teleTan){
+        Matcher matcher = pattern.matcher(teleTan);
+        return  matcher.find();
     }
 
     private String generateTanFromUUID() {

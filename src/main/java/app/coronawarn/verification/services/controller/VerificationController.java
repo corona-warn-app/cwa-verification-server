@@ -127,10 +127,15 @@ public class VerificationController {
         if (keyType.equals(RegistrationTokenKeyType.TELETAN)) {
             if (tanService.verifyTeleTan(key)) {
                 ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
-                VerificationTan teleTAN = tanService.getEntityByTan(key).get();
-                teleTAN.setRedeemed(true);
-                tanService.saveTan(teleTAN);
-                return response;
+                if (tanService.getEntityByTan(key).isPresent()) {
+                    VerificationTan teleTAN = tanService.getEntityByTan(key).get();
+                    teleTAN.setRedeemed(true);
+                    tanService.saveTan(teleTAN);
+                    return response;
+                }
+                else {
+                    LOG.warn("Teletan is not found");
+                }
             }
         } else {
             return appSessionService.generateRegistrationToken(key, keyType);

@@ -28,27 +28,45 @@ This component of the Corona-warn-app whereas named **verification process** pro
     
 To achieve this, the verification service gets the result of covid-19 tests from LIS (**L**abor **I**nformation **S**ystem) which deliver testresults to it. The complete process is described in [cwa-documentation/Solution Architecture](https://github.com/corona-warn-app/cwa-documentation/blob/master/solution_architecture.md) to which you may refer for detailed information about the workflow.
 
+The software stack of the verification server is based on spring boot, currently with an in-memory H2 database. As the persistence relies on the liquibase
+
 
 ## Development
 
 This component can be locally build in order to test the functionality of the interfaces and verify the concepts it is build upon.  
 There are two ways to build:
  - [Maven](https:///maven.apache.org) build - to run this component as spring application on your local machine
- - [Docker](https://www.docker.com) build, to run it as docker container composed from the provided docker composing [file](https://github.com/corona-warn-app/cwa-verification-server/blob/master/Dockerfile)
+ - [Docker](https://www.docker.com) build - to run it as docker container build from the provided docker build [file](https://github.com/corona-warn-app/cwa-verification-server/blob/master/Dockerfile)
  ### Prerequisites
- Open JDK 11  
- Maven  
- *(optional)*: Docker
+ [Open JDK 11](https://openjdk.java.net)  
+ [Maven](https://apache.maven.org)  
+ *(optional)*: [Docker](https://www.docker.com)  
  ### Build
- Whether you cloned or downloaded the 'ziped' souces you will either find the sources in the chosen checkout-directory or get a zip file with the source code, which you can expand in folder of your choice.
+ Whether you cloned or downloaded the 'ziped' souces you will either find the sources in the chosen checkout-directory or get a zip file with the source code, which you can expand to a folder of your choice.
 
- Open a Terminal on you machine pointing to the directory you checked out to.
->#### Maven    
+ In either case open a terminal pointing to the directory you put the sources in. The local build process is described afterwards depending on the way you chose.
+#### Maven based build
+For acitvely take part on the development this is the way you should chose.   
+Please check, whether following prerequisites are fullfilled
+- [Open JDK 11](https://openjdk.java.net) or a similar JDK 11 compatible VM  
+- [Maven](https://apache.maven.org)  
+  
+is installed on your machine.  
+You can then open a terminal pointing to the root directory of the verification server and do the following:
+
     mvn package
     java -jar target/cwa-verification-server-0.0.1-SNAPSHOT.jar  
+    
 The verification server will start up and run locally on your machine available on port 8080.
 
->#### Docker  
+#### Docker based build  
+We recommend, that you first check the prerequisites to ensure that  
+- [Docker](https://www.docker.com)  
+
+is istalled on you machine  
+
+On the commandline do the following:
+
     docker build -f|--file <path to dockerfile>  -t <imagename>  <path-to-verificationserver-root>
     docker run -p 127.0.0.1:8080:8080/tcp -it <imagename>
     
@@ -56,7 +74,17 @@ or simply
 
     docker build --pull --rm -f "Dockerfile" -t cwa-verificationserver "."
     docker run -p 127.0.0.1:8080:8080/tcp -it cwa-verificationserver
-if you are in the root of the checked out repository.
+if you are in the root of the checked out repository.  
+The dockerimmage will then run on your local machine on port 8080 assuming you configured docker for shared network mode.
+>API Documentation  
+
+Along with the application there comes a swagger api documentation which you can access in your webbrowser:
+
+    <base-url>/swagger-ui.html#/verification-controller
+
+mostly like  
+
+http://localhost:8080/swagger-ui.html#/verification-controller
      
 
 
@@ -97,14 +125,11 @@ The following public repositories are currently available for the Corona-Warn-Ap
 | ------------------- | --------------------------------------------------------------------- |
 | [cwa-documentation] | Project overview, general documentation, and white papers             |
 | [cwa-server]        | Backend implementation for the Apple/Google exposure notification API |
-| [cwa-verification-server] | **TBD** |
+| [cwa-verification-server] | Backend implementation of the verification process|
 
 [cwa-documentation]: https://github.com/corona-warn-app/cwa-documentation
 [cwa-server]: https://github.com/corona-warn-app/cwa-server
 [cwa-verification-server]: https://github.com/corona-warn-app/cwa-verification-server
-[Postgres]: https://www.postgresql.org/
-[MinIO]: https://min.io/
-[HSQLDB]: http://hsqldb.org/
 
 ## Licensing
 

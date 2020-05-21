@@ -24,20 +24,18 @@ import app.coronawarn.verification.services.common.AppSessionSourceOfTrust;
 import app.coronawarn.verification.services.common.RegistrationToken;
 import app.coronawarn.verification.services.common.RegistrationTokenKeyType;
 import app.coronawarn.verification.services.domain.VerificationAppSession;
-import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.repository.VerificationAppSessionRepository;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
 /**
  * This class represents the VerficationAppSession service.
@@ -75,7 +73,7 @@ public class AppSessionService {
      * @return
      */
     public VerificationAppSession generateAppSession(String registrationToken) {
-        LOG.info("Create the app session entity with the created registration token and given guid.");
+        LOG.info("Create the app session entity with the created registration token.");
         VerificationAppSession appSession = new VerificationAppSession();
         appSession.setCreatedOn(LocalDateTime.now());
         appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
@@ -91,7 +89,9 @@ public class AppSessionService {
      /**
      * This method generates a registration Token by a guid or a teletan.
      *
-     * @return
+     * @param key the guid or teletan
+     * @param keyType the key type {@link RegistrationTokenKeyType}
+     * @return an {@link ResponseEntity<RegistrationToken>}
      */
     public ResponseEntity<RegistrationToken> generateRegistrationToken(String key, RegistrationTokenKeyType keyType){
         String registrationToken;
@@ -120,6 +120,7 @@ public class AppSessionService {
                 if (checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
                     LOG.warn("The registration token already exists for this TeleTAN.");
                 } else {
+                    LOG.info("Start generating a new registration token for the given tele TAN.");
                     registrationToken = generateRegistrationToken();
                     appSession = generateAppSession(registrationToken);
                     appSession.setTeleTanHash(hashingService.hash(teleTan));

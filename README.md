@@ -57,14 +57,13 @@ or simply
     docker build --pull --rm -f "Dockerfile" -t cwa-verificationserver "."
     docker run -p 127.0.0.1:8080:8080/tcp -it cwa-verificationserver
 if you are in the root of the checked out repository.
-    
-
-m
- 
+     
 
 
-
-internal SBS (**S**oftware**B**uild**S**ervice) - jenkinsfile
+#### Remarks
+This repository contains files which support our CI/CD pipeline and will be remove without further notice  
+ - DockerfileCi - used for the GitHub buildchaing
+ - Jenkinsfile - used for Telekom internal SBS (**S**oftware**B**uild**S**ervice)
 
 
 

@@ -20,17 +20,21 @@
  */
 package app.coronawarn.verification.services.service;
 
+import app.coronawarn.verification.services.common.RegistrationTokenKeyType;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class represents the hashing service.
  */
 @Component
 public class HashingService {
-
+    private static final String GUID_HASH_PATTERN = "[0-9A-Fa-f]{64}";
     private static final Logger LOG = LogManager.getLogger();
 
     /**
@@ -42,5 +46,20 @@ public class HashingService {
     public String hash(String toHash) {
         LOG.info("HashingService - hash has been called.");
         return DigestUtils.sha256Hex(toHash);
+    }
+
+    /**
+     * Returns true if the String is resembles a SHA256 Pattern
+     *
+     * @param toValidate String that will be checked to match the pattern of a SHA256 Hash
+     * @return Boolean if the String Matches the Pattern
+     */
+    public boolean isHashValid(String toValidate) {
+        Pattern pattern = Pattern.compile(GUID_HASH_PATTERN);
+        Matcher matcher = pattern.matcher(toValidate);
+        if( matcher.find()) {
+            return true;
+        }
+        return false;
     }
 }

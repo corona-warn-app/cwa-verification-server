@@ -43,7 +43,7 @@ There are two ways to build:
  Whether you cloned or downloaded the 'ziped' souces you will either find the sources in the chosen checkout-directory or get a zip file with the source code, which you can expand in folder of your choice.
 
  Open a Terminal on you machine pointing to the directory you checked out to.
->#### if chosing the Maven way  
+>#### Maven    
     mvn package
     java -jar target/cwa-verification-server-0.0.1-SNAPSHOT.jar  
 The verification server will start up and run locally on your machine available on port 8080.

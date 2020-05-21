@@ -32,7 +32,6 @@ import app.coronawarn.verification.services.domain.VerificationAppSession;
 import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.service.AppSessionService;
 import app.coronawarn.verification.services.service.TanService;
-import io.swagger.annotations.ApiOperation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +97,6 @@ public class VerificationController {
      * @param hashedGuid
      * @return RegistrationToken - the created registration token.
      */
-    @ApiOperation(value = "Generates and return a registration token", response = RegistrationToken.class)
     @PostMapping(REGISTRATION_TOKEN_ROUTE)
     public ResponseEntity<RegistrationToken> generateRegistrationToken(@RequestBody HashedGuid hashedGuid) {
 
@@ -123,7 +121,6 @@ public class VerificationController {
      * Otherwise the HTTP-state 400 (Bad Request) will be returned, if an error
      * occures.
      */
-    @ApiOperation(value = "Generates and return a transaction number by a TeleTAN or Registration Token", response = Tan.class)
     @PostMapping(TAN_ROUTE)
     public ResponseEntity<Tan> generateTAN(@RequestBody TanRequest request) {
 
@@ -167,7 +164,6 @@ public class VerificationController {
      * @return the test result / status of the COVID-19 test, which can be
      * POSITIVE, NEGATIVE, INVALID, PENDING or FAILED
      */
-    @ApiOperation(value = "Returns the test status of the COVID-19 test", response = TestResult.class)
     @PostMapping(TESTRESULT_ROUTE)
     public ResponseEntity<TestResult> getTestState(@RequestBody RegistrationToken registrationToken) {
 
@@ -189,7 +185,6 @@ public class VerificationController {
      * @return HTTP-Status 200, if the verification was successfull.
      * Otherwise return HTTP 404.
      */
-    @ApiOperation(value = "Verifies the transaction number - TAN.")
     @PostMapping(TAN_VERIFY_ROUTE)
     public ResponseEntity<Void> verifyTAN(@RequestBody Tan tan) {
 
@@ -219,7 +214,6 @@ public class VerificationController {
      *
      * @return a created teletan
      */
-    @ApiOperation(value = "Creates a TeleTAN")
     @PostMapping(TELE_TAN_ROUTE)
     public ResponseEntity createTeleTAN() {
         //TODO implement if the clarification about JWT is done

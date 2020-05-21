@@ -6,6 +6,8 @@ logging:
 liquibase:
   enabled: false
 spring:
+  application:
+    name: verification-server
   datasource:
     driverClassName: org.h2.Driver
     password: ''

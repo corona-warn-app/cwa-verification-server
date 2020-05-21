@@ -32,13 +32,27 @@ To achieve this, the verification service gets the result of covid-19 tests from
 ## Development
 
 This component can be locally build in order to test the functionality of the interfaces and verify the concepts it is build upon.  
-There are two ways to build
- - maven build, run as spring application
- - docker build, run as local docker container
+There are two ways to build:
+ - [Maven](https:///maven.apache.org) build - to run this component as spring application on your local machine
+ - [Docker](https://www.docker.com) build, to run it as docker container composed from the provided docker composing [file](https://github.com/corona-warn-app/cwa-verification-server/blob/master/Dockerfile)
  ### Prerequisites
- Open JDK 11
- Maven
- 
+ Open JDK 11  
+ Maven  
+ *(optional)*: Docker
+ ### Build
+>#### Maven  
+    mvn package 
+    mvn run  
+
+>#### Docker  
+    docker build -f|--file <path to dockerfile>
+or simply  
+
+    docker build
+if you are in the root of the checked out repository.
+    
+
+
  
 
 

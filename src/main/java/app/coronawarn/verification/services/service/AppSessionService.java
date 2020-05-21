@@ -63,7 +63,11 @@ public class AppSessionService {
      */
     @Autowired
     private HashingService hashingService;
-
+    /**
+     * The {@link TanService}.
+     */
+    @Autowired
+    private TanService tanService;
     /**
      * Creates an AppSession-Entity.
      *
@@ -85,7 +89,7 @@ public class AppSessionService {
     }
     
      /**
-     * This mehtod generates a registration Token by a guid or a teletan.
+     * This method generates a registration Token by a guid or a teletan.
      *
      * @return
      */
@@ -96,28 +100,24 @@ public class AppSessionService {
         switch (keyType) {
             case GUID: 
                 String hashedGuid = key;
-                //TODO: is hashed Guid SHA 256
-                if (checkRegistrationTokenAlreadyExistsForGuid(hashedGuid)) {
-                    LOG.warn("The registration token already exists for the hashed guid.");
-                } else {
-                    LOG.info("Start generating a new registration token for the given hashed guid.");
-                    registrationToken = generateRegistrationToken();
-                    appSession = generateAppSession(registrationToken);
-                    appSession.setGuidHash(hashedGuid);
-                    appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID.getSourceName());
-                    saveAppSession(appSession);
-                    return new ResponseEntity(new RegistrationToken(registrationToken), HttpStatus.CREATED);
+                if (hashingService.isHashValid(key)) {
+                    if (checkRegistrationTokenAlreadyExistsForGuid(hashedGuid)) {
+                        LOG.warn("The registration token already exists for the hashed guid.");
+                    } else {
+                        LOG.info("Start generating a new registration token for the given hashed guid.");
+                        registrationToken = generateRegistrationToken();
+                        appSession = generateAppSession(registrationToken);
+                        appSession.setGuidHash(hashedGuid);
+                        appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID.getSourceName());
+                        saveAppSession(appSession);
+                        return new ResponseEntity(new RegistrationToken(registrationToken), HttpStatus.CREATED);
+                    }
                 }
                 break;
             case TELETAN:
-                /**
-                 * TODO: 
-                 * 1. verify teleTAN already exists.
-                 *          - syntax constraints check?
-                 */
+                //TODO check if teletan is valid?
                 String teleTan = key;
-                
-                if(checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
+                if (checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
                     LOG.warn("The registration token already exists for this TeleTAN.");
                 } else {
                     registrationToken = generateRegistrationToken();

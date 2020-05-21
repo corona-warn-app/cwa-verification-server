@@ -32,6 +32,13 @@ import app.coronawarn.verification.services.domain.VerificationAppSession;
 import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.service.AppSessionService;
 import app.coronawarn.verification.services.service.TanService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +46,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -97,9 +106,15 @@ public class VerificationController {
      * @param hashedGuid
      * @return RegistrationToken - the created registration token.
      */
+    @Operation (summary = "Get registration Token", description = "Get a registration token by providing a SHA-256 hasehd GUID or a TeleTAN")
+    @ApiResponses( value = {
+                @ApiResponse (responseCode = "200",  description = "GUID/TeleTAN found", content = { @Content(mediaType = "application/json", schema= @Schema (implementation = RegistrationToken.class) )}),
+               // @ApiResponse (responseCode = "400", description = "GUID already exists", content = { @Content(mediaType = "application/json", schema= @Schema (implementation = RegistrationToken.class ) )}),
+                @ApiResponse (responseCode = "400", description = "GUID/TeleTAN already exists.", content = { @Content(mediaType = "application/json", schema = @Schema () )}),
+     })
     @PostMapping(REGISTRATION_TOKEN_ROUTE)
     public ResponseEntity<RegistrationToken> generateRegistrationToken(@RequestBody HashedGuid hashedGuid) {
-
+        //TODO: Add consumption of TeleTAN to this request 
         if (appSessionService.checkGuidExists(hashedGuid.getHashedGUID())) {
             LOG.warn("The registration token already exists for the hashed guid.");
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -121,6 +136,12 @@ public class VerificationController {
      * Otherwise the HTTP-state 400 (Bad Request) will be returned, if an error
      * occures.
      */
+    @Operation (summary = "Generates a Tan", description = "Generates a TAN on input of Registration Token. With the TAN one can submit his Diagnosis keys")
+    @ApiResponses( value = {
+                @ApiResponse (responseCode = "201",  description = "Registration Token is valid", content = { @Content(mediaType = "application/json", schema= @Schema (implementation = Tan.class) )}),
+               // @ApiResponse (responseCode = "400", description = "GUID already exists", content = { @Content(mediaType = "application/json", schema= @Schema (implementation = RegistrationToken.class ) )}),
+                @ApiResponse (responseCode = "400", description = "Registration Token does not exist", content = { @Content(mediaType = "application/json", schema = @Schema () )}),
+     })
     @PostMapping(TAN_ROUTE)
     public ResponseEntity<Tan> generateTAN(@RequestBody TanRequest request) {
 
@@ -139,6 +160,7 @@ public class VerificationController {
                     }
                 }
                 break;
+             //TODO: Move the Teletan consumption option to the /registrationToken request, the /tan request only takes registrationTokens
             case TELETAN:
                 Optional<VerificationTan> teleTANEntity = tanService.getEntityByTan(key);
                 if (teleTANEntity.isPresent() && !teleTANEntity.get().isRedeemed()) {
@@ -164,6 +186,12 @@ public class VerificationController {
      * @return the test result / status of the COVID-19 test, which can be
      * POSITIVE, NEGATIVE, INVALID, PENDING or FAILED
      */
+    @Operation (summary = "COVID-19 test result", description = "Gets the result of COVID-19 Test.")
+    @ApiResponses( value = {
+                @ApiResponse (responseCode = "200",  description = "Testresult retrieved", content = { @Content(mediaType = "application/json", schema= @Schema (implementation = TestResult.class) )}),
+               // @ApiResponse (responseCode = "400", description = "GUID already exists", content = { @Content(mediaType = "application/json", schema= @Schema (implementation = RegistrationToken.class ) )}),
+               // @ApiResponse (responseCode = "400", description = "GUID already exists", content = { @Content(mediaType = "application/json", schema = @Schema () )}),
+     })
     @PostMapping(TESTRESULT_ROUTE)
     public ResponseEntity<TestResult> getTestState(@RequestBody RegistrationToken registrationToken) {
 
@@ -185,6 +213,12 @@ public class VerificationController {
      * @return HTTP-Status 200, if the verification was successfull.
      * Otherwise return HTTP 404.
      */
+    @Operation (summary = "verify provided TAN", description = "The provided Tan is verifyed to be formerly issued by the verification server")
+    @ApiResponses( value = {
+                @ApiResponse (responseCode = "200",  description = "TAN is valid an formerly issued by the verification server", content = { @Content(mediaType = "application/json", schema= @Schema () )}),
+               // @ApiResponse (responseCode = "400", description = "GUID already exists", content = { @Content(mediaType = "application/json", schema= @Schema (implementation = RegistrationToken.class ) )}),
+                @ApiResponse (responseCode = "404", description = "TAN could not be verified", content = { @Content(mediaType = "application/json", schema = @Schema () )}),
+     })
     @PostMapping(TAN_VERIFY_ROUTE)
     public ResponseEntity<Void> verifyTAN(@RequestBody Tan tan) {
 
@@ -214,6 +248,12 @@ public class VerificationController {
      *
      * @return a created teletan
      */
+    @Operation (summary = "request generation of a TeleTAN", description = "A TeleTAN is a human readable TAN with 7 characters which is supposed to be issued via call line")
+    @ApiResponses( value = {
+                @ApiResponse (responseCode = "201",  description = "TeleTAN created", content = { @Content(mediaType = "application/json", schema= @Schema (implementation = Tan.class) )}),
+               // @ApiResponse (responseCode = "400", description = "GUID already exists", content = { @Content(mediaType = "application/json", schema= @Schema (implementation = RegistrationToken.class ) )}),
+               // @ApiResponse (responseCode = "400", description = "GUID already exists", content = { @Content(mediaType = "application/json", schema = @Schema () )}),
+     })
     @PostMapping(TELE_TAN_ROUTE)
     public ResponseEntity createTeleTAN() {
         //TODO implement if the clarification about JWT is done

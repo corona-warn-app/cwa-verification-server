@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: verification-server
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:verification
+    username: sa
+    password: ''
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog.yml
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 5000
+        read-timeout: 5000
+        logger-level: basic
+tan:
+  tele:
+    valid:
+      hours: 1
+  valid:
+    days: 14
+appsession:
+  tancountermax: 2
+uri:
+  endpoint:
+    labserver: http://localhost:8088

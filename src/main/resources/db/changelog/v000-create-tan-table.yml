@@ -1,0 +1,73 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-tan-table
+      author: jhagestedt
+      changes:
+        - createTable:
+            tableName: tan
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    unique: true
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: version
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: valid_from
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: valid_until
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tan_hash
+                  type: varchar(64)
+              - column:
+                  name: sot
+                  type: varchar(255)
+              - column:
+                  name: type
+                  type: varchar(255)
+              - column:
+                  name: redeemed
+                  type: boolean
+  - changeSet:
+      id: create-tan-table-increment
+      author: jhagestedt
+      changes:
+        - addAutoIncrement:
+            tableName: tan
+            columnName: id
+            columnDataType: bigint
+            startWith: 1
+            incrementBy: 1
+  - changeSet:
+      id: create-tan-table-indexes
+      author: jhagestedt
+      changes:
+        - createIndex:
+            tableName: tan
+            indexName: idx_tan_tan_hash
+            columns:
+              - column:
+                  name: tan_hash
+                  type: varchar(64)

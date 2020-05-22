@@ -103,7 +103,6 @@ public class TanServiceTest {
     public void generateTeleTan(){
         String teleTan = tanService.generateTeleTan();
         Matcher matcher = pattern.matcher(teleTan);
-        LOG.info(teleTan);
         assertTrue(matcher.find());
     }
 }

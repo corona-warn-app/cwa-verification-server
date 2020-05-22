@@ -53,7 +53,7 @@ public class TanServiceTest {
     public static final String TEST_TAN = "1ea6ce8a-9740-11ea-bb37-0242ac130002";
     public static final String TEST_TAN_HASH = "8de76b627f0be70ea73c367a9a560d6a987eacec71f57ca3d86b2e4ed5b6f780";
 
-    private static final String TELETAN_PATTERN = "[2-9A-KM-N-P-Za-km-n-p-z]{7}";
+    private static final String TELETAN_PATTERN = "[2-9A-HJ-KM-N-P-Za-km-n-p-z]{7}";
     private static final Pattern pattern = Pattern.compile(TELETAN_PATTERN);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSS");
 
@@ -103,7 +103,7 @@ public class TanServiceTest {
     public void generateTeleTan(){
         String teleTan = tanService.generateTeleTan();
         Matcher matcher = pattern.matcher(teleTan);
-
+        LOG.info(teleTan);
         assertTrue(matcher.find());
     }
 }

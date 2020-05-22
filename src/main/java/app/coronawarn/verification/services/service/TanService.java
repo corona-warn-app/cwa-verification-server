@@ -49,9 +49,8 @@ public class TanService {
      */
     private static final Logger LOG = LogManager.getLogger();
 
-    //Todo verify Pattern
     private static final Integer TELE_TAN_LENGTH = 7;
-    private static final String TELETAN_PATTERN = "[2-9A-KM-N-P-Za-km-n-p-z]{7}";
+    private static final String TELETAN_PATTERN = "[2-9A-HJ-KM-N-P-Za-km-n-p-z]{7}";
     private static final Pattern pattern = Pattern.compile(TELETAN_PATTERN);
 
     @Value("${tan.valid.days}")
@@ -200,8 +199,7 @@ public class TanService {
      * @return The validity of the Tele TAN
      */
     public boolean isTeleTanValid(String teleTan) {
-        Matcher matcher = pattern.matcher(teleTan);
-        return  matcher.find();
+      return syntaxVerification(teleTan);
     }
 
     private String generateTanFromUUID() {

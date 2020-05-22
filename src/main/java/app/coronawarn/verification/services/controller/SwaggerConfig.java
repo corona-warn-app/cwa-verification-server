@@ -29,9 +29,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * @author T-Systems International GmbH
- */
-
-/**
+ *
  * This class represents the configuration for swagger.
  */
 @Configuration

@@ -7,7 +7,7 @@ WORKDIR ${WORK_DIR}
 
 RUN mkdir -p /root/.m2 /usr/tsi/verification-server
 RUN cd ${WORK_DIR}
-RUN mvn -B -DskipTests=true ${MAVEN_ARGS} install
+RUN mvn -B ${MAVEN_ARGS} install
 RUN cp ${WORK_DIR}/target/cwa-verification-server*.jar /usr/tsi/verification-server/verification.jar
 
 FROM gcr.io/distroless/java:11

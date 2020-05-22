@@ -46,7 +46,7 @@ public class OpenApiConfig {
       .info(new Info()
         .title("cwa-verification-server")
         .description("OpenApi documentation of cwa-verification-server")
-        .version("0.3.1-alpha")
+        .version("0.3.2-SNAPSHOT")
         .license(new License()
           .name("Apache 2.0")
           .url("http://www.apache.org/licenses/LICENSE-2.0")));

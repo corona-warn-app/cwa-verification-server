@@ -163,7 +163,8 @@ public class TanService {
         verificationTAN.setValidFrom(from);
         verificationTAN.setValidUntil(until);
         verificationTAN.setRedeemed(false);
-        verificationTAN.setCreatedOn(LocalDateTime.now());
+        verificationTAN.setCreatedAt(LocalDateTime.now());
+        verificationTAN.setUpdatedAt(LocalDateTime.now());
         verificationTAN.setType(tanType.name());
         return verificationTAN;
     }

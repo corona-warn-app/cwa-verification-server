@@ -68,7 +68,8 @@ public class AppSessionService {
     public VerificationAppSession generateAppSession(String hashedGuid, String registrationToken) {
         LOG.info("Create the app session entity with the created registration token and given guid.");
         VerificationAppSession appSession = new VerificationAppSession();
-        appSession.setCreatedOn(LocalDateTime.now());
+        appSession.setCreatedAt(LocalDateTime.now());
+        appSession.setUpdatedAt(LocalDateTime.now());
         appSession.setGuidHash(hashedGuid);
         appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
         appSession.setTanGenerated(false);

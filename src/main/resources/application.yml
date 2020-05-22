@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: verification-server
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:verification
+    username: sa
+    password: ''
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    change-log: classpath:db/changelog.yml
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 5000
+        read-timeout: 5000
+        logger-level: basic
+tan:
+  tele:
+    valid:
+      days: 14
+  valid:
+    days: 14
+uri:
+  endpoint:
+    labserver: http://labtestresults-test.telekom-healthcare.com:30000

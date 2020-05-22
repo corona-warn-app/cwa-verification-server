@@ -20,9 +20,14 @@
  */
 package app.coronawarn.verification.services.common;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+
 /**
  * The possible result states of the COVID-19 lab-test.
  */
+@Schema
+@Getter
 public enum LabTestResult {
     PENDING(0),
     NEGATIVE(1),
@@ -41,10 +46,6 @@ public enum LabTestResult {
      */
     LabTestResult(Integer stateValue) {
         this.testResult = stateValue;
-    }
-
-    public int getTestResult() {
-        return testResult;
     }
 
 }

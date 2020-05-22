@@ -21,6 +21,8 @@
         "tags":[
           "verification-controller"
         ],
+        "summary":"Get registration Token",
+        "description":"Get a registration token by providing a SHA-256 hasehd GUID or a TeleTAN",
         "operationId":"generateRegistrationToken",
         "requestBody":{
           "content":{
@@ -33,10 +35,20 @@
           "required":true
         },
         "responses":{
-          "200":{
-            "description":"OK",
+          "400":{
+            "description":"GUID/TeleTAN already exists.",
             "content":{
-              "*/*":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/RegistrationToken"
+                }
+              }
+            }
+          },
+          "200":{
+            "description":"GUID/TeleTAN found",
+            "content":{
+              "application/json":{
                 "schema":{
                   "$ref":"#/components/schemas/RegistrationToken"
                 }
@@ -51,6 +63,8 @@
         "tags":[
           "verification-controller"
         ],
+        "summary":"Generates a Tan",
+        "description":"Generates a TAN on input of Registration Token. With the TAN one can submit his Diagnosis keys",
         "operationId":"generateTAN",
         "requestBody":{
           "content":{
@@ -63,10 +77,20 @@
           "required":true
         },
         "responses":{
-          "200":{
-            "description":"OK",
+          "201":{
+            "description":"Registration Token is valid",
             "content":{
-              "*/*":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Tan"
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Registration Token does not exist",
+            "content":{
+              "application/json":{
                 "schema":{
                   "$ref":"#/components/schemas/Tan"
                 }
@@ -81,6 +105,8 @@
         "tags":[
           "verification-controller"
         ],
+        "summary":"COVID-19 test result",
+        "description":"Gets the result of COVID-19 Test.",
         "operationId":"getTestState",
         "requestBody":{
           "content":{
@@ -94,9 +120,9 @@
         },
         "responses":{
           "200":{
-            "description":"OK",
+            "description":"Testresult retrieved",
             "content":{
-              "*/*":{
+              "application/json":{
                 "schema":{
                   "$ref":"#/components/schemas/TestResult"
                 }
@@ -111,6 +137,8 @@
         "tags":[
           "verification-controller"
         ],
+        "summary":"Verify provided TAN",
+        "description":"The provided Tan is verified to be formerly issued by the verification server",
         "operationId":"verifyTAN",
         "requestBody":{
           "content":{
@@ -123,8 +151,11 @@
           "required":true
         },
         "responses":{
+          "404":{
+            "description":"TAN could not be verified"
+          },
           "200":{
-            "description":"OK"
+            "description":"TAN is valid an formerly issued by the verification server"
           }
         }
       }
@@ -134,10 +165,12 @@
         "tags":[
           "verification-controller"
         ],
+        "summary":"Request generation of a TeleTAN",
+        "description":"A TeleTAN is a human readable TAN with 7 characters which is supposed to be issued via call line",
         "operationId":"createTeleTAN",
         "responses":{
-          "200":{
-            "description":"OK",
+          "201":{
+            "description":"TeleTAN created",
             "content":{
               "*/*":{
                 "schema":{

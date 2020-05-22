@@ -20,9 +20,12 @@
  */
 package app.coronawarn.verification.services.common;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * This class represent the different key types of transaction numbers (TANs).
  */
+@Schema
 public enum TanKeyType {
 
     /**

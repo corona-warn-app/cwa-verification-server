@@ -20,7 +20,7 @@ tan:
 uri:
   endpoint:
     labserver: http://labtestresults-test.telekom-healthcare.com:30000
-    
+
 feign:
   client:
     config:

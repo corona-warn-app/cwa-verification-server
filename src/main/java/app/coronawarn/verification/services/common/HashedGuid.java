@@ -20,6 +20,7 @@
  */
 package app.coronawarn.verification.services.common;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,7 @@ import lombok.NoArgsConstructor;
  *
  * @author T-Systems International GmbH
  */
+@Schema
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

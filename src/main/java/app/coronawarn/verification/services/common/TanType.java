@@ -20,9 +20,12 @@
  */
 package app.coronawarn.verification.services.common;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * This class represents the different types of tans.
  */
+@Schema
 public enum TanType {
     /**
      * The general tan.

@@ -21,7 +21,6 @@
 package app.coronawarn.verification.services.controller;
 
 import app.coronawarn.verification.services.client.Guid;
-import app.coronawarn.verification.services.client.LabServerService;
 import app.coronawarn.verification.services.client.TestResult;
 import app.coronawarn.verification.services.common.AppSessionSourceOfTrust;
 import app.coronawarn.verification.services.common.LabTestResult;
@@ -33,8 +32,11 @@ import app.coronawarn.verification.services.common.TanSourceOfTrust;
 import app.coronawarn.verification.services.domain.VerificationAppSession;
 import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.service.AppSessionService;
+import app.coronawarn.verification.services.service.LabServerService;
 import app.coronawarn.verification.services.service.TanService;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
@@ -42,6 +44,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -111,8 +114,18 @@ public class VerificationController {
      * @param request {@link RegistrationTokenRequest}
      * @return RegistrationToken - the created registration token {@link RegistrationToken}
      */
-    @ApiOperation(value = "Generates and return a registration token", response = RegistrationToken.class)
-    @PostMapping(REGISTRATION_TOKEN_ROUTE)
+    @Operation(
+        summary = "Get registration Token",
+        description = "Get a registration token by providing a SHA-256 hasehd GUID or a TeleTAN"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "GUID/TeleTAN found"),
+        @ApiResponse(responseCode = "400", description = "GUID/TeleTAN already exists."),
+    })
+    @PostMapping(value = REGISTRATION_TOKEN_ROUTE,
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<RegistrationToken> generateRegistrationToken(@RequestBody RegistrationTokenRequest request) {
         String key = request.getKey();
         RegistrationTokenKeyType keyType = request.getKeyType();
@@ -134,7 +147,7 @@ public class VerificationController {
         } else {
             return appSessionService.generateRegistrationToken(key, keyType);
         }
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().build();
     }
 
     /**
@@ -145,8 +158,18 @@ public class VerificationController {
      * @return A generated TAN (with the HTTP-state 201 Created). Otherwise the
      * HTTP-state 400 (Bad Request) will be returned, if an error occurs.
      */
-    @ApiOperation(value = "Generates and return a transaction number by a Registration Token", response = Tan.class)
-    @PostMapping(TAN_ROUTE)
+    @Operation(
+        summary = "Generates a Tan",
+        description = "Generates a TAN on input of Registration Token. With the TAN one can submit his Diagnosis keys"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Registration Token is valid"),
+        @ApiResponse(responseCode = "400", description = "Registration Token does not exist"),
+    })
+    @PostMapping(value = TAN_ROUTE,
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<Tan> generateTAN(@RequestBody RegistrationToken registrationToken) {
 
         Optional<VerificationAppSession> actual =
@@ -160,22 +183,22 @@ public class VerificationController {
                     //TODO check error handling if lab service cannot be performed.
                     TestResult covidTestResult = labServerService.result(new Guid(appSession.getGuidHash()));
                     if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()) {
-                        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                        return ResponseEntity.badRequest().build();
                     }
                 } else if (AppSessionSourceOfTrust.TELETAN.getSourceName().equals(sourceOfTrust)) {
                     sourceOfTrust = TanSourceOfTrust.TELETAN.getSourceName();
                 } else {
-                    return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                    return ResponseEntity.badRequest().build();
                 }
                 String generatedTAN = tanService.generateVerificationTan(sourceOfTrust);
                 Integer tanCounter = appSession.getTanCounter();
                 tanCounter++;
                 appSession.setTanCounter(tanCounter);
                 appSessionService.saveAppSession(appSession);
-                return new ResponseEntity(new Tan(generatedTAN), HttpStatus.CREATED);
+                return ResponseEntity.status(HttpStatus.CREATED).body(new Tan(generatedTAN));
             }
         }
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().build();
     }
 
     /**
@@ -185,18 +208,27 @@ public class VerificationController {
      * @return the test result / status of the COVID-19 test, which can be
      * POSITIVE, NEGATIVE, INVALID, PENDING or FAILED
      */
-    @ApiOperation(value = "Returns the test status of the COVID-19 test", response = TestResult.class)
-    @PostMapping(TESTRESULT_ROUTE)
+    @Operation(
+        summary = "COVID-19 test result",
+        description = "Gets the result of COVID-19 Test."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Testresult retrieved"),
+    })
+    @PostMapping(value = TESTRESULT_ROUTE,
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<TestResult> getTestState(@RequestBody RegistrationToken registrationToken) {
 
         Optional<VerificationAppSession> actual = appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
         if (actual.isPresent()) {
             //TODO Exception Handling 404 from LabServer
             TestResult result = labServerService.result(new Guid(actual.get().getGuidHash()));
-            return new ResponseEntity(result, HttpStatus.OK);
+            return ResponseEntity.ok(result);
         } else {
             LOG.info("The registration token is invalid.");
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -207,8 +239,17 @@ public class VerificationController {
      * @return HTTP-Status 200, if the verification was successful. Otherwise
      * return HTTP 404.
      */
-    @ApiOperation(value = "Verifies the transaction number - TAN.")
-    @PostMapping(TAN_VERIFY_ROUTE)
+    @Operation(
+        summary = "Verify provided TAN",
+        description = "The provided Tan is verified to be formerly issued by the verification server"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "TAN is valid an formerly issued by the verification server"),
+        @ApiResponse(responseCode = "404", description = "TAN could not be verified"),
+    })
+    @PostMapping(value = TAN_VERIFY_ROUTE,
+        consumes = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<Void> verifyTAN(@RequestBody Tan tan) {
 
         boolean verified = false;
@@ -229,7 +270,7 @@ public class VerificationController {
                 }
             }
         }
-        return new ResponseEntity(verified ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(verified ? HttpStatus.OK : HttpStatus.NOT_FOUND).build();
     }
 
     /**
@@ -237,10 +278,16 @@ public class VerificationController {
      *
      * @return a created teletan
      */
-    @ApiOperation(value = "Creates a TeleTAN")
+    @Operation(
+        summary = "Request generation of a TeleTAN",
+        description = "A TeleTAN is a human readable TAN with 7 characters which is supposed to be issued via call line"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "TeleTAN created"),
+    })
     @PostMapping(TELE_TAN_ROUTE)
-    public ResponseEntity createTeleTAN() {
-        //TODO implement if the clarification about JWT is done
-        return new ResponseEntity(HttpStatus.CREATED);
+    public ResponseEntity<Void> createTeleTAN() {
+        // TODO implement if the clarification about communication is done
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

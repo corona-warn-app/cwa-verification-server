@@ -38,7 +38,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 /**
- * This class represents the VerficationAppSession service.
+ * This class represents the VerificationAppSession service.
  *
  * @author T-Systems International GmbH
  */
@@ -76,7 +76,8 @@ public class AppSessionService {
     public VerificationAppSession generateAppSession(String registrationToken) {
         LOG.info("Create the app session entity with the created registration token.");
         VerificationAppSession appSession = new VerificationAppSession();
-        appSession.setCreatedOn(LocalDateTime.now());
+        appSession.setCreatedAt(LocalDateTime.now());
+        appSession.setUpdatedAt(LocalDateTime.now());
         appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
         appSession.setTanCounter(0);
         return appSession;
@@ -111,7 +112,9 @@ public class AppSessionService {
                         appSession.setGuidHash(hashedGuid);
                         appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID.getSourceName());
                         saveAppSession(appSession);
-                        return new ResponseEntity(new RegistrationToken(registrationToken), HttpStatus.CREATED);
+                        return ResponseEntity
+                            .status(HttpStatus.CREATED)
+                            .body(new RegistrationToken(registrationToken));
                     }
                 }
                 break;
@@ -127,7 +130,9 @@ public class AppSessionService {
                         appSession.setTeleTanHash(hashingService.hash(teleTan));
                         appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN.getSourceName());
                         saveAppSession(appSession);
-                        return new ResponseEntity(new RegistrationToken(registrationToken), HttpStatus.CREATED);
+                        return ResponseEntity
+                            .status(HttpStatus.CREATED)
+                            .body(new RegistrationToken(registrationToken));
                     }
                 }
                 else {
@@ -137,7 +142,7 @@ public class AppSessionService {
             default: 
                 break;
         } 
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().build();
     }
 
     /**
@@ -147,7 +152,7 @@ public class AppSessionService {
      * @param appSession the verification app session entity
      */
     public void saveAppSession(VerificationAppSession appSession) {
-        LOG.info("VerficationAppSessionService start saveAppSession.");
+        LOG.info("VerificationAppSessionService start saveAppSession.");
         appSessionRepository.save(appSession);
     }
 
@@ -159,7 +164,7 @@ public class AppSessionService {
      * @return flag for existing registrationToken
      */
     public boolean checkRegistrationTokenExists(String registrationTokenHash) {
-        LOG.info("VerficationAppSessionService start checkRegistrationTokenExists.");
+        LOG.info("VerificationAppSessionService start checkRegistrationTokenExists.");
         VerificationAppSession appSession = new VerificationAppSession();
         appSession.setRegistrationTokenHash(registrationTokenHash);
         return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
@@ -173,7 +178,7 @@ public class AppSessionService {
      * @return Optional VerificationAppSession
      */
     public Optional<VerificationAppSession> getAppSessionByToken(String registrationToken) {
-        LOG.info("VerficationAppSessionService start getAppSessionByToken.");
+        LOG.info("VerificationAppSessionService start getAppSessionByToken.");
         VerificationAppSession appSession = new VerificationAppSession();
         appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
         return appSessionRepository.findOne(Example.of(appSession, ExampleMatcher.matching()));
@@ -187,7 +192,7 @@ public class AppSessionService {
      * @return flag for existing guid
      */
     public boolean checkRegistrationTokenAlreadyExistsForGuid(String hashedGuid) {
-        LOG.info("VerficationAppSessionService start checkRegistrationTokenExists.");
+        LOG.info("VerificationAppSessionService start checkRegistrationTokenExists.");
         VerificationAppSession appSession = new VerificationAppSession();
         appSession.setGuidHash(hashedGuid);
         return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
@@ -201,7 +206,7 @@ public class AppSessionService {
      * @return flag for existing teleTAN
      */
     public boolean checkRegistrationTokenAlreadyExistForTeleTan(String teleTan) {
-        LOG.info("VerficationAppSessionService start checkTeleTanAlreadyExistForTeleTan.");
+        LOG.info("VerificationAppSessionService start checkTeleTanAlreadyExistForTeleTan.");
         VerificationAppSession appSession = new VerificationAppSession();
         appSession.setRegistrationTokenHash(hashingService.hash(teleTan));
         return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));

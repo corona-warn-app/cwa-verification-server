@@ -18,20 +18,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package app.coronawarn.verification.services.service;
 
-package app.coronawarn.verification.services.client;
-
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
+import app.coronawarn.verification.services.client.Guid;
+import app.coronawarn.verification.services.client.LabServerClient;
+import app.coronawarn.verification.services.client.TestResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
- * This class represents the Labor Server service client.
- *
- * @author T-Systems International GmbH
+ * This class represents the lab server service.
  */
+@Component
+public class LabServerService {
 
-@FeignClient(name = "labServerService", url = "${uri.endpoint.labserver}")
-public interface LabServerService {
-    @PostMapping(value = "/api/v1/app/result", consumes = "application/json", produces = "application/json")
-    TestResult result(Guid guid);
+    @Autowired
+    private LabServerClient labServerClient;
+
+    public TestResult result(Guid guid) {
+        return labServerClient.result(guid);
+    }
 }

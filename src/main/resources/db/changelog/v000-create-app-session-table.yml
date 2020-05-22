@@ -35,33 +35,46 @@ databaseChangeLog:
             name: registration_token_hash
             type: varchar(64)
         - column:
-            name: tan_generated_flag
-            type: boolean
+            name: tele_tan_hash
+            type: varchar(64)
+        - column:
+            name: tan_counter
+            type: int
+        - column:
+            name: sot
+            type: varchar(255)
 - changeSet:
     id: create-app-session-table-increment
     author: jhagestedt
     changes:
-      - addAutoIncrement:
-          tableName: app_session
-          columnName: id
-          columnDataType: bigint
-          startWith: 1
-          incrementBy: 1
+    - addAutoIncrement:
+        tableName: app_session
+        columnName: id
+        columnDataType: bigint
+        startWith: 1
+        incrementBy: 1
 - changeSet:
     id: create-app-session-table-indexes
     author: jhagestedt
     changes:
-      - createIndex:
-          tableName: app_session
-          indexName: idx_app_session_guid_hash
-          columns:
-            - column:
-                name: guid_hash
-                type: varchar(64)
-      - createIndex:
-          tableName: app_session
-          indexName: idx_app_session_registration_token_hash
-          columns:
-            - column:
-                name: registration_token_hash
-                type: varchar(64)
+    - createIndex:
+        tableName: app_session
+        indexName: idx_app_session_guid_hash
+        columns:
+        - column:
+            name: guid_hash
+            type: varchar(64)
+    - createIndex:
+        tableName: app_session
+        indexName: idx_app_session_registration_token_hash
+        columns:
+        - column:
+            name: registration_token_hash
+            type: varchar(64)
+    - createIndex:
+        tableName: app_session
+        indexName: idx_app_session_tele_tan_hash
+        columns:
+        - column:
+            name: tele_tan_hash
+            type: varchar(64)

@@ -20,6 +20,7 @@
  */
 package app.coronawarn.verification.services.service;
 
+import app.coronawarn.verification.services.VerificationApplication;
 import app.coronawarn.verification.services.domain.VerificationTan;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,23 +29,24 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.test.context.junit4.SpringRunner;
+
 
 import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(properties = {"log4j.configurationFile=log4j2-test.xml"})
-@TestPropertySource("classpath:test.properties")
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@ContextConfiguration(classes = VerificationApplication.class)
 public class TanServiceTest {
     /**
      * The logger.
@@ -71,6 +73,8 @@ public class TanServiceTest {
     @Test
     public void saveTanTest() throws Exception {
         VerificationTan tan = new VerificationTan();
+        tan.setCreatedAt(LocalDateTime.now());
+        tan.setUpdatedAt(LocalDateTime.now());
         tan.setRedeemed(false);
         tan.setTanHash(TEST_GUI_HASH);
         tan.setValidFrom(LocalDateTime.now());
@@ -85,6 +89,8 @@ public class TanServiceTest {
     @Test
     public void getEntityByTanTest(){
         VerificationTan tan = new VerificationTan();
+        tan.setCreatedAt(LocalDateTime.now());
+        tan.setUpdatedAt(LocalDateTime.now());
         tan.setRedeemed(false);
         tan.setTanHash(TEST_TAN_HASH);
         LocalDateTime start = LocalDateTime.parse(LocalDateTime.now().format(formatter));

@@ -22,9 +22,11 @@ feign:
 tan:
   tele:
     valid:
-      days: 14
+      hours: 1
   valid:
     days: 14
+appsession:
+  tancountermax: 2
 uri:
   endpoint:
-    labserver: http://labtestresults-test.telekom-healthcare.com:30000
+    labserver: http://localhost:8088

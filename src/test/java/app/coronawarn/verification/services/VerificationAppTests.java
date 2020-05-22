@@ -21,7 +21,7 @@
 package app.coronawarn.verification.services;
 
 import app.coronawarn.verification.services.client.Guid;
-import app.coronawarn.verification.services.client.LabServerService;
+import app.coronawarn.verification.services.client.LabServerClient;
 import app.coronawarn.verification.services.client.TestResult;
 import app.coronawarn.verification.services.common.AppSessionSourceOfTrust;
 import app.coronawarn.verification.services.common.RegistrationToken;
@@ -33,6 +33,7 @@ import app.coronawarn.verification.services.common.TanType;
 import app.coronawarn.verification.services.domain.VerificationAppSession;
 import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.repository.VerificationAppSessionRepository;
+import app.coronawarn.verification.services.service.LabServerService;
 import app.coronawarn.verification.services.service.TanService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,10 +45,14 @@ import org.apache.logging.log4j.Logger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
+
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +60,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -65,10 +73,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * This is the test class for the verification application.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
-@SpringBootTest(properties = {"log4j.configurationFile=log4j2-test.xml"})
-@TestPropertySource("classpath:test.properties")
+@SpringBootTest
+@ContextConfiguration(classes = VerificationApplication.class)
 public class VerificationAppTests {
 
     public static final String TEST_GUI_HASH = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
@@ -85,8 +93,6 @@ public class VerificationAppTests {
     private static final String PREFIX_API_VERSION = "/version/v1";
     @Autowired
     private MockMvc mockMvc;
-    //    @MockBean
-//    private VerificationAppSessionService appSessionService;
     @MockBean
     private LabServerService labServerService;
     @MockBean
@@ -108,11 +114,10 @@ public class VerificationAppTests {
      */
     @Test
     public void callGenerateTAN() throws Exception {
-        LOG.info("VerficationAppTests callGenerateTAN()");
+        LOG.info("VerificationAppTests callGenerateTAN()");
 
         prepareAppSessionTestData();
-
-        given(this.labServerService.result(new Guid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
+        doReturn(TEST_LAB_POSITIVE_RESULT).when(labServerService).result(any());
 
         mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -120,8 +125,8 @@ public class VerificationAppTests {
                 .andExpect(status().isCreated());
 
         long count = appSessionrepository.count();
-        LOG.info("Got {} verfication entries from db repository.", count);
-        assertTrue("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", count == 1);
+        LOG.info("Got {} verification entries from db repository.", count);
+        assertEquals("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", 1, count);
 
         List<VerificationAppSession> verficationList = appSessionrepository.findAll();
         assertNotNull(verficationList);
@@ -138,7 +143,7 @@ public class VerificationAppTests {
      */
     @Test
     public void callGetRegistrationTokenByGuid() throws Exception {
-        LOG.info("VerficationAppTests callGetRegistrationToken() ");
+        LOG.info("VerificationAppTests callGetRegistrationToken() ");
 
         RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
         mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
@@ -148,8 +153,8 @@ public class VerificationAppTests {
                 .andExpect(jsonPath("$.registrationToken").exists());
 
         long count = appSessionrepository.count();
-        LOG.info("Got {} verfication entries from db repository.", count);
-        assertTrue("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", count == 1);
+        LOG.info("Got {} verification entries from db repository.", count);
+        assertEquals("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", 1, count);
 
         List<VerificationAppSession> verificationList = appSessionrepository.findAll();
         assertNotNull(verificationList);
@@ -165,7 +170,7 @@ public class VerificationAppTests {
      */
     @Test
     public void callGetRegistrationTokenByTeleTan() throws Exception {
-        LOG.info("VerficationAppTests callGetRegistrationToken() ");
+        LOG.info("VerificationAppTests callGetRegistrationToken() ");
         appSessionrepository.deleteAll();
         RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_TELETAN, RegistrationTokenKeyType.TELETAN);
         given(this.tanService.verifyTeleTan(TEST_TELETAN)).willReturn(true);
@@ -179,12 +184,12 @@ public class VerificationAppTests {
                 .andExpect(jsonPath("$.registrationToken").exists());
 
         long count = appSessionrepository.count();
-        LOG.info("Got {} verfication entries from db repository.", count);
-        assertTrue("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", count == 1);
+        LOG.info("Got {} verification entries from db repository.", count);
+        assertEquals("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", 1, count);
 
         List<VerificationAppSession> verificationList = appSessionrepository.findAll();
         assertNotNull(verificationList);
-        assertEquals(null, verificationList.get(0).getGuidHash());
+        assertNull(verificationList.get(0).getGuidHash());
         assertEquals(AppSessionSourceOfTrust.TELETAN.getSourceName(), verificationList.get(0).getSourceOfTrust());
         assertNotNull(verificationList.get(0).getRegistrationTokenHash());
     }
@@ -196,7 +201,7 @@ public class VerificationAppTests {
      */
     @Test
     public void callGetTestState() throws Exception {
-        LOG.info("VerficationAppTests callGetTestState()");
+        LOG.info("VerificationAppTests callGetTestState()");
 
         prepareAppSessionTestData();
 
@@ -214,7 +219,7 @@ public class VerificationAppTests {
      */
     @Test
     public void callGetTestStateByAppSessionIsEmpty() throws Exception {
-        LOG.info("VerficationAppTests callGetTestStateByAppSessionIsEmpty()");
+        LOG.info("VerificationAppTests callGetTestStateByAppSessionIsEmpty()");
 
         //clean the repo
         appSessionrepository.deleteAll();
@@ -230,7 +235,7 @@ public class VerificationAppTests {
      */
     @Test
     public void callVerifyTAN() throws Exception {
-        LOG.info("VerficationAppTests callVerifyTAN()");
+        LOG.info("VerificationAppTests callVerifyTAN()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
         given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
@@ -250,7 +255,7 @@ public class VerificationAppTests {
      */
     @Test
     public void callVerifyTANByVerificationTANIsEmpty() throws Exception {
-        LOG.info("VerficationAppTests callVerifyTANByVerificationTANIsEmpty()");
+        LOG.info("VerificationAppTests callVerifyTANByVerificationTANIsEmpty()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
         // without mock tanService.getEntityByTan so this method will return empty entity
@@ -266,7 +271,7 @@ public class VerificationAppTests {
      */
     @Test
     public void callVerifyTANByTanSyntaxFailed() throws Exception {
-        LOG.info("VerficationAppTests callVerifyTANByTanSyntaxFailed()");
+        LOG.info("VerificationAppTests callVerifyTANByTanSyntaxFailed()");
 
         // without mock tanService.syntaxVerification so this method will return false
         given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
@@ -282,7 +287,7 @@ public class VerificationAppTests {
      */
     @Test
     public void callVerifyTANByExpiredTimeFrom() throws Exception {
-        LOG.info("VerficationAppTests callVerifyTANByTanSyntaxFailed()");
+        LOG.info("VerificationAppTests callVerifyTANByTanSyntaxFailed()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
         VerificationTan cvtan = getVerificationTANTestData();
@@ -301,7 +306,7 @@ public class VerificationAppTests {
      */
     @Test
     public void callVerifyTANByExpiredTimeUntil() throws Exception {
-        LOG.info("VerficationAppTests callVerifyTANByTanSyntaxFailed()");
+        LOG.info("VerificationAppTests callVerifyTANByTanSyntaxFailed()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
         VerificationTan cvtan = getVerificationTANTestData();
@@ -320,7 +325,7 @@ public class VerificationAppTests {
      */
     @Test
     public void callVerifyTANByIsRedeemed() throws Exception {
-        LOG.info("VerficationAppTests callVerifyTANByIsRedeemed()");
+        LOG.info("VerificationAppTests callVerifyTANByIsRedeemed()");
 
         given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
         VerificationTan cvtan = getVerificationTANTestData();
@@ -340,7 +345,8 @@ public class VerificationAppTests {
     private VerificationAppSession getAppSessionTestData() {
         VerificationAppSession cv = new VerificationAppSession();
         cv.setGuidHash(TEST_GUI_HASH);
-        cv.setCreatedOn(LocalDateTime.now());
+        cv.setCreatedAt(LocalDateTime.now());
+        cv.setUpdatedAt(LocalDateTime.now());
         cv.setTanCounter(0);
         cv.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID.getSourceName());
         cv.setRegistrationTokenHash(TEST_REG_TOK_HASH);
@@ -349,7 +355,8 @@ public class VerificationAppTests {
 
     private VerificationTan getVerificationTANTestData() {
         VerificationTan cvtan = new VerificationTan();
-        cvtan.setCreatedOn(LocalDateTime.now());
+        cvtan.setCreatedAt(LocalDateTime.now());
+        cvtan.setUpdatedAt(LocalDateTime.now());
         cvtan.setRedeemed(false);
         cvtan.setSourceOfTrust(TEST_SOT);
         cvtan.setTanHash(TEST_HASHED_TAN);
@@ -361,7 +368,8 @@ public class VerificationAppTests {
 
     private VerificationTan getTeleTanTestData() {
         VerificationTan cvtan = new VerificationTan();
-        cvtan.setCreatedOn(LocalDateTime.now());
+        cvtan.setCreatedAt(LocalDateTime.now());
+        cvtan.setUpdatedAt(LocalDateTime.now());
         cvtan.setRedeemed(false);
         cvtan.setSourceOfTrust(TanSourceOfTrust.TELETAN.getSourceName());
         cvtan.setTanHash(TEST_HASHED_TAN);
@@ -372,7 +380,6 @@ public class VerificationAppTests {
     }
 
     private String getAsJsonFormat(Object o) throws JsonProcessingException {
-        String jsonRepresentation = mapper.writeValueAsString(o);
-        return jsonRepresentation;
+        return mapper.writeValueAsString(o);
     }
 }

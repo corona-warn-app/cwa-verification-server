@@ -25,7 +25,7 @@ You can find an architectural overview of the component in the [solution archite
 This component of the Corona-warn-app whereas named **verification process** provides indeed two functionalities:  
 1. prove that a prentended positive case is indeed positive  
 2. provide the result of a Covid-19 Test  
-    
+
 To achieve this, the verification service gets the result of covid-19 tests from LIS (**L**abor **I**nformation **S**ystem) which deliver testresults to it. The complete process is described in [cwa-documentation/Solution Architecture](https://github.com/corona-warn-app/cwa-documentation/blob/master/solution_architecture.md) to which you may refer for detailed information about the workflow.
 
 The software stack of the verification server is based on spring boot, currently with an in-memory H2 database. As the persistence relies on the liquibase
@@ -50,7 +50,7 @@ For acitvely take part on the development this is the way you should chose.
 Please check, whether following prerequisites are fullfilled
 - [Open JDK 11](https://openjdk.java.net) or a similar JDK 11 compatible VM  
 - [Maven](https://apache.maven.org)  
-  
+
 is installed on your machine.  
 You can then open a terminal pointing to the root directory of the verification server and do the following:
 
@@ -69,11 +69,11 @@ On the commandline do the following:
 
     docker build -f|--file <path to dockerfile>  -t <imagename>  <path-to-verificationserver-root>
     docker run -p 127.0.0.1:8080:8080/tcp -it <imagename>
-    
+
 or simply  
 
     docker build --pull --rm -f "Dockerfile" -t cwa-verificationserver "."
-    docker run -p 127.0.0.1:8080:8080/tcp -it cwa-verificationserver 
+    docker run -p 127.0.0.1:8080:8080/tcp -it cwa-verificationserver
 
 if you are in the root of the checked out repository.  
 The dockerimmage will then run on your local machine on port 8080 assuming you configured docker for shared network mode.
@@ -86,7 +86,7 @@ Along with the application there comes a swagger2 api documentation which you ca
 mostly like:  
 
 http://localhost:8080/swagger-ui.html#/verification-controller
-     
+
 
 
 #### Remarks
@@ -105,10 +105,10 @@ The following channels are available for discussions, feedback, and support requ
 
 | Type                     | Channel                                                |
 | ------------------------ | ------------------------------------------------------ |
-| **General Discussion**   | <a href="https://github.com/corona-warn-app/cwa-documentation/issues/new/choose" title="General Discussion"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-documentation/question.svg?style=flat-square"></a> </a>   |
-| **Concept Feedback**    | <a href="https://github.com/corona-warn-app/cwa-documentation/issues/new/choose" title="Open Concept Feedback"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-documentation/architecture.svg?style=flat-square"></a>  |
+| **General Discussion**   | <a href="https://github.com/corona-warn-app/cwa-verification-server/issues/new/choose" title="General Discussion"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-verification-server/question.svg?style=flat-square"></a> </a>   |
+| **Concept Feedback**    | <a href="https://github.com/corona-warn-app/cwa-verification-server/issues/new/choose" title="Open Concept Feedback"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-verification-server/architecture.svg?style=flat-square"></a>  |
 | **Verification Server Issue**    | <a href="https://github.com/corona-warn-app/cwa-verification-server/issues" title="Open Issues"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-verification-server?style=flat"></a>  |
-| **Other Requests**    | <a href="mailto:corona-warn-app.opensource@sap.com" title="Email CWD Team"><img src="https://img.shields.io/badge/email-CWD%20team-green?logo=mail.ru&style=flat-square&logoColor=white"></a>   |
+| **Other Requests**    | <a href="mailto:open-source@telekom.de" title="Email CWA Team"><img src="https://img.shields.io/badge/email-CWA%20team-green?logo=mail.ru&style=flat-square&logoColor=white"></a>   |
 
 ## How to Contribute
 

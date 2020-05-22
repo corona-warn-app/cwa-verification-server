@@ -4,9 +4,9 @@
  * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
- * copyright owners license this file to you under the Apache
- * License, Version 2.0 (the "License"); you may not use this
- * file except in compliance with the License.
+ * copyright owners license this file to you under the Apache 
+ * License, Version 2.0 (the "License"); you may not use this 
+ * file except in compliance with the License. 
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -20,27 +20,20 @@
  */
 package app.coronawarn.verification.services.common;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 /**
- * This class represents a tan request.
+ * This class represents the possible sources of trust for an appsession entity.
  */
-@Schema
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class TanRequest {
+public enum AppSessionSourceOfTrust {
+    HASHED_GUID("hashedGUID"),
+    TELETAN("teleTAN");
 
-    /**
-     * The key which can be a teletan or a regestration token.
-     */
-    private String key;
+    private final String sourceName;
 
-    /**
-     * The type of key, which can be "token" or "teleTAN".
-     */
-    private TanKeyType keyType;
+    private AppSessionSourceOfTrust(String sourceName) {
+        this.sourceName = sourceName;
+    }
+
+    public String getSourceName() {
+        return this.sourceName;
+    }
 }

@@ -20,10 +20,7 @@
  */
 package app.coronawarn.verification.services.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -33,6 +30,10 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * This class represents the AppSession-entity.
@@ -67,7 +68,13 @@ public class VerificationAppSession implements Serializable {
     @Column(name = "registration_token_hash")
     private String registrationTokenHash;
 
-    @Column(name = "tan_generated_flag")
-    private boolean tanGenerated;
+    @Column(name = "tele_tan_hash")
+    private String teleTanHash;
+
+    @Column(name = "tan_counter")
+    private Integer tanCounter;
+
+    @Column(name = "sot")
+    private String sourceOfTrust;
 
 }

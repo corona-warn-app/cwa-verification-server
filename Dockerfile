@@ -14,3 +14,5 @@ FROM gcr.io/distroless/java:11
 COPY --from=build /usr/tsi/verification-server/verification.jar .
 CMD ["verification.jar"]
 EXPOSE 8080
+LABEL Version="0.0.1-SNAPSHOT"
+LABEL Name="cwa-verification-server"

@@ -18,23 +18,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package app.coronawarn.verification.services.common;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+package app.coronawarn.verification.services.client;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
- * This class represents the registration Token.
+ * This class represents the Labor Server service client.
  *
  * @author T-Systems International GmbH
  */
-@Schema
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RegistrationToken {
 
-    private String registrationToken;
+@FeignClient(name = "labServerService", url = "${uri.endpoint.labserver}")
+public interface LabServerClient {
+    @PostMapping(value = "/api/v1/app/result",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    TestResult result(Guid guid);
 }

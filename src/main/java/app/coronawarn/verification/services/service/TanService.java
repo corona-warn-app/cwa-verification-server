@@ -23,6 +23,7 @@ package app.coronawarn.verification.services.service;
 import app.coronawarn.verification.services.common.TanType;
 import app.coronawarn.verification.services.domain.VerificationTan;
 import app.coronawarn.verification.services.repository.VerificationTanRepository;
+import net.bytebuddy.utility.RandomString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class represents the TanService service.
@@ -46,32 +49,37 @@ public class TanService {
      */
     private static final Logger LOG = LogManager.getLogger();
 
+    private static final Integer TELE_TAN_LENGTH = 7;
+    private static final String TELETAN_PATTERN = "[2-9A-HJ-KM-N-P-Za-km-n-p-z]{7}";
+    private static final Pattern pattern = Pattern.compile(TELETAN_PATTERN);
+
     @Value("${tan.valid.days}")
-    Integer TAN_VALID_IN_DAYS;
-    @Value("${tan.tele.valid.days}")
-    Integer TELE_TAN_VALID_IN_DAYS;
+    private Integer TAN_VALID_IN_DAYS;
+    @Value("${tan.tele.valid.hours}")
+    private Integer TELE_TAN_VALID_IN_HOURS;
 
     /**
      * The {@link VerificationTanRepository}.
      */
     @Autowired
-    VerificationTanRepository tanRepository;
+    private VerificationTanRepository tanRepository;
 
     /**
      * The {@link HashingService}.
      */
     @Autowired
-    HashingService hashingService;
+    private HashingService hashingService;
 
     /**
-     * This Method generates a valid TAN and persists it.
-     * Returns the generated TAN.
+     * This Method generates a valid TAN and persists it. Returns the generated
+     * TAN.
      *
-     * @return
+     * @param sourceOfTrust sets the source of Trust for the Tan
+     * @return Tan a valid tan with given source of Trust
      */
-    public String generateVerificationTan() {
+    public String generateVerificationTan(String sourceOfTrust) {
         String tan = generateValidTan();
-        persistTan(tan, TanType.TAN);
+        persistTan(tan, TanType.TAN, sourceOfTrust);
         return tan;
     }
 
@@ -94,6 +102,39 @@ public class TanService {
     //TODO syntax constraints from Julius
     public boolean syntaxVerification(String tan) {
         return true;
+    }
+
+    //TODO syntax constraints from Julius
+    /**
+     * Check Tele-TAN syntax constraints.
+     *
+     * @param teleTan the Tele TAN
+     * @return Tele TAN verification flag
+     */
+    private boolean syntaxTeleTanVerification(String teleTan) {
+        Matcher matcher = pattern.matcher(teleTan);
+        return matcher.find();
+    }
+
+    /**
+     * Verifies the tele transaction number (Tele TAN).
+     *
+     * @param teleTan the Tele TAN to verify
+     * @return verified is teletan is verified
+     */
+    public boolean verifyTeleTan(String teleTan) {
+        boolean verified = false;
+        if (syntaxTeleTanVerification(teleTan)) {
+            Optional<VerificationTan> teleTANEntity = getEntityByTan(teleTan);
+            if (teleTANEntity.isPresent() && !teleTANEntity.get().isRedeemed()) {
+                verified = true;
+            } else {
+                LOG.warn("The Tele TAN is unknown or already redeemed.");
+            }
+        } else {
+            LOG.warn("The Tele TAN is not valid to the syntax constraints.");
+        }
+        return verified;
     }
 
     /**
@@ -126,21 +167,39 @@ public class TanService {
      *
      * @param tan
      * @param tanType
-     * @return
+     * @return the persisted Tan
      */
-    private VerificationTan persistTan(String tan, TanType tanType) {
-        VerificationTan newTan = TanService.this.generateVerificationTan(tan, tanType);
+    private VerificationTan persistTan(String tan, TanType tanType,
+            String sourceOfTrust) {
+        VerificationTan newTan = TanService.this.generateVerificationTan(tan, tanType, sourceOfTrust);
         return tanRepository.save(newTan);
     }
 
     /**
-     * Returns the hash of the supplied string.
+     * Returns the a new valid Teletan String.
      *
-     * @return
+     * @return a new Teletan
      */
     public String generateTeleTan() {
-        //TODO clarify generation of Teletan
-        return null;
+        /*
+         * The generation of a Teletan is a temporary solution and may be subject to later changes.
+         */
+        String generatedTeleTan = "";
+        Boolean isTeleTanValid = false;
+
+        while (!isTeleTanValid) {
+            generatedTeleTan = RandomString.make(TELE_TAN_LENGTH);
+            isTeleTanValid = isTeleTanValid(generatedTeleTan);
+        }
+        return generatedTeleTan;
+    }
+    /**
+     * Returns the if a Tele Tan matches the Pattern requirements
+     * @param teleTan the Tele TAN to check
+     * @return The validity of the Tele TAN
+     */
+    public boolean isTeleTanValid(String teleTan) {
+      return syntaxTeleTanVerification(teleTan);
     }
 
     private String generateTanFromUUID() {
@@ -153,15 +212,23 @@ public class TanService {
         return !tanRepository.existsByTanHash(tanHash);
     }
 
-    private VerificationTan generateVerificationTan(String tan, TanType tanType) {
+    private VerificationTan generateVerificationTan(String tan, TanType tanType,
+            String sourceOfTrust) {
         LocalDateTime from = LocalDateTime.now();
-        LocalDateTime until = from.plusDays(TAN_VALID_IN_DAYS);
+        LocalDateTime until;
 
+        if (tanType == TanType.TELETAN) {
+            until = from.plusHours(TELE_TAN_VALID_IN_HOURS);
+        }
+        else {
+            until = from.plusDays(TAN_VALID_IN_DAYS);
+        }
 
         VerificationTan verificationTAN = new VerificationTan();
         verificationTAN.setTanHash(hashingService.hash(tan));
         verificationTAN.setValidFrom(from);
         verificationTAN.setValidUntil(until);
+        verificationTAN.setSourceOfTrust(sourceOfTrust);
         verificationTAN.setRedeemed(false);
         verificationTAN.setCreatedAt(LocalDateTime.now());
         verificationTAN.setUpdatedAt(LocalDateTime.now());
@@ -182,5 +249,4 @@ public class TanService {
         tanEntity.setTanHash(hashingService.hash(tan));
         return tanRepository.findOne(Example.of(tanEntity, ExampleMatcher.matching()));
     }
-
 }

@@ -20,16 +20,51 @@
  */
 package app.coronawarn.verification.services.service;
 
+import app.coronawarn.verification.services.VerificationApplication;
+import app.coronawarn.verification.services.domain.VerificationTan;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.test.context.junit4.SpringRunner;
+
+
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
 @RunWith(SpringRunner.class)
+@SpringBootTest
+@ContextConfiguration(classes = VerificationApplication.class)
 public class TanServiceTest {
+    /**
+     * The logger.
+     */
+    private static final Logger LOG = LogManager.getLogger();
+    public static final String TEST_TAN = "1ea6ce8a-9740-11ea-bb37-0242ac130002";
+    public static final String TEST_TAN_HASH = "8de76b627f0be70ea73c367a9a560d6a987eacec71f57ca3d86b2e4ed5b6f780";
 
+    private static final String TELETAN_PATTERN = "[2-9A-HJ-KM-N-P-Za-km-n-p-z]{7}";
+    private static final Pattern pattern = Pattern.compile(TELETAN_PATTERN);
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSS");
+
+    public static final String TEST_GUI_HASH = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
+    public static final String TEST_TAN_TYPE = "TAN";
+    private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
+
+    @Autowired
+    TanService tanService;
     /**
      * Test saveTan.
      *
@@ -37,7 +72,43 @@ public class TanServiceTest {
      */
     @Test
     public void saveTanTest() throws Exception {
+        VerificationTan tan = new VerificationTan();
+        tan.setCreatedAt(LocalDateTime.now());
+        tan.setUpdatedAt(LocalDateTime.now());
+        tan.setRedeemed(false);
+        tan.setTanHash(TEST_GUI_HASH);
+        tan.setValidFrom(LocalDateTime.now());
+        tan.setValidUntil(TAN_VALID_UNTIL_IN_DAYS);
+        tan.setType(TEST_TAN_TYPE);
+        tan.setSourceOfTrust("");
+
+        VerificationTan retunedTan = tanService.saveTan(tan);
+        Assert.assertEquals(retunedTan, tan);
+    }
+
+    @Test
+    public void getEntityByTanTest(){
+        VerificationTan tan = new VerificationTan();
+        tan.setCreatedAt(LocalDateTime.now());
+        tan.setUpdatedAt(LocalDateTime.now());
+        tan.setRedeemed(false);
+        tan.setTanHash(TEST_TAN_HASH);
+        LocalDateTime start = LocalDateTime.parse(LocalDateTime.now().format(formatter));
+        tan.setValidFrom(start);
+        tan.setValidUntil(LocalDateTime.parse((TAN_VALID_UNTIL_IN_DAYS.format(formatter))));
+        tan.setType(TEST_TAN_TYPE);
+        tan.setSourceOfTrust("");
+        tanService.saveTan(tan);
+
+        Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
+        assertTrue(tanFromDB.get().equals(tan));
 
     }
 
+    @Test
+    public void generateTeleTan(){
+        String teleTan = tanService.generateTeleTan();
+        Matcher matcher = pattern.matcher(teleTan);
+        assertTrue(matcher.find());
+    }
 }

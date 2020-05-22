@@ -4,9 +4,9 @@
  * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
- * copyright owners license this file to you under the Apache
- * License, Version 2.0 (the "License"); you may not use this
- * file except in compliance with the License.
+ * copyright owners license this file to you under the Apache 
+ * License, Version 2.0 (the "License"); you may not use this 
+ * file except in compliance with the License. 
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -20,21 +20,20 @@
  */
 package app.coronawarn.verification.services.common;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 /**
- * This class represents the registration Token.
- *
- * @author T-Systems International GmbH
+ * This class represents the possible sources of trust for a TAN entity.
  */
-@Schema
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RegistrationToken {
+public enum TanSourceOfTrust {
+    CONNECTED_LAB("connectedLab"),
+    TELETAN("teleTAN");
 
-    private String registrationToken;
+    private final String sourceName;
+
+    private TanSourceOfTrust(String sourceName) {
+        this.sourceName = sourceName;
+    }
+
+    public String getSourceName() {
+        return this.sourceName;
+    }
 }

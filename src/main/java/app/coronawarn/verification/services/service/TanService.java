@@ -218,7 +218,7 @@ public class TanService {
             String sourceOfTrust) {
         LocalDateTime from = LocalDateTime.now();
         LocalDateTime until;
-        
+
         if (tanType == TanType.TELETAN) {
             until = from.plusHours(TELE_TAN_VALID_IN_HOURS);
         }

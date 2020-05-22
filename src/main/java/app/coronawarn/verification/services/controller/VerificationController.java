@@ -113,32 +113,26 @@ public class VerificationController {
      */
     @ApiOperation(value = "Generates and return a registration token", response = RegistrationToken.class)
     @PostMapping(REGISTRATION_TOKEN_ROUTE)
-    public ResponseEntity<RegistrationToken> generateRegistrationToken(@RequestBody(required = false)
-                                                                               RegistrationTokenRequest request) {
-        /*
-         * TODO verify this fix for issue  [BSI][20200519] Verbose Error Messages #4
-         */
-        if (request != null) {
-            String key = request.getKey();
-            RegistrationTokenKeyType keyType = request.getKeyType();
+    public ResponseEntity<RegistrationToken> generateRegistrationToken(@RequestBody RegistrationTokenRequest request) {
+        String key = request.getKey();
+        RegistrationTokenKeyType keyType = request.getKeyType();
 
-            if (keyType == RegistrationTokenKeyType.TELETAN) {
-                if (tanService.verifyTeleTan(key)) {
-                    ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
-                    Optional<VerificationTan> optional = tanService.getEntityByTan(key);
-                    if (optional.isPresent()) {
-                        VerificationTan teleTAN = optional.get();
-                        teleTAN.setRedeemed(true);
-                        tanService.saveTan(teleTAN);
-                        return response;
-                    }
-                    else {
-                        LOG.warn("Teletan is not found");
-                    }
+        if (keyType == RegistrationTokenKeyType.TELETAN) {
+            if (tanService.verifyTeleTan(key)) {
+                ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
+                Optional<VerificationTan> optional = tanService.getEntityByTan(key);
+                if (optional.isPresent()) {
+                    VerificationTan teleTAN = optional.get();
+                    teleTAN.setRedeemed(true);
+                    tanService.saveTan(teleTAN);
+                    return response;
                 }
-            } else {
-                return appSessionService.generateRegistrationToken(key, keyType);
+                else {
+                    LOG.warn("Teletan is not found");
+                }
             }
+        } else {
+            return appSessionService.generateRegistrationToken(key, keyType);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }

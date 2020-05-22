@@ -3,7 +3,7 @@
  *
  * (C) 2020, T-Systems International GmbH
  *
- * Deutsche Telekom AG, SAP AG and all other contributors /
+ * Deutsche Telekom AG and all other contributors /
  * copyright owners license this file to you under the Apache
  * License, Version 2.0 (the "License"); you may not use this
  * file except in compliance with the License.
@@ -18,27 +18,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package app.coronawarn.verification.services.controller;
 
+package app.coronawarn.verification.services.config;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-/**
- * @author T-Systems International GmbH
- */
 
 @Configuration
-@EnableSwagger2
-public class SwaggerConfig {
+public class OpenApiConfig {
+
     @Bean
-    public Docket productApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
-            .select().apis(RequestHandlerSelectors.basePackage("app.coronawarn.verification.services.controller"))
-            //.paths(regex("/verification.*"))
-            .build();
+    public OpenAPI springShopOpenAPI() {
+        return new OpenAPI()
+            .info(new Info()
+                .title("cwa-verification-server")
+                .description("OpenApi documentation of cwa-verification-server")
+                .version("v0.0.1")
+                .license(new License()
+                    .name("Apache 2.0")
+                    .url("http://www.apache.org/licenses/LICENSE-2.0")));
     }
 }

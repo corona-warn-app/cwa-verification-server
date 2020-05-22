@@ -13,6 +13,7 @@ spring:
 tan:
   tele:
     valid:
+      days: 14
       hours: 1
   valid:
     days: 14

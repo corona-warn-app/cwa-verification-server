@@ -21,6 +21,11 @@ Licensor:  H2
 Website:   http://www.h2database.com/
 License:   Mozilla Public License 2.0
 
+Component: Liquibase
+Licensor:  Datical, Inc
+Website:   https://www.liquibase.org/
+License:   Apache License 2.0
+
 Component: Lombok
 Licensor:  The Project Lombok
 Website:   https://projectlombok.org/

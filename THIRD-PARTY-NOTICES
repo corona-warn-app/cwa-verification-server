@@ -47,8 +47,7 @@ Website:   https://springdoc.org/
 License:   Apache License 2.0
 
 --------------------------------------------------------------------------------
-Apache License 2.0 (Commons IO, Commons Math 3, flyway, JSON-Simple,
-Maven, MinIO Object Storage, snakeyaml, Spring Boot, Zenko CloudServer)
+Apache License 2.0 (Apache Commons Codec, Maven, Spring Boot, Spring Doc)
 
                                  Apache License
                            Version 2.0, January 2004
@@ -631,7 +630,7 @@ Exhibit B - “Incompatible With Secondary Licenses” Notice
 This Source Code Form is “Incompatible With Secondary Licenses”, as defined by
 the Mozilla Public License, v. 2.0.
 --------------------------------------------------------------------------------
-MIT License (BouncyCastle)
+MIT License (Lombok)
 
 Copyright (c) 2000 - 2020 The Legion of the Bouncy Castle Inc.
 (https://www.bouncycastle.org)

@@ -31,6 +31,11 @@ Licensor:  The Project Lombok
 Website:   https://projectlombok.org/
 License:   MIT license
 
+Component: Mockito
+Licensor:  Apache Software Foundation
+Website:   https://maven.apache.org/
+License:   MIT License
+
 Component: Maven
 Licensor:  Apache Software Foundation
 Website:   https://maven.apache.org/
@@ -635,7 +640,7 @@ Exhibit B - “Incompatible With Secondary Licenses” Notice
 This Source Code Form is “Incompatible With Secondary Licenses”, as defined by
 the Mozilla Public License, v. 2.0.
 --------------------------------------------------------------------------------
-MIT License (Lombok)
+MIT License (Lombok, Mockito)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in

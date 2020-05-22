@@ -1,0 +1,238 @@
+{
+  "openapi":"3.0.1",
+  "info":{
+    "title":"cwa-verification-server",
+    "description":"OpenApi documentation of cwa-verification-server",
+    "license":{
+      "name":"Apache 2.0",
+      "url":"http://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "version":"v0.0.1"
+  },
+  "servers":[
+    {
+      "url":"http://localhost:8080",
+      "description":"Generated server url"
+    }
+  ],
+  "paths":{
+    "/version/v1/registrationToken":{
+      "post":{
+        "tags":[
+          "verification-controller"
+        ],
+        "summary":"Get registration Token",
+        "description":"Get a registration token by providing a SHA-256 hasehd GUID or a TeleTAN",
+        "operationId":"generateRegistrationToken",
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref":"#/components/schemas/HashedGuid"
+              }
+            }
+          },
+          "required":true
+        },
+        "responses":{
+          "400":{
+            "description":"GUID/TeleTAN already exists.",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/RegistrationToken"
+                }
+              }
+            }
+          },
+          "200":{
+            "description":"GUID/TeleTAN found",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/RegistrationToken"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/version/v1/tan":{
+      "post":{
+        "tags":[
+          "verification-controller"
+        ],
+        "summary":"Generates a Tan",
+        "description":"Generates a TAN on input of Registration Token. With the TAN one can submit his Diagnosis keys",
+        "operationId":"generateTAN",
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref":"#/components/schemas/TanRequest"
+              }
+            }
+          },
+          "required":true
+        },
+        "responses":{
+          "201":{
+            "description":"Registration Token is valid",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Tan"
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Registration Token does not exist",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Tan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/version/v1/testresult":{
+      "post":{
+        "tags":[
+          "verification-controller"
+        ],
+        "summary":"COVID-19 test result",
+        "description":"Gets the result of COVID-19 Test.",
+        "operationId":"getTestState",
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref":"#/components/schemas/RegistrationToken"
+              }
+            }
+          },
+          "required":true
+        },
+        "responses":{
+          "200":{
+            "description":"Testresult retrieved",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/TestResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/version/v1/tan/verify":{
+      "post":{
+        "tags":[
+          "verification-controller"
+        ],
+        "summary":"Verify provided TAN",
+        "description":"The provided Tan is verified to be formerly issued by the verification server",
+        "operationId":"verifyTAN",
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref":"#/components/schemas/Tan"
+              }
+            }
+          },
+          "required":true
+        },
+        "responses":{
+          "404":{
+            "description":"TAN could not be verified"
+          },
+          "200":{
+            "description":"TAN is valid an formerly issued by the verification server"
+          }
+        }
+      }
+    },
+    "/version/v1/tan/teletan":{
+      "post":{
+        "tags":[
+          "verification-controller"
+        ],
+        "summary":"Request generation of a TeleTAN",
+        "description":"A TeleTAN is a human readable TAN with 7 characters which is supposed to be issued via call line",
+        "operationId":"createTeleTAN",
+        "responses":{
+          "201":{
+            "description":"TeleTAN created",
+            "content":{
+              "*/*":{
+                "schema":{
+                  "type":"string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components":{
+    "schemas":{
+      "HashedGuid":{
+        "type":"object",
+        "properties":{
+          "hashedGUID":{
+            "type":"string"
+          }
+        }
+      },
+      "RegistrationToken":{
+        "type":"object",
+        "properties":{
+          "registrationToken":{
+            "type":"string"
+          }
+        }
+      },
+      "TanRequest":{
+        "type":"object",
+        "properties":{
+          "key":{
+            "type":"string"
+          },
+          "keyType":{
+            "type":"string",
+            "enum":[
+              "TOKEN",
+              "TELETAN"
+            ]
+          }
+        }
+      },
+      "Tan":{
+        "type":"object",
+        "properties":{
+          "tan":{
+            "type":"string"
+          }
+        }
+      },
+      "TestResult":{
+        "type":"object",
+        "properties":{
+          "testResult":{
+            "type":"integer",
+            "format":"int32"
+          }
+        }
+      }
+    }
+  }
+}

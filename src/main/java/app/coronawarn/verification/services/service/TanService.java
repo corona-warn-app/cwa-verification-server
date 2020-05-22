@@ -230,7 +230,8 @@ public class TanService {
         verificationTAN.setValidUntil(until);
         verificationTAN.setSourceOfTrust(sourceOfTrust);
         verificationTAN.setRedeemed(false);
-        verificationTAN.setCreatedOn(LocalDateTime.now());
+        verificationTAN.setCreatedAt(LocalDateTime.now());
+        verificationTAN.setUpdatedAt(LocalDateTime.now());
         verificationTAN.setType(tanType.name());
         return verificationTAN;
     }

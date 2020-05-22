@@ -7,7 +7,7 @@
       "name":"Apache 2.0",
       "url":"http://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version":"v0.0.1"
+    "version":"0.3-alpha"
   },
   "servers":[
     {
@@ -28,13 +28,23 @@
           "content":{
             "application/json":{
               "schema":{
-                "$ref":"#/components/schemas/HashedGuid"
+                "$ref":"#/components/schemas/RegistrationTokenRequest"
               }
             }
           },
           "required":true
         },
         "responses":{
+          "500":{
+            "description":"Internal Server Error",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/RegistrationToken"
+                }
+              }
+            }
+          },
           "400":{
             "description":"GUID/TeleTAN already exists.",
             "content":{
@@ -65,20 +75,30 @@
         ],
         "summary":"Generates a Tan",
         "description":"Generates a TAN on input of Registration Token. With the TAN one can submit his Diagnosis keys",
-        "operationId":"generateTAN",
+        "operationId":"generateTan",
         "requestBody":{
           "content":{
             "application/json":{
               "schema":{
-                "$ref":"#/components/schemas/TanRequest"
+                "$ref":"#/components/schemas/RegistrationToken"
               }
             }
           },
           "required":true
         },
         "responses":{
-          "201":{
-            "description":"Registration Token is valid",
+          "500":{
+            "description":"Internal Server Error",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/RegistrationToken"
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Registration Token does not exist",
             "content":{
               "application/json":{
                 "schema":{
@@ -87,8 +107,8 @@
               }
             }
           },
-          "400":{
-            "description":"Registration Token does not exist",
+          "201":{
+            "description":"Registration Token is valid",
             "content":{
               "application/json":{
                 "schema":{
@@ -119,6 +139,26 @@
           "required":true
         },
         "responses":{
+          "500":{
+            "description":"Internal Server Error",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/RegistrationToken"
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Bad Request",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/TestResult"
+                }
+              }
+            }
+          },
           "200":{
             "description":"Testresult retrieved",
             "content":{
@@ -137,9 +177,9 @@
         "tags":[
           "verification-controller"
         ],
-        "summary":"Verify provided TAN",
+        "summary":"Verify provided Tan",
         "description":"The provided Tan is verified to be formerly issued by the verification server",
-        "operationId":"verifyTAN",
+        "operationId":"verifyTan",
         "requestBody":{
           "content":{
             "application/json":{
@@ -151,11 +191,31 @@
           "required":true
         },
         "responses":{
-          "404":{
-            "description":"TAN could not be verified"
+          "500":{
+            "description":"Internal Server Error",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/RegistrationToken"
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Bad Request",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/TestResult"
+                }
+              }
+            }
           },
           "200":{
-            "description":"TAN is valid an formerly issued by the verification server"
+            "description":"Tan is valid an formerly issued by the verification server"
+          },
+          "404":{
+            "description":"Tan could not be verified"
           }
         }
       }
@@ -165,19 +225,32 @@
         "tags":[
           "verification-controller"
         ],
-        "summary":"Request generation of a TeleTAN",
-        "description":"A TeleTAN is a human readable TAN with 7 characters which is supposed to be issued via call line",
-        "operationId":"createTeleTAN",
+        "summary":"Request generation of a TeleTan",
+        "description":"A TeleTan is a human readable TAN with 7 characters which is supposed to be issued via call line",
+        "operationId":"createTeleTan",
         "responses":{
-          "201":{
-            "description":"TeleTAN created",
+          "500":{
+            "description":"Internal Server Error",
             "content":{
-              "*/*":{
+              "application/json":{
                 "schema":{
-                  "type":"string"
+                  "$ref":"#/components/schemas/RegistrationToken"
                 }
               }
             }
+          },
+          "400":{
+            "description":"Bad Request",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/TestResult"
+                }
+              }
+            }
+          },
+          "201":{
+            "description":"TeleTan created"
           }
         }
       }
@@ -185,23 +258,7 @@
   },
   "components":{
     "schemas":{
-      "HashedGuid":{
-        "type":"object",
-        "properties":{
-          "hashedGUID":{
-            "type":"string"
-          }
-        }
-      },
-      "RegistrationToken":{
-        "type":"object",
-        "properties":{
-          "registrationToken":{
-            "type":"string"
-          }
-        }
-      },
-      "TanRequest":{
+      "RegistrationTokenRequest":{
         "type":"object",
         "properties":{
           "key":{
@@ -210,9 +267,17 @@
           "keyType":{
             "type":"string",
             "enum":[
-              "TOKEN",
+              "GUID",
               "TELETAN"
             ]
+          }
+        }
+      },
+      "RegistrationToken":{
+        "type":"object",
+        "properties":{
+          "registrationToken":{
+            "type":"string"
           }
         }
       },

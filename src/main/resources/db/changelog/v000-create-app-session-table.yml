@@ -1,80 +1,80 @@
 databaseChangeLog:
-- changeSet:
-    id: create-app-session-table
-    author: jhagestedt
-    changes:
-    - createTable:
-        tableName: app_session
-        columns:
-        - column:
-            name: id
-            type: bigint
-            constraints:
-              unique: true
-              nullable: false
-              primaryKey: true
-        - column:
-            name: version
-            type: bigint
-            constraints:
-              nullable: false
-        - column:
-            name: created_at
-            type: datetime
-            constraints:
-              nullable: false
-        - column:
-            name: updated_at
-            type: datetime
-            constraints:
-              nullable: false
-        - column:
-            name: guid_hash
-            type: varchar(64)
-        - column:
-            name: registration_token_hash
-            type: varchar(64)
-        - column:
-            name: tele_tan_hash
-            type: varchar(64)
-        - column:
-            name: tan_counter
-            type: int
-        - column:
-            name: sot
-            type: varchar(255)
-- changeSet:
-    id: create-app-session-table-increment
-    author: jhagestedt
-    changes:
-    - addAutoIncrement:
-        tableName: app_session
-        columnName: id
-        columnDataType: bigint
-        startWith: 1
-        incrementBy: 1
-- changeSet:
-    id: create-app-session-table-indexes
-    author: jhagestedt
-    changes:
-    - createIndex:
-        tableName: app_session
-        indexName: idx_app_session_guid_hash
-        columns:
-        - column:
-            name: guid_hash
-            type: varchar(64)
-    - createIndex:
-        tableName: app_session
-        indexName: idx_app_session_registration_token_hash
-        columns:
-        - column:
-            name: registration_token_hash
-            type: varchar(64)
-    - createIndex:
-        tableName: app_session
-        indexName: idx_app_session_tele_tan_hash
-        columns:
-        - column:
-            name: tele_tan_hash
-            type: varchar(64)
+  - changeSet:
+      id: create-app-session-table
+      author: jhagestedt
+      changes:
+        - createTable:
+            tableName: app_session
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    unique: true
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: version
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: guid_hash
+                  type: varchar(64)
+              - column:
+                  name: registration_token_hash
+                  type: varchar(64)
+              - column:
+                  name: tele_tan_hash
+                  type: varchar(64)
+              - column:
+                  name: tan_counter
+                  type: int
+              - column:
+                  name: sot
+                  type: varchar(255)
+  - changeSet:
+      id: create-app-session-table-increment
+      author: jhagestedt
+      changes:
+        - addAutoIncrement:
+            tableName: app_session
+            columnName: id
+            columnDataType: bigint
+            startWith: 1
+            incrementBy: 1
+  - changeSet:
+      id: create-app-session-table-indexes
+      author: jhagestedt
+      changes:
+        - createIndex:
+            tableName: app_session
+            indexName: idx_app_session_guid_hash
+            columns:
+              - column:
+                  name: guid_hash
+                  type: varchar(64)
+        - createIndex:
+            tableName: app_session
+            indexName: idx_app_session_registration_token_hash
+            columns:
+              - column:
+                  name: registration_token_hash
+                  type: varchar(64)
+        - createIndex:
+            tableName: app_session
+            indexName: idx_app_session_tele_tan_hash
+            columns:
+              - column:
+                  name: tele_tan_hash
+                  type: varchar(64)

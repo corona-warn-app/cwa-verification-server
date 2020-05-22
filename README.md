@@ -23,12 +23,12 @@ The goal of this project is to develop the official Corona-Warn-App for Germany 
 ## Architecture Overview
 You can find an architectural overview of the component in the [solution architecture document](https://github.com/corona-warn-app/cwa-documentation/blob/master/solution_architecture.md)  
 This component of the Corona-warn-app whereas named **verification process** provides indeed two functionalities:  
-1. prove that a prentended positive case is indeed positive  
+1. prove that a pretended positive case is indeed positive  
 2. provide the result of a Covid-19 Test  
 
-To achieve this, the verification service gets the result of covid-19 tests from LIS (**L**abor **I**nformation **S**ystem) which deliver testresults to it. The complete process is described in [cwa-documentation/Solution Architecture](https://github.com/corona-warn-app/cwa-documentation/blob/master/solution_architecture.md) to which you may refer for detailed information about the workflow.
+To achieve this, the verification service gets the result of covid-19 tests from LIS (**L**abor **I**nformation **S**ystem) which deliver test results to it. The complete process is described in [cwa-documentation/Solution Architecture](https://github.com/corona-warn-app/cwa-documentation/blob/master/solution_architecture.md) to which you may refer for detailed information about the workflow.
 
-The software stack of the verification server is based on spring boot, currently with an in-memory H2 database. As the persistence relies on the liquibase
+The software stack of the verification server is based on spring boot, currently with an in-memory H2 database. As the persistence relies on the liquibase.
 
 
 ## Development
@@ -42,12 +42,12 @@ There are two ways to build:
  [Maven](https://apache.maven.org)  
  *(optional)*: [Docker](https://www.docker.com)  
  ### Build
- Whether you cloned or downloaded the 'ziped' souces you will either find the sources in the chosen checkout-directory or get a zip file with the source code, which you can expand to a folder of your choice.
+ Whether you cloned or downloaded the 'zipped' sources you will either find the sources in the chosen checkout-directory or get a zip file with the source code, which you can expand to a folder of your choice.
 
- In either case open a terminal pointing to the directory you put the sources in. The local build process is described afterwards depending on the way you chose.
+ In either case open a terminal pointing to the directory you put the sources in. The local build process is described afterwards depending on the way you choose.
 #### Maven based build
-For acitvely take part on the development this is the way you should chose.   
-Please check, whether following prerequisites are fullfilled
+For actively take part on the development this is the way you should choose.   
+Please check, whether following prerequisites are fulfilled
 - [Open JDK 11](https://openjdk.java.net) or a similar JDK 11 compatible VM  
 - [Maven](https://apache.maven.org)  
 
@@ -60,26 +60,26 @@ You can then open a terminal pointing to the root directory of the verification 
 The verification server will start up and run locally on your machine available on port 8080.
 
 #### Docker based build  
-We recommend, that you first check the prerequisites to ensure that  
+We recommend that you first check the prerequisites to ensure that  
 - [Docker](https://www.docker.com)  
 
-is istalled on you machine  
+is installed on you machine  
 
 On the commandline do the following:
-
-    docker build -f|--file <path to dockerfile>  -t <imagename>  <path-to-verificationserver-root>
-    docker run -p 127.0.0.1:8080:8080/tcp -it <imagename>
-
+```bash
+docker build -f|--file <path to dockerfile>  -t <imagename>  <path-to-verificationserver-root>
+docker run -p 127.0.0.1:8080:8080/tcp -it <imagename>
+```
 or simply  
-
-    docker build --pull --rm -f "Dockerfile" -t cwa-verificationserver "."
-    docker run -p 127.0.0.1:8080:8080/tcp -it cwa-verificationserver
-
+```bash
+docker build --pull --rm -f "Dockerfile" -t cwa-verificationserver "."
+docker run -p 127.0.0.1:8080:8080/tcp -it cwa-verificationserver
+```
 if you are in the root of the checked out repository.  
-The dockerimmage will then run on your local machine on port 8080 assuming you configured docker for shared network mode.
+The docker image will then run on your local machine on port 8080 assuming you configured docker for shared network mode.
 #### API Documentation  
 
-Along with the application there comes a swagger2 api documentation which you can access in your webbrowser, when the verification server applications runs:
+Along with the application there comes a swagger2 api documentation which you can access in your web browser, when the verification server applications runs:
 
     <base-url>/swagger-ui.html#/verification-controller
 
@@ -91,7 +91,7 @@ http://localhost:8080/swagger-ui.html#/verification-controller
 
 #### Remarks
 This repository contains files which support our CI/CD pipeline and will be remove without further notice  
- - DockerfileCi - used for the GitHub buildchaing
+ - DockerfileCi - used for the GitHub build chain
  - Jenkinsfile - used for Telekom internal SBS (**S**oftware**B**uild**S**ervice)
 
 
@@ -112,7 +112,7 @@ The following channels are available for discussions, feedback, and support requ
 
 ## How to Contribute
 
-Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](./CONTRIBUTING.md). By participating in this project, you agree to abide by its [Code of Conduct](./CODE_OF_CONDUCT.md) at all times.
+Contribution and feedback is encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](./CONTRIBUTING.md). By participating in this project, you agree to abide by its [Code of Conduct](./CODE_OF_CONDUCT.md) at all times.
 
 ## Contributors
 

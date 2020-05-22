@@ -116,7 +116,7 @@ public class AppSessionService {
                 break;
             case TELETAN:
                 String teleTan = key;
-                if(tanService.isTeleTanValid(teleTan)){
+                if (tanService.isTeleTanValid(teleTan)) {
                     if (checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
                         LOG.warn("The registration token already exists for this TeleTAN.");
                     } else {

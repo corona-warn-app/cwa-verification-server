@@ -162,7 +162,7 @@ public class VerificationController {
                         generatedTAN = tanService.generateVerificationTan();
                         appSession.setTanGenerated(true);
                         appSessionService.saveAppSession(appSession);
-                        ResponseEntity.status(HttpStatus.CREATED).body(new Tan(generatedTAN));
+                        return ResponseEntity.status(HttpStatus.CREATED).body(new Tan(generatedTAN));
                     }
                 }
                 break;
@@ -175,7 +175,7 @@ public class VerificationController {
 
                     teleTAN.setRedeemed(true);
                     tanService.saveTan(teleTAN);
-                    ResponseEntity.status(HttpStatus.CREATED).body(new Tan(generatedTAN));
+                    return ResponseEntity.status(HttpStatus.CREATED).body(new Tan(generatedTAN));
                 }
                 LOG.info("The given teleTAN is invalid.");
                 break;

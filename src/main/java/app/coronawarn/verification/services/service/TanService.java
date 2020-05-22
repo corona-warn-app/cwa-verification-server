@@ -177,11 +177,14 @@ public class TanService {
     }
 
     /**
-     * Returns the hash of the supplied string.
+     * Returns the a new valid Teletan String.
      *
      * @return a new Teletan
      */
     public String generateTeleTan() {
+        /*
+         * The generation of a Teletan is a temporary solution and may be subject to later changes.
+         */
         String generatedTeleTan = "";
         Boolean isTeleTanValid = false;
 
@@ -214,7 +217,14 @@ public class TanService {
     private VerificationTan generateVerificationTan(String tan, TanType tanType,
             String sourceOfTrust) {
         LocalDateTime from = LocalDateTime.now();
-        LocalDateTime until = from.plusDays(TAN_VALID_IN_DAYS);
+        LocalDateTime until;
+        
+        if (tanType == TanType.TELETAN) {
+            until = from.plusHours(TELE_TAN_VALID_IN_HOURS);
+        }
+        else {
+            until = from.plusDays(TAN_VALID_IN_DAYS);
+        }
 
         VerificationTan verificationTAN = new VerificationTan();
         verificationTAN.setTanHash(hashingService.hash(tan));

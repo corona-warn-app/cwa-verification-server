@@ -66,6 +66,7 @@ public class AppSessionService {
      */
     @Autowired
     private TanService tanService;
+
     /**
      * Creates an AppSession-Entity.
      *
@@ -96,7 +97,7 @@ public class AppSessionService {
     public ResponseEntity<RegistrationToken> generateRegistrationToken(String key, RegistrationTokenKeyType keyType) {
         String registrationToken;
         VerificationAppSession appSession;
-        
+
         switch (keyType) {
             case GUID: 
                 String hashedGuid = key;

@@ -199,7 +199,7 @@ public class TanService {
      * @return The validity of the Tele TAN
      */
     public boolean isTeleTanValid(String teleTan) {
-      return syntaxVerification(teleTan);
+      return syntaxTeleTanVerification(teleTan);
     }
 
     private String generateTanFromUUID() {

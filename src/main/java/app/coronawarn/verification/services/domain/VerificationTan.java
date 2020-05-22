@@ -20,183 +20,61 @@
  */
 package app.coronawarn.verification.services.domain;
 
-import javax.persistence.Basic;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 /**
  * This class represents the TAN - entity.
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "TAN")
+@Table(name = "tan")
 public class VerificationTan implements Serializable {
 
-    @Column(name = "ID", nullable = false, precision = 19)
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "TAN_HASH", columnDefinition = "VARCHAR2(64)")
-    @Basic
+    @Version
+    @Column(name = "version")
+    private long version;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "tan_hash")
     private String tanHash;
 
-    @Column(name = "VALID_FROM", columnDefinition = "DATETIME(6)")
-    @Basic
+    @Column(name = "valid_from")
     private LocalDateTime validFrom;
 
-    @Column(name = "VALID_UNTIL", columnDefinition = "DATETIME(6)")
-    @Basic
+    @Column(name = "valid_until")
     private LocalDateTime validUntil;
 
-    @Column(name = "SOT", columnDefinition = "VARCHAR2(255)")
-    @Basic
+    @Column(name = "sot")
     private String sourceOfTrust;
 
-    @Column(name = "REDEEMED", columnDefinition = "BIT")
-    @Basic
+    @Column(name = "redeemed")
     private boolean redeemed;
 
-    @Column(name = "TYPE", columnDefinition = "VARCHAR2(255)")
-    @Basic
+    @Column(name = "type")
     private String type;
-
-    @Column(name = "CREATED_ON", columnDefinition = "DATETIME(6)")
-    @Basic
-    private LocalDateTime createdOn;
-
-    @Column(name = "OBJ_VERSION", columnDefinition = "BIGINT")
-    @Version
-    private long objVersion;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTanHash() {
-        return tanHash;
-    }
-
-    public void setTanHash(String tanHash) {
-        this.tanHash = tanHash;
-    }
-
-    public LocalDateTime getValidFrom() {
-        return validFrom;
-    }
-
-    public void setValidFrom(LocalDateTime validFrom) {
-        this.validFrom = validFrom;
-    }
-
-    public LocalDateTime getValidUntil() {
-        return validUntil;
-    }
-
-    public void setValidUntil(LocalDateTime validUntil) {
-        this.validUntil = validUntil;
-    }
-
-    public String getSourceOfTrust() {
-        return sourceOfTrust;
-    }
-
-    public void setSourceOfTrust(String sourceOfTrust) {
-        this.sourceOfTrust = sourceOfTrust;
-    }
-
-    public boolean isRedeemed() {
-        return redeemed;
-    }
-
-    public void setRedeemed(boolean redeemed) {
-        this.redeemed = redeemed;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public LocalDateTime getCreatedOn() {
-        return createdOn;
-    }
-
-    public void setCreatedOn(LocalDateTime createdOn) {
-        this.createdOn = createdOn;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 53 * hash + Objects.hashCode(this.id);
-        hash = 53 * hash + Objects.hashCode(this.tanHash);
-        hash = 53 * hash + Objects.hashCode(this.validFrom);
-        hash = 53 * hash + Objects.hashCode(this.validUntil);
-        hash = 53 * hash + Objects.hashCode(this.sourceOfTrust);
-        hash = 53 * hash + (this.redeemed ? 1 : 0);
-        hash = 53 * hash + Objects.hashCode(this.type);
-        hash = 53 * hash + Objects.hashCode(this.createdOn);
-        hash = 53 * hash + (int) (this.objVersion ^ (this.objVersion >>> 32));
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final VerificationTan other = (VerificationTan) obj;
-        if (this.redeemed != other.redeemed) {
-            return false;
-        }
-        if (!Objects.equals(this.tanHash, other.tanHash)) {
-            return false;
-        }
-        if (!Objects.equals(this.sourceOfTrust, other.sourceOfTrust)) {
-            return false;
-        }
-        if (!Objects.equals(this.type, other.type)) {
-            return false;
-        }
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        if (!Objects.equals(this.validFrom, other.validFrom)) {
-            return false;
-        }
-        if (!Objects.equals(this.validUntil, other.validUntil)) {
-            return false;
-        }
-        return Objects.equals(this.createdOn, other.createdOn);
-    }
-
-    @Override
-    public String toString() {
-        return "VerificationTAN{" + "id=" + id + ", tanHash=" + tanHash
-            + ", validFrom=" + validFrom + ", validUntil=" + validUntil
-            + ", sourceOfTrust=" + sourceOfTrust + ", redeemed=" + redeemed
-            + ", type=" + type + ", createdOn=" + createdOn
-            + ", objVersion=" + objVersion + '}';
-    }
 
 }

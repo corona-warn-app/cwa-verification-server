@@ -29,7 +29,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: guid_hash
+                  name: hashed_guid
                   type: varchar(64)
               - column:
                   name: registration_token_hash
@@ -62,7 +62,7 @@ databaseChangeLog:
             indexName: idx_app_session_guid_hash
             columns:
               - column:
-                  name: guid_hash
+                  name: hashed_guid
                   type: varchar(64)
         - createIndex:
             tableName: app_session

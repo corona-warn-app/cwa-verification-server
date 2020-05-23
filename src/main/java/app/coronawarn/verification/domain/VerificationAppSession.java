@@ -61,8 +61,8 @@ public class VerificationAppSession implements Serializable {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
-  @Column(name = "guid_hash")
-  private String guidHash;
+  @Column(name = "hashed_guid")
+  private String hashedGuid;
 
   @Column(name = "registration_token_hash")
   private String registrationTokenHash;

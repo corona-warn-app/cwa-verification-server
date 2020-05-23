@@ -21,7 +21,7 @@
 
 package app.coronawarn.verification.service;
 
-import app.coronawarn.verification.client.Guid;
+import app.coronawarn.verification.client.HashedGuid;
 import app.coronawarn.verification.client.LabServerClient;
 import app.coronawarn.verification.client.TestResult;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class LabServerService {
   @Autowired
   private LabServerClient labServerClient;
 
-  public TestResult result(Guid guid) {
+  public TestResult result(HashedGuid guid) {
     return labServerClient.result(guid);
   }
 }

@@ -21,20 +21,18 @@
 
 package app.coronawarn.verification.client;
 
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * This class represents the Labor Server service client.
+ * This class represents the GUID.
  *
  * @author T-Systems International GmbH
  */
-@FeignClient(name = "labServerService", url = "${uri.endpoint.labserver}")
-public interface LabServerClient {
-  @PostMapping(value = "/api/v1/app/result",
-    consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
-  )
-  TestResult result(HashedGuid guid);
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class HashedGuid {
+  private String id;
 }

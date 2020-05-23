@@ -105,7 +105,7 @@ public class AppSessionService {
             log.info("Start generating a new registration token for the given hashed guid.");
             registrationToken = generateRegistrationToken();
             appSession = generateAppSession(registrationToken);
-            appSession.setGuidHash(hashedGuid);
+            appSession.setHashedGuid(hashedGuid);
             appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID.getSourceName());
             saveAppSession(appSession);
             return ResponseEntity
@@ -189,7 +189,7 @@ public class AppSessionService {
   public boolean checkRegistrationTokenAlreadyExistsForGuid(String hashedGuid) {
     log.info("VerificationAppSessionService start checkRegistrationTokenExists.");
     VerificationAppSession appSession = new VerificationAppSession();
-    appSession.setGuidHash(hashedGuid);
+    appSession.setHashedGuid(hashedGuid);
     return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
   }
 

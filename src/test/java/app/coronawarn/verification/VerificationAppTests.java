@@ -21,8 +21,8 @@
 
 package app.coronawarn.verification;
 
-import app.coronawarn.verification.client.Guid;
 import app.coronawarn.verification.client.TestResult;
+import app.coronawarn.verification.client.HashedGuid;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
@@ -44,9 +44,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -56,16 +64,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -132,7 +130,7 @@ public class VerificationAppTests {
 
     List<VerificationAppSession> verficationList = appSessionrepository.findAll();
     assertNotNull(verficationList);
-    assertEquals(TEST_GUI_HASH, verficationList.get(0).getGuidHash());
+    assertEquals(TEST_GUI_HASH, verficationList.get(0).getHashedGuid());
     Assert.assertEquals(AppSessionSourceOfTrust.HASHED_GUID.getSourceName(), verficationList.get(0).getSourceOfTrust());
     assertEquals(TEST_REG_TOK_HASH, verficationList.get(0).getRegistrationTokenHash());
 
@@ -160,7 +158,7 @@ public class VerificationAppTests {
 
     List<VerificationAppSession> verificationList = appSessionrepository.findAll();
     assertNotNull(verificationList);
-    assertEquals(TEST_GUI_HASH, verificationList.get(0).getGuidHash());
+    assertEquals(TEST_GUI_HASH, verificationList.get(0).getHashedGuid());
     assertEquals(AppSessionSourceOfTrust.HASHED_GUID.getSourceName(), verificationList.get(0).getSourceOfTrust());
     assertNotNull(verificationList.get(0).getRegistrationTokenHash());
   }
@@ -191,7 +189,7 @@ public class VerificationAppTests {
 
     List<VerificationAppSession> verificationList = appSessionrepository.findAll();
     assertNotNull(verificationList);
-    assertNull(verificationList.get(0).getGuidHash());
+    assertNull(verificationList.get(0).getHashedGuid());
     assertEquals(AppSessionSourceOfTrust.TELETAN.getSourceName(), verificationList.get(0).getSourceOfTrust());
     assertNotNull(verificationList.get(0).getRegistrationTokenHash());
   }
@@ -207,7 +205,7 @@ public class VerificationAppTests {
 
     prepareAppSessionTestData();
 
-    given(this.labServerService.result(new Guid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
+    given(this.labServerService.result(new HashedGuid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
       .andExpect(status().isOk())
@@ -346,7 +344,7 @@ public class VerificationAppTests {
 
   private VerificationAppSession getAppSessionTestData() {
     VerificationAppSession cv = new VerificationAppSession();
-    cv.setGuidHash(TEST_GUI_HASH);
+    cv.setHashedGuid(TEST_GUI_HASH);
     cv.setCreatedAt(LocalDateTime.now());
     cv.setUpdatedAt(LocalDateTime.now());
     cv.setTanCounter(0);

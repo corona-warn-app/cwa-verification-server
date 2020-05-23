@@ -41,7 +41,7 @@ public class RegistrationTokenRequest {
   private String key;
 
   /**
-   * The type of key, which can be "guidHash" or "teleTAN".
+   * The type of key, which can be "hashedGUID" or "teleTAN".
    */
   private RegistrationTokenKeyType keyType;
 }

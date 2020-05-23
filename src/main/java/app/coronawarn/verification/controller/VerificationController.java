@@ -21,7 +21,7 @@
 
 package app.coronawarn.verification.controller;
 
-import app.coronawarn.verification.client.Guid;
+import app.coronawarn.verification.client.HashedGuid;
 import app.coronawarn.verification.client.TestResult;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
@@ -163,7 +163,7 @@ public class VerificationController {
         String sourceOfTrust = appSession.getSourceOfTrust();
         if (AppSessionSourceOfTrust.HASHED_GUID.getSourceName().equals(sourceOfTrust)) {
           sourceOfTrust = TanSourceOfTrust.CONNECTED_LAB.getSourceName();
-          TestResult covidTestResult = labServerService.result(new Guid(appSession.getGuidHash()));
+          TestResult covidTestResult = labServerService.result(new HashedGuid(appSession.getHashedGuid()));
           if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()) {
             return ResponseEntity.badRequest().build();
           }
@@ -202,7 +202,7 @@ public class VerificationController {
     Optional<VerificationAppSession> actual = appSessionService
       .getAppSessionByToken(registrationToken.getRegistrationToken());
     if (actual.isPresent()) {
-      TestResult result = labServerService.result(new Guid(actual.get().getGuidHash()));
+      TestResult result = labServerService.result(new HashedGuid(actual.get().getHashedGuid()));
       return ResponseEntity.ok(result);
     } else {
       log.info("The registration token is invalid.");

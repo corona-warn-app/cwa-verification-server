@@ -1,0 +1,18 @@
+name: "Dockerfile-Linting"
+
+on:
+  pull_request:
+    branches: 
+    - master
+    paths:
+    - '**/Dockerfile'
+
+jobs:
+  verification:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Pull HaDoLint image
+      run: docker pull hadolint/hadolint
+    - name: Lint Dockerfile
+      run: docker run --rm --interactive hadolint/hadolint < ./Dockerfile

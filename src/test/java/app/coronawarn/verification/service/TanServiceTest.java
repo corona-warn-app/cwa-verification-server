@@ -29,14 +29,13 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Assert;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -78,11 +77,12 @@ public class TanServiceTest {
   @Test
   public void getEntityByTanTest() {
     VerificationTan tan = new VerificationTan();
-    tan.setCreatedAt(LocalDateTime.now());
-    tan.setUpdatedAt(LocalDateTime.now());
+    LocalDateTime start = LocalDateTime.parse(LocalDateTime.now().format(formatter));
+    tan.setCreatedAt(start);
+    tan.setUpdatedAt(start);
     tan.setRedeemed(false);
     tan.setTanHash(TEST_TAN_HASH);
-    LocalDateTime start = LocalDateTime.parse(LocalDateTime.now().format(formatter));
+    
     tan.setValidFrom(start);
     tan.setValidUntil(LocalDateTime.parse((TAN_VALID_UNTIL_IN_DAYS.format(formatter))));
     tan.setType(TEST_TAN_TYPE);

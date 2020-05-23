@@ -103,7 +103,7 @@ public class VerificationController {
     description = "Get a registration token by providing a SHA-256 hasehd GUID or a TeleTAN"
   )
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "GUID/TeleTAN found"),
+    @ApiResponse(responseCode = "201", description = "registration token generated."),
     @ApiResponse(responseCode = "400", description = "GUID/TeleTAN already exists."),
   })
   @PostMapping(value = REGISTRATION_TOKEN_ROUTE,
@@ -159,7 +159,7 @@ public class VerificationController {
       appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
     if (actual.isPresent()) {
       VerificationAppSession appSession = actual.get();
-      if (appSession.getTanCounter() <= tanCounterMax) {
+      if (appSession.getTanCounter() < tanCounterMax) {
         String sourceOfTrust = appSession.getSourceOfTrust();
         if (AppSessionSourceOfTrust.HASHED_GUID.getSourceName().equals(sourceOfTrust)) {
           sourceOfTrust = TanSourceOfTrust.CONNECTED_LAB.getSourceName();

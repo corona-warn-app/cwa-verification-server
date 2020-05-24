@@ -176,7 +176,7 @@ public class AppSessionService {
     log.info("VerificationAppSessionService start getAppSessionByToken.");
     VerificationAppSession appSession = new VerificationAppSession();
     appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
-    return appSessionRepository.findOne(Example.of(appSession, ExampleMatcher.matchingAll()));
+    return appSessionRepository.findOne(Example.of(appSession, ExampleMatcher.matchingAny()));
   }
 
   /**

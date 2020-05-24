@@ -377,6 +377,7 @@ Categories follow STRIDE:
 ## Used Timeframes
 TAN
 -	Lifespan of TAN is 14 days
+
 teleTAN
 -	Lifespan of teleTAN is 1h
 

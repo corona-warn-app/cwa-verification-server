@@ -46,7 +46,7 @@ public class TanService {
 
   private static final Integer TELE_TAN_LENGTH = 7;
   private static final String TELE_TAN_PATTERN = "[2-9A-HJ-KM-N-P-Za-km-n-p-z]{7}";
-  private static final String TAN_TAN_PATTERN = "[2-9A-HJ-KM-N-P-Za-km-n-p-z]{7}";
+  private static final String TAN_TAN_PATTERN = "[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}";
   private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
   private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
 

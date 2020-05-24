@@ -21,45 +21,20 @@
 
 package app.coronawarn.verification;
 
-import app.coronawarn.verification.client.TestResult;
 import app.coronawarn.verification.client.HashedGuid;
+import app.coronawarn.verification.client.TestResult;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
-import app.coronawarn.verification.model.AppSessionSourceOfTrust;
-import app.coronawarn.verification.model.RegistrationToken;
-import app.coronawarn.verification.model.RegistrationTokenKeyType;
-import app.coronawarn.verification.model.RegistrationTokenRequest;
-import app.coronawarn.verification.model.Tan;
-import app.coronawarn.verification.model.TanSourceOfTrust;
-import app.coronawarn.verification.model.TanType;
+import app.coronawarn.verification.model.*;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import app.coronawarn.verification.service.LabServerService;
 import app.coronawarn.verification.service.TanService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
-
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -70,6 +45,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -93,7 +76,6 @@ public class VerificationAppTests {
   public static final String TEST_SOT = "connectedLab17";
   public static final String TEST_HASHED_TAN = "16154ea91c2c59d6ef9d0e7f902a59283b1e7ff9111570d20139a4e6b1832876";
   public static final String TEST_TAN_TYPE = "TAN";
-  static final Logger LOG = LogManager.getLogger();
   private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
   private static final String PREFIX_API_VERSION = "/version/v1";
 

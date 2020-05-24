@@ -23,24 +23,24 @@ package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.VerificationApplication;
 import app.coronawarn.verification.domain.VerificationTan;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import app.coronawarn.verification.model.TanType;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -89,7 +89,7 @@ public class TanServiceTest {
     tan.setUpdatedAt(start);
     tan.setRedeemed(false);
     tan.setTanHash(TEST_TAN_HASH);
-    
+
     tan.setValidFrom(start);
     tan.setValidUntil(LocalDateTime.parse((TAN_VALID_UNTIL_IN_DAYS.format(formatter))));
     tan.setType(TEST_TAN_TYPE);
@@ -120,7 +120,7 @@ public class TanServiceTest {
   }
 
   @Test
-  public void checkTanAlreadyExist(){
+  public void checkTanAlreadyExist() {
     assertTrue(tanService.checkTanAlreadyExist(VALID_TELE_TAN));
   }
 

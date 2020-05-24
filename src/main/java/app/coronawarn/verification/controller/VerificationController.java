@@ -230,7 +230,6 @@ public class VerificationController {
   public ResponseEntity<Void> verifyTan(@RequestBody Tan tan) {
 
     boolean verified = false;
-    //TODO TAN syntax constraints
     boolean syntaxVerified = tanService.syntaxVerification(tan.getTan());
 
     if (syntaxVerified) {

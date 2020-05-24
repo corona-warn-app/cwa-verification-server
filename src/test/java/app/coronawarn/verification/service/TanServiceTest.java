@@ -38,11 +38,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 
-@Slf4j
+Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
@@ -52,7 +60,7 @@ public class TanServiceTest {
   public static final String TEST_GUI_HASH = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
   public static final String TEST_TAN_TYPE = "TAN";
   public static final String VALID_TELE_TAN = "R3ZNUeV";
-  private static final String TELETAN_PATTERN = "[2-9A-HJ-KM-N-P-Za-km-n-p-z]{7}";
+  private static final String TELETAN_PATTERN = "^[2-9A-HJ-KMNP-Za-kmnp-z]{7}$";
   private static final Pattern pattern = Pattern.compile(TELETAN_PATTERN);
   private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSS");
   private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
@@ -104,7 +112,6 @@ public class TanServiceTest {
   @Test
   public void generateTeleTan() {
     String teleTan = tanService.generateTeleTan();
-    log.info(teleTan);
     Matcher matcher = pattern.matcher(teleTan);
     assertTrue(matcher.find());
   }
@@ -138,4 +145,18 @@ public class TanServiceTest {
     assertFalse(tan.isEmpty());
   }
 
+  @Test
+  public void testTeleTANFormat() {
+    assertThat(tanService.isTeleTanValid("29zAE4E")).isTrue();
+    assertThat(tanService.isTeleTanValid("29zAE4O")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAE40")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAE41")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAE4I")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAE4L")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAEil")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zA?ßö")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAE4EZ")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAE4")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAL4-")).isFalse();
+  }
 }

@@ -90,7 +90,7 @@ http://localhost:8080/swagger-ui.html#/verification-controller
 
 
 #### Remarks
-This repository contains files which support our CI/CD pipeline and will be remove without further notice  
+This repository contains files which support our CI/CD pipeline and will be removed without further notice  
  - DockerfileCi - used for the GitHub build chain
  - Jenkinsfile - used for Telekom internal SBS (**S**oftware**B**uild**S**ervice)
 

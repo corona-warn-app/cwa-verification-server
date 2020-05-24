@@ -142,6 +142,15 @@ public class TanService {
    * @return a Valid TAN String
    */
   public String generateValidTan() {
+    return generateTanFromUuid();
+  }
+
+  /**
+   * Returns the a Valid TeleTAN String.
+   *
+   * @return a Valid TAN String
+   */
+  public String generateValidTeleTan() {
     return IntStream.range(0, TELE_TAN_LENGTH)
       .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.numberGenerator.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
       .collect(Collector.of(

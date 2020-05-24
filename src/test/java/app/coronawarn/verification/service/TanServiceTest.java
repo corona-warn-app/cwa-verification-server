@@ -29,6 +29,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Assert;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +47,7 @@ public class TanServiceTest {
   public static final String TEST_TAN_HASH = "8de76b627f0be70ea73c367a9a560d6a987eacec71f57ca3d86b2e4ed5b6f780";
   public static final String TEST_GUI_HASH = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
   public static final String TEST_TAN_TYPE = "TAN";
-  private static final String TELETAN_PATTERN = "[2-9A-HJ-KM-N-P-Za-km-n-p-z]{7}";
+  private static final String TELETAN_PATTERN = "^[2-9A-HJ-KMNP-Za-kmnp-z]{7}$";
   private static final Pattern pattern = Pattern.compile(TELETAN_PATTERN);
   private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSS");
   private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
@@ -99,5 +101,20 @@ public class TanServiceTest {
     String teleTan = tanService.generateTeleTan();
     Matcher matcher = pattern.matcher(teleTan);
     assertTrue(matcher.find());
+  }
+
+  @Test
+  public void testTeleTANFormat() {
+    assertThat(tanService.isTeleTanValid("29zAE4E")).isTrue();
+    assertThat(tanService.isTeleTanValid("29zAE4O")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAE40")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAE41")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAE4I")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAE4L")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAEil")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zA?ßö")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAE4EZ")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAE4")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAL4-")).isFalse();
   }
 }

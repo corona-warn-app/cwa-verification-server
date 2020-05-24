@@ -46,7 +46,9 @@ public class TanService {
 
   private static final Integer TELE_TAN_LENGTH = 7;
   private static final String TELE_TAN_PATTERN = "[2-9A-HJ-KM-N-P-Za-km-n-p-z]{7}";
+  private static final String TAN_TAN_PATTERN = "[2-9A-HJ-KM-N-P-Za-km-n-p-z]{7}";
   private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
+  private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
 
   @Value("${tan.valid.days}")
   private Integer tanValidInDays;
@@ -81,9 +83,9 @@ public class TanService {
    * @param tan the TAN
    * @return TAN verification flag
    */
-  // TODO syntax constraints
   public boolean syntaxVerification(String tan) {
-    return true;
+    Matcher matcher = TAN_PATTERN.matcher(tan);
+    return matcher.find();
   }
 
   /**
@@ -107,6 +109,7 @@ public class TanService {
     boolean verified = false;
     if (syntaxTeleTanVerification(teleTan)) {
       Optional<VerificationTan> teleTanEntity = getEntityByTan(teleTan);
+      log.info(teleTanEntity.toString());
       if (teleTanEntity.isPresent() && !teleTanEntity.get().isRedeemed()) {
         verified = true;
       } else {
@@ -206,7 +209,7 @@ public class TanService {
     return tan;
   }
 
-  private VerificationTan generateVerificationTan(String tan, TanType tanType, String sourceOfTrust) {
+  protected VerificationTan generateVerificationTan(String tan, TanType tanType, String sourceOfTrust) {
     LocalDateTime from = LocalDateTime.now();
     LocalDateTime until;
 

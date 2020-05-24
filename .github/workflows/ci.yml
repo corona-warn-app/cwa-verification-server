@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - run: git fetch --unshallow
     - uses: actions/cache@v1
       env:
         cache-name: m2
@@ -24,7 +25,14 @@ jobs:
       with:
         java-version: 11
     - run: |
-        mvn --batch-mode package
+        mvn --batch-mode package sonar:sonar \
+          -Dsonar.login=$SONAR_TOKEN \
+          -Dsonar.organization=corona-warn-app \
+          -Dsonar.projectKey=corona-warn-app_cwa-verification-server
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: https://sonarcloud.io
     - uses: actions/upload-artifact@v1
       with:
         name: target

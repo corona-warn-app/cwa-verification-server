@@ -308,7 +308,7 @@ All data is deleted after 14 days.
 |Role|	Authentication	|Comment|
 | ------------- |:-------------:| -----:|
 |Anonymous |	None|	 the app uses no authentication for communication with Verification Server|
-|Tracinig Server|	TLS Client Certificate, 2nd factor IP Range	|
+|Tracing Server|	TLS Client Certificate, 2nd factor IP Range	|
 |Health Authority User|	Signed JWT, verification of signature	|
 |Hotline User|	Signed JWT, verification of signature	|
 

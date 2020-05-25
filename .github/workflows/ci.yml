@@ -45,6 +45,7 @@ jobs:
     - uses: actions/download-artifact@v1
       with:
         name: target
+        path: target
     - run: sudo apt-get install --yes --no-install-recommends libxml-xpath-perl
     - run: |
         VERSION=$(xpath -q -e "/project/version/text()" pom.xml)

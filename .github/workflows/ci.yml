@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - uses: actions/cache@v1
       env:
         cache-name: m2
@@ -23,9 +25,31 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 11
-    - run: |
-        mvn --batch-mode package
+    - run: mvn --batch-mode deploy
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # will be uncommented as soon as sonar token is available
+    # - run: mvn --batch-mode verify sonar:sonar -Dsonar.login=${SONAR_TOKEN}
+    #   env:
+    #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - uses: actions/upload-artifact@v1
       with:
         name: target
-        path: target
+  package:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v1
+      with:
+        name: target
+    - run: sudo apt-get install --yes --no-install-recommends libxml-xpath-perl
+    - run: |
+        VERSION=$(xpath -q -e "/project/version/text()" pom.xml)
+        echo "::set-env name=VERSION::${VERSION}"
+    - run: echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_AUTHOR} --password-stdin
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - run: docker build --file DockerfileCi --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/app:${VERSION} .
+    - run: docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/app:${VERSION}

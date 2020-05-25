@@ -1,0 +1,24 @@
+name: ci-dockerlint
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - Dockerfile
+    - DockerfileCi
+    pull_request:
+      types:
+      - opened
+      - synchronize
+      - reopened
+      paths:
+      - Dockerfile
+      - DockerfileCi
+jobs:
+  verification:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: docker pull hadolint/hadolint
+    - run: docker run --rm --interactive hadolint/hadolint < Dockerfile
+    - run: docker run --rm --interactive hadolint/hadolint < DockerfileCi

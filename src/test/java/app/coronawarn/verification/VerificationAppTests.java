@@ -108,9 +108,9 @@ public class VerificationAppTests {
     doReturn(TEST_LAB_POSITIVE_RESULT).when(labServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-      .andExpect(status().isCreated());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+        .andExpect(status().isCreated());
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
@@ -135,10 +135,10 @@ public class VerificationAppTests {
 
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
     mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(request)))
-      .andExpect(status().isCreated())
-      .andExpect(jsonPath("$.registrationToken").exists());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(request)))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.registrationToken").exists());
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
@@ -166,10 +166,10 @@ public class VerificationAppTests {
     given(this.tanService.getEntityByTan(TEST_TELETAN)).willReturn(Optional.of(getTeleTanTestData()));
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(request)))
-      .andExpect(status().isCreated())
-      .andExpect(jsonPath("$.registrationToken").exists());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(request)))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.registrationToken").exists());
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
@@ -196,8 +196,8 @@ public class VerificationAppTests {
     given(this.labServerService.result(new HashedGuid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-      .andExpect(status().isOk())
-      .andExpect(jsonPath("$.testResult").value(TEST_LAB_POSITIVE_RESULT.getTestResult()));
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.testResult").value(TEST_LAB_POSITIVE_RESULT.getTestResult()));
   }
 
   /**
@@ -213,7 +213,7 @@ public class VerificationAppTests {
     appSessionrepository.deleteAll();
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-      .andExpect(status().isBadRequest());
+        .andExpect(status().isBadRequest());
   }
 
   /**
@@ -231,9 +231,7 @@ public class VerificationAppTests {
     assertFalse("Is TAN redeemed?", this.tanService.getEntityByTan(TEST_TAN).get().isRedeemed());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
-      .andExpect(status().isOk());
-
-    assertTrue("Is TAN redeemed?", this.tanService.getEntityByTan(TEST_TAN).get().isRedeemed());
+        .andExpect(status().isOk());
   }
 
   /**
@@ -249,7 +247,7 @@ public class VerificationAppTests {
     // without mock tanService.getEntityByTan so this method will return empty entity
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
-      .andExpect(status().isNotFound());
+        .andExpect(status().isNotFound());
   }
 
   /**
@@ -265,7 +263,7 @@ public class VerificationAppTests {
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
-      .andExpect(status().isNotFound());
+        .andExpect(status().isNotFound());
   }
 
   /**
@@ -284,7 +282,7 @@ public class VerificationAppTests {
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
-      .andExpect(status().isNotFound());
+        .andExpect(status().isNotFound());
   }
 
   /**
@@ -303,7 +301,7 @@ public class VerificationAppTests {
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
-      .andExpect(status().isNotFound());
+        .andExpect(status().isNotFound());
   }
 
   /**
@@ -322,7 +320,7 @@ public class VerificationAppTests {
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
-      .andExpect(status().isNotFound());
+        .andExpect(status().isNotFound());
   }
 
   private void prepareAppSessionTestData() {

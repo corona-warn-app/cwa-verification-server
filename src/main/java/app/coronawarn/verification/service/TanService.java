@@ -40,7 +40,6 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
 
-
 /**
  * This class represents the TanService service.
  */
@@ -79,7 +78,8 @@ public class TanService {
    * based UUIDs. In a holder class to defer initialization until needed.
    */
   private static class Holder {
-    static final SecureRandom numberGenerator = new SecureRandom();
+
+    static final SecureRandom NUMBER_GENERATOR = new SecureRandom();
   }
 
   /**
@@ -90,6 +90,15 @@ public class TanService {
    */
   public VerificationTan saveTan(VerificationTan tan) {
     return tanRepository.save(tan);
+  }
+
+  /**
+   * Deletes a {@link VerificationTan} from the database.
+   *
+   * @param tan the tan which will be deleted
+   */
+  public void deleteTan(VerificationTan tan) {
+    tanRepository.delete(tan);
   }
 
   /**
@@ -152,12 +161,12 @@ public class TanService {
    */
   public String generateValidTeleTan() {
     return IntStream.range(0, TELE_TAN_LENGTH)
-      .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.numberGenerator.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
-      .collect(Collector.of(
-        StringBuilder::new,
-        StringBuilder::append,
-        StringBuilder::append,
-        StringBuilder::toString));
+        .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
+        .collect(Collector.of(
+            StringBuilder::new,
+            StringBuilder::append,
+            StringBuilder::append,
+            StringBuilder::toString));
   }
 
   /**
@@ -173,7 +182,7 @@ public class TanService {
   /**
    * This method generates a {@link VerificationTan} - entity and saves it.
    *
-   * @param tan     the TAN
+   * @param tan the TAN
    * @param tanType the TAN type
    * @return the persisted TAN
    */
@@ -222,7 +231,8 @@ public class TanService {
   }
 
   /**
-   * This Method generates a valid TAN and persists it. Returns the generated TAN.
+   * This Method generates a valid TAN and persists it. Returns the generated
+   * TAN.
    *
    * @param sourceOfTrust sets the source of Trust for the Tan
    * @return Tan a valid tan with given source of Trust
@@ -256,8 +266,7 @@ public class TanService {
   }
 
   /**
-   * Get existing VerificationTan by TAN from
-   * {@link VerificationTanRepository}.
+   * Get existing VerificationTan by TAN from {@link VerificationTanRepository}.
    *
    * @param tan the TAN
    * @return Optional VerificationTan

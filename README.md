@@ -9,13 +9,6 @@
 </p>
 
 <p align="center">
-    ![ci](https://github.com/corona-warn-app/cwa-verification-server/workflows/ci/badge.svg)
-    [![quality gate](https://sonarcloud.io/api/project_badges/measure?project=corona-warn-app_cwa-verification-server&metric=alert_status)](https://sonarcloud.io/dashboard?id=corona-warn-app_cwa-verification-server)
-    [![coverage](https://sonarcloud.io/api/project_badges/measure?project=corona-warn-app_cwa-verification-server&metric=coverage)](https://sonarcloud.io/dashboard?id=corona-warn-app_cwa-verification-server)
-    [![bugs](https://sonarcloud.io/api/project_badges/measure?project=corona-warn-app_cwa-verification-server&metric=bugs)](https://sonarcloud.io/dashboard?id=corona-warn-app_cwa-verification-server)
-</p>
-
-<p align="center">
   <a href="#development">Development</a> •
   <a href="#documentation">Documentation</a> •
   <a href="#support-and-feedback">Support</a> •
@@ -26,6 +19,12 @@
 </p>
 
 The goal of this project is to develop the official Corona-Warn-App for Germany based on the exposure notification API from [Apple](https://www.apple.com/covid19/contacttracing/) and [Google](https://www.google.com/covid19/exposurenotifications/). The apps (for both iOS and Android) use Bluetooth technology to exchange anonymous encrypted data with other mobile phones (on which the app is also installed) in the vicinity of an app user's phone. The data is stored locally on each user's device, preventing authorities or other parties from accessing or controlling the data. This repository contains the **verification service** for the Corona-Warn-App. This implementation is still a **work in progress**, and the code it contains is currently alpha-quality code.
+
+## Status
+![ci](https://github.com/corona-warn-app/cwa-verification-server/workflows/ci/badge.svg)
+[![quality gate](https://sonarcloud.io/api/project_badges/measure?project=corona-warn-app_cwa-verification-server&metric=alert_status)](https://sonarcloud.io/dashboard?id=corona-warn-app_cwa-verification-server)
+[![coverage](https://sonarcloud.io/api/project_badges/measure?project=corona-warn-app_cwa-verification-server&metric=coverage)](https://sonarcloud.io/dashboard?id=corona-warn-app_cwa-verification-server)
+[![bugs](https://sonarcloud.io/api/project_badges/measure?project=corona-warn-app_cwa-verification-server&metric=bugs)](https://sonarcloud.io/dashboard?id=corona-warn-app_cwa-verification-server)
 
 ## Architecture Overview
 You can find an architectural overview of the component in the [solution architecture document](https://github.com/corona-warn-app/cwa-documentation/blob/master/solution_architecture.md)  

@@ -260,7 +260,7 @@ public class VerificationController {
     @ApiResponse(responseCode = "201", description = "TeleTan created"),})
   @PostMapping(TELE_TAN_ROUTE)
   public ResponseEntity<TeleTan> createTeleTan() {
-    String teleTan = tanService.generateTeleTan();
+    String teleTan = tanService.generateVerificationTeleTan();
     return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));
   }
 }

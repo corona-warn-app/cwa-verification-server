@@ -8,7 +8,6 @@
  */
 sbsBuild(
   jdk: 'jdk11',
-  dockerfile: 'DockerfileCi',
   dockerAlternateRegistries: [
     'MTR_SBS@mtr.external.otc.telekomcloud.com/sbs/cwa-verification-server'
   ]

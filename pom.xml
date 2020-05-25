@@ -11,16 +11,17 @@
   <name>cwa-verification-server</name>
   <description>CWA verification server project.</description>
 
-   <url>https://www.coronawarn.app/</url>
-   <ciManagement>
-     <url>https://github.com/corona-warn-app/cwa-verification-server/actions?query=workflow%3Aci</url>
-   </ciManagement>
-   <issueManagement>
-     <url>https://github.com/corona-warn-app/cwa-verification-server/issues</url>
-   </issueManagement>
-   <scm>
-     <url>https://github.com/corona-warn-app/cwa-verification-server</url>
-   </scm>
+  <url>https://www.coronawarn.app/</url>
+  <ciManagement>
+    <url>https://github.com/corona-warn-app/cwa-verification-server/actions?query=workflow%3Aci</url>
+  </ciManagement>
+  <issueManagement>
+    <url>https://github.com/corona-warn-app/cwa-verification-server/issues</url>
+  </issueManagement>
+  <scm>
+    <url>https://github.com/corona-warn-app/cwa-verification-server</url>
+  </scm>
+
   <properties>
     <!-- java -->
     <java.version>11</java.version>

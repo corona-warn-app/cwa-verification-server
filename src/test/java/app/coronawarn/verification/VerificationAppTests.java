@@ -236,9 +236,12 @@ public class VerificationAppTests {
   @Test
   public void callVerifyTAN() throws Exception {
     log.info("VerificationAppTests callVerifyTAN()");
+    
+    var tan = getVerificationTANTestData();
 
     given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
+    given(this.tanService.saveTan(any())).willReturn(tan);
 
     assertFalse("Is TAN redeemed?", this.tanService.getEntityByTan(TEST_TAN).get().isRedeemed());
 

@@ -43,6 +43,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -199,15 +200,16 @@ public class VerificationController {
     produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<TestResult> getTestState(@RequestBody RegistrationToken registrationToken) {
-    Optional<VerificationAppSession> actual = appSessionService
-      .getAppSessionByToken(registrationToken.getRegistrationToken());
-    if (actual.isPresent()) {
-      TestResult result = labServerService.result(new HashedGuid(actual.get().getHashedGuid()));
-      return ResponseEntity.ok(result);
-    } else {
-      log.info("The registration token is invalid.");
-      return ResponseEntity.badRequest().build();
-    }
+    
+    return appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken())
+        .map(it -> it.getHashedGuid())
+        .map(HashedGuid::new)
+        .map(labServerService::result)
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> {
+          log.info("The registration token is invalid.");
+          return ResponseEntity.badRequest().build();
+        });
   }
 
   /**
@@ -227,27 +229,21 @@ public class VerificationController {
   @PostMapping(value = TAN_VERIFY_ROUTE,
     consumes = MediaType.APPLICATION_JSON_VALUE
   )
-  public ResponseEntity<Void> verifyTan(@RequestBody Tan tan) {
+  public ResponseEntity<?> verifyTan(@RequestBody Tan tan) {
 
-    boolean verified = false;
     //TODO TAN syntax constraints
-    boolean syntaxVerified = tanService.syntaxVerification(tan.getTan());
-
-    if (syntaxVerified) {
-      Optional<VerificationTan> optional = tanService.getEntityByTan(tan.getTan());
-      if (optional.isPresent()) {
-        VerificationTan cvtan = optional.get();
-        LocalDateTime dateTimeNow = LocalDateTime.now();
-        boolean tanTimeValid = dateTimeNow.isAfter(cvtan.getValidFrom()) && dateTimeNow.isBefore(cvtan.getValidUntil());
-        boolean tanRedeemed = cvtan.isRedeemed();
-        if (tanTimeValid && !tanRedeemed) {
-          cvtan.setRedeemed(true);
-          tanService.saveTan(cvtan);
-          verified = true;
-        }
-      }
+    if (!tanService.syntaxVerification(tan.getTan())) {
+      return ResponseEntity.notFound().build();
     }
-    return ResponseEntity.status(verified ? HttpStatus.OK : HttpStatus.NOT_FOUND).build();
+      
+     return tanService.getEntityByTan(tan.getTan())
+        .filter(cvtan -> cvtan.canBeRedeemed(LocalDateTime.now()))
+        .map(cvtan -> {
+          cvtan.setRedeemed(true);
+          return tanService.saveTan(cvtan);
+        })
+        .map(it -> ResponseEntity.ok().build())
+        .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   /**

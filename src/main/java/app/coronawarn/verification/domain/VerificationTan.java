@@ -77,4 +77,9 @@ public class VerificationTan implements Serializable {
   @Column(name = "type")
   private String type;
 
+  public boolean canBeRedeemed(LocalDateTime reference) {
+    return validFrom.isBefore(reference)
+        && validUntil.isAfter(reference)
+        && !isRedeemed();
+  }
 }

@@ -29,13 +29,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: |
-        echo ${GITHUB_REGPOSITORY_OWNER}
-        echo ${GITHUB_REGPOSITORY/\//_}
+        echo ${GITHUB_REPOSITORY_OWNER}
+        echo ${GITHUB_REPOSITORY/\//_}
         mvn --batch-mode verify sonar:sonar \
         -Dsonar.login=${SONAR_TOKEN} \
         -Dsonar.host.url=${SONAR_URL} \
-        -Dsonar.organization=${GITHUB_REGPOSITORY_OWNER} \
-        -Dsonar.projectKey=${GITHUB_REGPOSITORY/\//_}
+        -Dsonar.organization=${GITHUB_REPOSITORY_OWNER} \
+        -Dsonar.projectKey=${GITHUB_REPOSITORY/\//_}
       env:
         SONAR_URL: https://sonarcloud.io
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

@@ -53,5 +53,5 @@ jobs:
     - run: echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_ACTOR} --password-stdin
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: docker build --file DockerfileCi --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/app:${VERSION} .
-    - run: docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/app:${VERSION}
+    - run: docker build --file DockerfileCi --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/cwa-verification-server:${VERSION} .
+    - run: docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/cwa-verification-server:${VERSION}

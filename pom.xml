@@ -40,10 +40,6 @@
     <plugin.checkstyle.version>3.1.1</plugin.checkstyle.version>
     <plugin.sonar.version>3.6.1.1688</plugin.sonar.version>
     <plugin.jacoco.version>0.8.5</plugin.jacoco.version>
-    <!-- sonar -->
-    <sonar.organization>corona-warn-app</sonar.organization>
-    <sonar.projectKey>${sonar.organization}_${project.artifactId}</sonar.projectKey>
-    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
   </properties>
 
   <dependencyManagement>

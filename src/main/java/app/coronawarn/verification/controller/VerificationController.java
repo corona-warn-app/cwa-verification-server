@@ -156,7 +156,7 @@ public class VerificationController {
   public ResponseEntity<Tan> generateTan(@RequestBody RegistrationToken registrationToken) {
 
     Optional<VerificationAppSession> actual
-        = appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
+        = appSessionService.getAppSessionByToken(registrationToken.getToken());
     if (actual.isPresent()) {
       VerificationAppSession appSession = actual.get();
       if (appSession.getTanCounter() < tanCounterMax) {
@@ -200,7 +200,7 @@ public class VerificationController {
   )
   public ResponseEntity<TestResult> getTestState(@RequestBody RegistrationToken registrationToken) {
     Optional<VerificationAppSession> actual = appSessionService
-        .getAppSessionByToken(registrationToken.getRegistrationToken());
+        .getAppSessionByToken(registrationToken.getToken());
     if (actual.isPresent()) {
       TestResult result = labServerService.result(new HashedGuid(actual.get().getHashedGuid()));
       return ResponseEntity.ok(result);
@@ -229,10 +229,10 @@ public class VerificationController {
   public ResponseEntity<Void> verifyTan(@RequestBody Tan tan) {
 
     boolean verified = false;
-    boolean syntaxVerified = tanService.syntaxVerification(tan.getTan());
+    boolean syntaxVerified = tanService.syntaxVerification(tan.getValue());
 
     if (syntaxVerified) {
-      Optional<VerificationTan> optional = tanService.getEntityByTan(tan.getTan());
+      Optional<VerificationTan> optional = tanService.getEntityByTan(tan.getValue());
       if (optional.isPresent()) {
         VerificationTan cvtan = optional.get();
         LocalDateTime dateTimeNow = LocalDateTime.now();

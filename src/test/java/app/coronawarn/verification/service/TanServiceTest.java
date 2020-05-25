@@ -23,7 +23,6 @@ package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.VerificationApplication;
 import app.coronawarn.verification.domain.VerificationTan;
-import app.coronawarn.verification.model.TanType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -98,7 +97,7 @@ public class TanServiceTest {
     tanService.saveTan(tan);
 
     Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
-    assertTrue(tanFromDB.get().equals(tan));
+    Assert.assertEquals(tan, tanFromDB.get());
   }
 
   @Test
@@ -110,9 +109,7 @@ public class TanServiceTest {
 
   @Test
   public void verifyTeletan() {
-    String teleTan = tanService.generateTeleTan();
-    VerificationTan tan = tanService.generateVerificationTan(teleTan, TanType.TELETAN, "test");
-    tanService.saveTan(tan);
+    String teleTan = tanService.generateVerificationTeleTan();
     assertTrue(tanService.checkTanAlreadyExist(VALID_TELE_TAN));
     assertTrue(tanService.verifyTeleTan(teleTan));
     assertFalse(tanService.verifyTeleTan("R3ZNUI0"));

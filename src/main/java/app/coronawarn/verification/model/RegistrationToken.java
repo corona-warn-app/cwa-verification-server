@@ -37,5 +37,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RegistrationToken {
 
-  private String registrationToken;
+  private String token;
 }

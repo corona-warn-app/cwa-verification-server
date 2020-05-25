@@ -1,7 +1,9 @@
 FROM maven:3.6.3-jdk-11 as build
 
-COPY . /build/
-WORKDIR /build
+ARG WORK_DIR=/build
+
+COPY . ${WORK_DIR}/
+WORKDIR ${WORK_DIR}
 
 RUN mkdir -p /root/.m2 /usr/tsi
 RUN mvn --batch-mode ${MAVEN_ARGS} install

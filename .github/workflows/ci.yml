@@ -49,7 +49,7 @@ jobs:
     - run: |
         VERSION=$(xpath -q -e "/project/version/text()" pom.xml)
         echo "::set-env name=VERSION::${VERSION}"
-    - run: echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_AUTHOR} --password-stdin
+    - run: echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_ACTOR} --password-stdin
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: docker build --file DockerfileCi --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/app:${VERSION} .

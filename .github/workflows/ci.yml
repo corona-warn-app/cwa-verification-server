@@ -29,8 +29,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: |
-        echo ${GITHUB_REPOSITORY_OWNER}
-        echo ${GITHUB_REPOSITORY/\//_}
         mvn --batch-mode verify sonar:sonar \
         -Dsonar.login=${SONAR_TOKEN} \
         -Dsonar.host.url=${SONAR_URL} \
@@ -57,8 +55,10 @@ jobs:
     - run: |
         VERSION=$(xpath -q -e "/project/version/text()" pom.xml)
         echo "::set-env name=VERSION::${VERSION}"
+        IMAGE=${${GITHUB_REPOSITORY/${GITHUB_REPOSITORY_OWNER}/}/\//}
+        echo "::set-env name=IMAGE::${IMAGE}"
     - run: echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY_OWNER} --password-stdin
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: docker build --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/cwa-verification-server:${VERSION} .
-    - run: docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/cwa-verification-server:${VERSION}
+    - run: docker build --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/${IMAGE}:${VERSION} .
+    - run: docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${IMAGE}:${VERSION}

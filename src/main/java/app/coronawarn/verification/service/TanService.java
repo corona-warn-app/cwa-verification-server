@@ -22,6 +22,7 @@
 package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.domain.VerificationTan;
+import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
 import java.security.SecureRandom;
@@ -155,21 +156,6 @@ public class TanService {
   }
 
   /**
-   * Returns the a Valid TeleTAN String.
-   *
-   * @return a Valid TAN String
-   */
-  public String generateValidTeleTan() {
-    return IntStream.range(0, TELE_TAN_LENGTH)
-        .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
-        .collect(Collector.of(
-            StringBuilder::new,
-            StringBuilder::append,
-            StringBuilder::append,
-            StringBuilder::toString));
-  }
-
-  /**
    * Check for existing TAN in the {@link VerificationTanRepository}.
    *
    * @param tan the TAN
@@ -197,17 +183,13 @@ public class TanService {
    * @return a new TeleTan
    */
   public String generateTeleTan() {
-    /*
-     * The generation of a TeleTan is a temporary solution and may be subject to later changes.
-     */
-    String generatedTeleTan = "";
-    boolean isTeleTanValid = false;
-
-    while (!isTeleTanValid) {
-      generatedTeleTan = RandomString.make(TELE_TAN_LENGTH);
-      isTeleTanValid = isTeleTanValid(generatedTeleTan);
-    }
-    return generatedTeleTan;
+    return IntStream.range(0, TELE_TAN_LENGTH)
+        .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
+        .collect(Collector.of(
+            StringBuilder::new,
+            StringBuilder::append,
+            StringBuilder::append,
+            StringBuilder::toString));
   }
 
   /**
@@ -231,11 +213,22 @@ public class TanService {
   }
 
   /**
+   * Returns a generated valid tele TAN and persists it.
+   *
+   * @return a valid tele TAN
+   */
+  public String generateVerificationTeleTan() {
+    String teleTan = generateTeleTan();
+    persistTan(teleTan, TanType.TELETAN, TanSourceOfTrust.TELETAN.getSourceName());
+    return teleTan;
+  }
+
+  /**
    * This Method generates a valid TAN and persists it. Returns the generated
    * TAN.
    *
    * @param sourceOfTrust sets the source of Trust for the Tan
-   * @return Tan a valid tan with given source of Trust
+   * @return a valid tan with given source of Trust
    */
   public String generateVerificationTan(String sourceOfTrust) {
     String tan = generateValidTan();

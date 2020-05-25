@@ -125,6 +125,19 @@ public class VerificationAppTests {
   }
 
   /**
+   * Test the generation of a tele Tan.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGenerateTeleTAN() throws Exception {
+    log.info("VerificationAppTests callGenerateTeleTAN()");
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan"))
+        .andExpect(status().isCreated());
+  }
+
+  /**
    * Test get registration token by a guid.
    *
    * @throws Exception if the test cannot be performed.
@@ -212,7 +225,9 @@ public class VerificationAppTests {
     //clean the repo
     appSessionrepository.deleteAll();
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+    mockMvc.perform(post(PREFIX_API_VERSION + "/testresult")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
         .andExpect(status().isBadRequest());
   }
 
@@ -230,7 +245,9 @@ public class VerificationAppTests {
 
     assertFalse("Is TAN redeemed?", this.tanService.getEntityByTan(TEST_TAN).get().isRedeemed());
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(new Tan(TEST_TAN))))
         .andExpect(status().isOk());
   }
 
@@ -246,7 +263,9 @@ public class VerificationAppTests {
     given(this.tanService.syntaxVerification(TEST_TAN)).willReturn(true);
     // without mock tanService.getEntityByTan so this method will return empty entity
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new Tan(TEST_TAN))))
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(new Tan(TEST_TAN))))
         .andExpect(status().isNotFound());
   }
 

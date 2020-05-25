@@ -32,6 +32,7 @@ import app.coronawarn.verification.model.RegistrationTokenKeyType;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.model.Tan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
+import app.coronawarn.verification.model.TeleTan;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.LabServerService;
 import app.coronawarn.verification.service.TanService;
@@ -247,7 +248,7 @@ public class VerificationController {
   }
 
   /**
-   * This method creates a TeleTan.
+   * This method generates a valid Tele-TAN.
    *
    * @return a created teletan
    */
@@ -258,8 +259,8 @@ public class VerificationController {
   @ApiResponses(value = {
     @ApiResponse(responseCode = "201", description = "TeleTan created"),})
   @PostMapping(TELE_TAN_ROUTE)
-  public ResponseEntity<Void> createTeleTan() {
-    // TODO implement if the clarification about communication is done
-    return ResponseEntity.status(HttpStatus.CREATED).build();
+  public ResponseEntity<TeleTan> createTeleTan() {
+    String teleTan = tanService.generateTeleTan();
+    return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));
   }
 }

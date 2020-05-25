@@ -29,15 +29,15 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: |
+        echo ${GITHUB_REGPOSITORY_OWNER}
+        echo ${GITHUB_REGPOSITORY/\//_}
         mvn --batch-mode verify sonar:sonar \
         -Dsonar.login=${SONAR_TOKEN} \
         -Dsonar.host.url=${SONAR_URL} \
-        -Dsonar.organization=${SONAR_ORGANIZATION} \
-        -Dsonar.projectKey=${SONAR_ORGANIZATION}_${SONAR_PROJECT}
+        -Dsonar.organization=${GITHUB_REGPOSITORY_OWNER} \
+        -Dsonar.projectKey=${GITHUB_REGPOSITORY/\//_}
       env:
         SONAR_URL: https://sonarcloud.io
-        SONAR_ORGANIZATION: corona-warn-app
-        SONAR_PROJECT: cwa-verification-server
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - uses: actions/upload-artifact@v1
@@ -57,7 +57,7 @@ jobs:
     - run: |
         VERSION=$(xpath -q -e "/project/version/text()" pom.xml)
         echo "::set-env name=VERSION::${VERSION}"
-    - run: echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_ACTOR} --password-stdin
+    - run: echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY_OWNER} --password-stdin
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: docker build --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/cwa-verification-server:${VERSION} .

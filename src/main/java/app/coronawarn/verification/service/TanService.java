@@ -32,9 +32,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -46,6 +47,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TanService {
 
   private static final Integer TELE_TAN_LENGTH = 7;
@@ -62,14 +64,12 @@ public class TanService {
   /**
    * The {@link VerificationTanRepository}.
    */
-  @Autowired
-  private VerificationTanRepository tanRepository;
+  private final @NonNull VerificationTanRepository tanRepository;
 
   /**
    * The {@link HashingService}.
    */
-  @Autowired
-  private HashingService hashingService;
+  private final @NonNull HashingService hashingService;
 
   /*
    * The random number generator used by this class to create random

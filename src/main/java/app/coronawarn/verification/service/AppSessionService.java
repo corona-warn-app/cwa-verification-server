@@ -29,8 +29,8 @@ import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
@@ -44,24 +44,22 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AppSessionService {
 
   /**
    * The {@link VerificationAppSessionRepository}.
    */
-  @Autowired
-  private VerificationAppSessionRepository appSessionRepository;
+  private final VerificationAppSessionRepository appSessionRepository;
 
   /**
    * The {@link HashingService}.
    */
-  @Autowired
-  private HashingService hashingService;
+  private final HashingService hashingService;
   /**
    * The {@link TanService}.
    */
-  @Autowired
-  private TanService tanService;
+  private final TanService tanService;
 
   /**
    * Creates an AppSession-Entity.

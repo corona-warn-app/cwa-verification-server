@@ -22,16 +22,16 @@
 package app.coronawarn.verification.repository;
 
 import app.coronawarn.verification.domain.VerificationTan;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.QueryByExampleExecutor;
 
 /**
  * This class represents the AppSession repository.
  *
  * @author T-Systems International GmbH
  */
-@Repository
-public interface VerificationTanRepository extends JpaRepository<VerificationTan, Long> {
+public interface VerificationTanRepository extends CrudRepository<VerificationTan, Long>,
+  QueryByExampleExecutor<VerificationTan> {
 
   boolean existsByTanHash(String tanHash);
 }

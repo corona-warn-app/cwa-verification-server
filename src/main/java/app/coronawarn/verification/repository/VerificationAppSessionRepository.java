@@ -23,13 +23,11 @@ package app.coronawarn.verification.repository;
 
 import app.coronawarn.verification.domain.VerificationAppSession;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 /**
  * This class represents the AppSession repository.
  *
  * @author T-Systems International GmbH
  */
-@Repository
 public interface VerificationAppSessionRepository extends JpaRepository<VerificationAppSession, Long> {
 }

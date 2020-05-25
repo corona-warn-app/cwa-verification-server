@@ -24,8 +24,9 @@ package app.coronawarn.verification.service;
 import app.coronawarn.verification.client.HashedGuid;
 import app.coronawarn.verification.client.LabServerClient;
 import app.coronawarn.verification.client.TestResult;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,10 +34,10 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class LabServerService {
 
-  @Autowired
-  private LabServerClient labServerClient;
+  private final @NonNull LabServerClient labServerClient;
 
   public TestResult result(HashedGuid guid) {
     return labServerClient.result(guid);

@@ -40,10 +40,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/version/v1")
 public class VerificationController {
 
@@ -84,14 +84,11 @@ public class VerificationController {
   @Value("${appsession.tancountermax}")
   private Integer tanCounterMax;
 
-  @Autowired
-  private AppSessionService appSessionService;
+  private final AppSessionService appSessionService;
 
-  @Autowired
-  private LabServerService labServerService;
+  private final LabServerService labServerService;
 
-  @Autowired
-  private TanService tanService;
+  private final TanService tanService;
 
   /**
    * This method generates a registrationToken by a hashed guid or a teleTan.

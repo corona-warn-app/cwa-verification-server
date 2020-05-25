@@ -36,6 +36,7 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
         name: target
+        path: target
   package:
     needs: build
     runs-on: ubuntu-latest

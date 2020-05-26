@@ -51,7 +51,8 @@ The Verification Server handles pseudonym data this data needs a high level of p
 
 ##	Measures to increase data privacy
 ###	Separate Operation of Verification Server and Corona-Warn-App Server
-The Verification Server and the Corona-Warn-App Server are operated by different people and run in different cloud subscriptions.
+The Verification Server and the Corona-Warn-App Server are operated by different people and run in different namespaces in one cloud tenant. The namespaces organize access rights of people for resources.
+
 ###	Logging
 Primary key or pseudonymous data must not be part of a logging statement, the only exception is detected abuse cases.
 Logfiles are kept for 30 days.

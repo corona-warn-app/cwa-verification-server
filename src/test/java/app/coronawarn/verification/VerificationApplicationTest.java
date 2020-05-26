@@ -66,10 +66,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class VerificationApplicationTest {
 
   public static final String TEST_GUI_HASH = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
-  public static final String TEST_TELETAN = "8eFjPSV";
+  public static final String TEST_INVALID_GUI_HASH = "f0e4c2f76c58916ec2b";
+  public static final String TEST_TELE_TAN = "R3ZNUeV";
+  public static final String TEST_TELE_TAN_HASH = "eeaa54dc40aa84f587e3bc0cbbf18f7c05891558a5fe1348d52f3277794d8730";
   public static final String TEST_REG_TOK = "1234567890";
   public static final String TEST_REG_TOK_HASH = "c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646";
   public static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2);
+  public static final TestResult TEST_LAB_NEGATIVE_RESULT = new TestResult(1);
   public static final String TEST_TAN = "1ea6ce8a-9740-11ea-bb37-0242ac130002";
   public static final String TEST_SOT = "connectedLab17";
   public static final String TEST_HASHED_TAN = "16154ea91c2c59d6ef9d0e7f902a59283b1e7ff9111570d20139a4e6b1832876";
@@ -123,6 +126,79 @@ public class VerificationApplicationTest {
   }
 
   /**
+   * Test generateTAN with an unknown registration token.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGenerateTanByUnknownToken() throws Exception {
+    log.info("VerificationAppTests callGenerateTanByUnknownToken()");
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+        .andExpect(status().isBadRequest());
+  }
+
+  /**
+   * Test generateTAN with an negative test result from the lab-server.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGenerateTanWithNegativeCovidResult() throws Exception {
+    log.info("VerificationAppTests callGenerateTanWithNegativeCovidResult()");
+    prepareAppSessionTestData();
+    doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+        .andExpect(status().isBadRequest());
+  }
+
+  /**
+   * Test generateTAN with an registration token connected to an appsession
+   * based on a tele Tan.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGenerateTanWithTeleTanAppSession() throws Exception {
+    log.info("VerificationAppTests callGenerateTanWithTeleTanAppSession()");
+    appSessionrepository.deleteAll();
+    VerificationAppSession appSessionTestData = getAppSessionTestData();
+    appSessionTestData.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN.getSourceName());
+    appSessionrepository.save(appSessionTestData);
+    doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+        .andExpect(status().isCreated());
+  }
+
+  /**
+   * Test generateTAN with an unknown source of trust in the appsession.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGenerateTanWithUnknownSourceOfTrust() throws Exception {
+    log.info("VerificationAppTests callGenerateTanWithUnknownSourceOfTrust()");
+    appSessionrepository.deleteAll();
+    VerificationAppSession appSessionTestData = getAppSessionTestData();
+    appSessionTestData.setSourceOfTrust("TestSourceOfTrust");
+    appSessionrepository.save(appSessionTestData);
+    doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+        .andExpect(status().isBadRequest());
+  }
+
+  /**
    * Test the generation of a tele Tan.
    *
    * @throws Exception if the test cannot be performed.
@@ -142,8 +218,8 @@ public class VerificationApplicationTest {
    */
   @Test
   public void callGetRegistrationTokenByGuid() throws Exception {
-    log.info("VerificationAppTests callGetRegistrationToken() ");
-
+    log.info("VerificationAppTests callGetRegistrationTokenByGuid() ");
+    appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
     mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
         .contentType(MediaType.APPLICATION_JSON)
@@ -169,12 +245,12 @@ public class VerificationApplicationTest {
    */
   @Test
   public void callGetRegistrationTokenByTeleTan() throws Exception {
-    log.info("VerificationAppTests callGetRegistrationToken() ");
+    log.info("VerificationAppTests callGetRegistrationTokenByTeleTan() ");
     appSessionrepository.deleteAll();
-    RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_TELETAN, RegistrationTokenKeyType.TELETAN);
-    given(this.tanService.verifyTeleTan(TEST_TELETAN)).willReturn(true);
-    given(this.tanService.isTeleTanValid(TEST_TELETAN)).willReturn(true);
-    given(this.tanService.getEntityByTan(TEST_TELETAN)).willReturn(Optional.of(getTeleTanTestData()));
+    RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_TELE_TAN, RegistrationTokenKeyType.TELETAN);
+    given(this.tanService.verifyTeleTan(TEST_TELE_TAN)).willReturn(true);
+    given(this.tanService.isTeleTanValid(TEST_TELE_TAN)).willReturn(true);
+    given(this.tanService.getEntityByTan(TEST_TELE_TAN)).willReturn(Optional.of(getTeleTanTestData()));
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
         .contentType(MediaType.APPLICATION_JSON)
@@ -194,6 +270,85 @@ public class VerificationApplicationTest {
   }
 
   /**
+   * Test get registration token by a unknown Tele-Tan.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGetRegistrationTokenByUnknownTeleTan() throws Exception {
+    log.info("VerificationAppTests callGetRegistrationTokenByUnknownTeleTan() ");
+    appSessionrepository.deleteAll();
+    RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_TELE_TAN, RegistrationTokenKeyType.TELETAN);
+    given(this.tanService.verifyTeleTan(TEST_TELE_TAN)).willReturn(true);
+    given(this.tanService.getEntityByTan(TEST_TELE_TAN)).willReturn(Optional.empty());
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(request)))
+        .andExpect(status().isBadRequest());
+  }
+
+  /**
+   * Test get registration token by a unknown Tele-Tan.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGetRegistrationTokenByInvalidHashedGUID() throws Exception {
+    log.info("VerificationAppTests callGetRegistrationTokenByInvalidHashedGUID() ");
+    appSessionrepository.deleteAll();
+    RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_INVALID_GUI_HASH, RegistrationTokenKeyType.GUID);
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(request)))
+        .andExpect(status().isBadRequest());
+  }
+
+  /**
+   * Test get registration token for a guid, but the guid already has a
+   * registration token.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGetRegistrationTokenByAlreadyExistForGUID() throws Exception {
+    log.info("VerificationAppTests callGetRegistrationTokenByInvalidHashedGUID() ");
+    prepareAppSessionTestData();
+    RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(request)))
+        .andExpect(status().isBadRequest());
+  }
+
+  /**
+   * Test get registration token for a teletan, but the teletan already has a
+   * registration token.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGetRegistrationTokenByAlreadyExistForTeleTan() throws Exception {
+    log.info("VerificationAppTests callGetRegistrationTokenByInvalidHashedGUID() ");
+
+    appSessionrepository.deleteAll();
+    VerificationAppSession appSessionTestData = getAppSessionTestData();
+    appSessionTestData.setTeleTanHash(TEST_TELE_TAN_HASH);
+    appSessionrepository.save(appSessionTestData);
+
+    given(this.tanService.verifyTeleTan(TEST_TELE_TAN)).willReturn(true);
+
+    RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_TELE_TAN, RegistrationTokenKeyType.TELETAN);
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(request)))
+        .andExpect(status().isBadRequest());
+  }
+
+  /**
    * Test getTestState.
    *
    * @throws Exception if the test cannot be performed.
@@ -206,7 +361,8 @@ public class VerificationApplicationTest {
 
     given(this.labServerService.result(new HashedGuid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON).content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+    mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
+        .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.testResult").value(TEST_LAB_POSITIVE_RESULT.getTestResult()));
   }

@@ -47,8 +47,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class TanService {
 
-  // UUID pattern
-  private static final String TAN_TAN_PATTERN = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$";
+  // TANs are UUIDs
+  private static final String UUID_PATTERN = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$";
+  private static final String TAN_TAN_PATTERN = UUID_PATTERN;
   private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
 
   private static final Integer TELE_TAN_LENGTH = 7;

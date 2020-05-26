@@ -152,20 +152,6 @@ public class AppSessionService {
   }
 
   /**
-   * Check for existing Reg Token in the
-   * {@link VerificationAppSessionRepository}.
-   *
-   * @param registrationTokenHash the hashed registrationToken
-   * @return flag for existing registrationToken
-   */
-  public boolean checkRegistrationTokenExists(String registrationTokenHash) {
-    log.info("VerificationAppSessionService start checkRegistrationTokenExists.");
-    VerificationAppSession appSession = new VerificationAppSession();
-    appSession.setRegistrationTokenHash(registrationTokenHash);
-    return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
-  }
-
-  /**
    * Get existing VerificationAppSession for Reg Token from
    * {@link VerificationAppSessionRepository}.
    *
@@ -176,7 +162,7 @@ public class AppSessionService {
     log.info("VerificationAppSessionService start getAppSessionByToken.");
     VerificationAppSession appSession = new VerificationAppSession();
     appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
-    return appSessionRepository.findOne(Example.of(appSession, ExampleMatcher.matchingAll()));
+    return appSessionRepository.findOne(Example.of(appSession, ExampleMatcher.matchingAny()));
   }
 
   /**
@@ -187,7 +173,7 @@ public class AppSessionService {
    * @return flag for existing guid
    */
   public boolean checkRegistrationTokenAlreadyExistsForGuid(String hashedGuid) {
-    log.info("VerificationAppSessionService start checkRegistrationTokenExists.");
+    log.info("VerificationAppSessionService start checkRegistrationTokenAlreadyExistsForGuid.");
     VerificationAppSession appSession = new VerificationAppSession();
     appSession.setHashedGuid(hashedGuid);
     return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));

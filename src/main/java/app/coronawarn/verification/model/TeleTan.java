@@ -27,7 +27,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * This class represents the registration Token.
+ * This class represents the tele transaction number (Tele TAN).
  *
  * @author T-Systems International GmbH
  */
@@ -35,7 +35,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegistrationToken {
+public class TeleTan {
 
-  private String token;
+  private String value;
 }

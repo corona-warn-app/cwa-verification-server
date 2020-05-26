@@ -22,6 +22,7 @@
 package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.domain.VerificationTan;
+import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
 import java.security.SecureRandom;
@@ -33,13 +34,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
-
 
 /**
  * This class represents the TanService service.
@@ -49,10 +48,13 @@ import org.springframework.stereotype.Component;
 public class TanService {
 
   private static final Integer TELE_TAN_LENGTH = 7;
+  private static final String TAN_TAN_PATTERN = "[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}";
+
   // Exclude characters which can be confusing in some fonts like 0-O or i-I-l.
   private static final String TELE_TAN_ALLOWED_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz";
   private static final String TELE_TAN_PATTERN = "^[" + TELE_TAN_ALLOWED_CHARS + "]{" + TELE_TAN_LENGTH + "}$";
   private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
+  private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
 
   @Value("${tan.valid.days}")
   private Integer tanValidInDays;
@@ -76,7 +78,8 @@ public class TanService {
    * based UUIDs. In a holder class to defer initialization until needed.
    */
   private static class Holder {
-    static final SecureRandom numberGenerator = new SecureRandom();
+
+    static final SecureRandom NUMBER_GENERATOR = new SecureRandom();
   }
 
   /**
@@ -90,14 +93,23 @@ public class TanService {
   }
 
   /**
+   * Deletes a {@link VerificationTan} from the database.
+   *
+   * @param tan the tan which will be deleted
+   */
+  public void deleteTan(VerificationTan tan) {
+    tanRepository.delete(tan);
+  }
+
+  /**
    * Check TAN syntax constraints.
    *
    * @param tan the TAN
    * @return TAN verification flag
    */
-  // TODO syntax constraints
   public boolean syntaxVerification(String tan) {
-    return true;
+    Matcher matcher = TAN_PATTERN.matcher(tan);
+    return matcher.find();
   }
 
   /**
@@ -121,6 +133,7 @@ public class TanService {
     boolean verified = false;
     if (syntaxTeleTanVerification(teleTan)) {
       Optional<VerificationTan> teleTanEntity = getEntityByTan(teleTan);
+      log.info(teleTanEntity.toString());
       if (teleTanEntity.isPresent() && !teleTanEntity.get().isRedeemed()) {
         verified = true;
       } else {
@@ -138,13 +151,7 @@ public class TanService {
    * @return a Valid TAN String
    */
   public String generateValidTan() {
-    return IntStream.range(0, TELE_TAN_LENGTH)
-      .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.numberGenerator.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
-      .collect(Collector.of(
-        StringBuilder::new,
-        StringBuilder::append,
-        StringBuilder::append,
-        StringBuilder::toString));
+    return generateTanFromUuid();
   }
 
   /**
@@ -160,7 +167,7 @@ public class TanService {
   /**
    * This method generates a {@link VerificationTan} - entity and saves it.
    *
-   * @param tan     the TAN
+   * @param tan the TAN
    * @param tanType the TAN type
    * @return the persisted TAN
    */
@@ -175,17 +182,13 @@ public class TanService {
    * @return a new TeleTan
    */
   public String generateTeleTan() {
-    /*
-     * The generation of a TeleTan is a temporary solution and may be subject to later changes.
-     */
-    String generatedTeleTan = "";
-    boolean isTeleTanValid = false;
-
-    while (!isTeleTanValid) {
-      generatedTeleTan = RandomString.make(TELE_TAN_LENGTH);
-      isTeleTanValid = isTeleTanValid(generatedTeleTan);
-    }
-    return generatedTeleTan;
+    return IntStream.range(0, TELE_TAN_LENGTH)
+        .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
+        .collect(Collector.of(
+            StringBuilder::new,
+            StringBuilder::append,
+            StringBuilder::append,
+            StringBuilder::toString));
   }
 
   /**
@@ -209,10 +212,22 @@ public class TanService {
   }
 
   /**
-   * This Method generates a valid TAN and persists it. Returns the generated TAN.
+   * Returns a generated valid tele TAN and persists it.
+   *
+   * @return a valid tele TAN
+   */
+  public String generateVerificationTeleTan() {
+    String teleTan = generateTeleTan();
+    persistTan(teleTan, TanType.TELETAN, TanSourceOfTrust.TELETAN.getSourceName());
+    return teleTan;
+  }
+
+  /**
+   * This Method generates a valid TAN and persists it. Returns the generated
+   * TAN.
    *
    * @param sourceOfTrust sets the source of Trust for the Tan
-   * @return Tan a valid tan with given source of Trust
+   * @return a valid tan with given source of Trust
    */
   public String generateVerificationTan(String sourceOfTrust) {
     String tan = generateValidTan();
@@ -220,7 +235,7 @@ public class TanService {
     return tan;
   }
 
-  private VerificationTan generateVerificationTan(String tan, TanType tanType, String sourceOfTrust) {
+  protected VerificationTan generateVerificationTan(String tan, TanType tanType, String sourceOfTrust) {
     LocalDateTime from = LocalDateTime.now();
     LocalDateTime until;
 
@@ -243,8 +258,7 @@ public class TanService {
   }
 
   /**
-   * Get existing VerificationTan by TAN from
-   * {@link VerificationTanRepository}.
+   * Get existing VerificationTan by TAN from {@link VerificationTanRepository}.
    *
    * @param tan the TAN
    * @return Optional VerificationTan

@@ -38,7 +38,8 @@ jobs:
         mvn --batch-mode verify sonar:sonar \
         -Dsonar.login=${SONAR_TOKEN} \
         -Dsonar.host.url=${SONAR_URL} \
-        -Dsonar.organization=${GITHUB_REPOSITORY_OWNER}
+        -Dsonar.organization=${GITHUB_REPOSITORY_OWNER} \
+        -Dsonar.projectKey=${GITHUB_REPOSITORY/\//_}
       env:
         SONAR_URL: https://sonarcloud.io
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

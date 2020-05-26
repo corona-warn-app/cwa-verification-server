@@ -25,15 +25,20 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 11
-    - run: mvn --batch-mode deploy
+    - name: mvn package
+      if: ${{ github.event_name == 'pull_request' }}
+      run: mvn --batch-mode package
+    - name: mvn deploy
+      if: ${{ github.event_name == 'push' }}
+      run: mvn --batch-mode deploy
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: |
+    - name: mvn sonar
+      run: |
         mvn --batch-mode verify sonar:sonar \
         -Dsonar.login=${SONAR_TOKEN} \
         -Dsonar.host.url=${SONAR_URL} \
-        -Dsonar.organization=${GITHUB_REPOSITORY_OWNER} \
-        -Dsonar.projectKey=${GITHUB_REPOSITORY/\//_}
+        -Dsonar.organization=${GITHUB_REPOSITORY_OWNER}
       env:
         SONAR_URL: https://sonarcloud.io
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -51,14 +56,19 @@ jobs:
       with:
         name: target
         path: target
-    - run: sudo apt-get install --yes --no-install-recommends libxml-xpath-perl
-    - run: |
+    - name: docker build
+      if: ${{ github.event_name == 'pull_request' }}
+      run: docker build .
+    - name: docker build and push
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        sudo apt-get install --yes --no-install-recommends libxml-xpath-perl
         ARTIFACT_ID=$(xpath -q -e "/project/artifactId/text()" pom.xml)
         echo "::set-env name=ARTIFACT_ID::${ARTIFACT_ID}"
         VERSION=$(xpath -q -e "/project/version/text()" pom.xml)
         echo "::set-env name=VERSION::${VERSION}"
-    - run: echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY_OWNER} --password-stdin
+        echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY_OWNER} --password-stdin
+        docker build --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION} .
+        docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: docker build --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION} .
-    - run: docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION}

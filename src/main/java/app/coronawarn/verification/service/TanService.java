@@ -47,14 +47,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class TanService {
 
-  private static final Integer TELE_TAN_LENGTH = 7;
-  private static final String TAN_TAN_PATTERN = "[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}";
+  // TANs are UUIDs
+  private static final String UUID_PATTERN = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$";
+  private static final String TAN_TAN_PATTERN = UUID_PATTERN;
+  private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
 
+  // Tele-TANs are a shorter, easier to communicate form of TAN
+  private static final Integer TELE_TAN_LENGTH = 7;
   // Exclude characters which can be confusing in some fonts like 0-O or i-I-l.
   private static final String TELE_TAN_ALLOWED_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz";
   private static final String TELE_TAN_PATTERN = "^[" + TELE_TAN_ALLOWED_CHARS + "]{" + TELE_TAN_LENGTH + "}$";
   private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
-  private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
 
   @Value("${tan.valid.days}")
   private Integer tanValidInDays;

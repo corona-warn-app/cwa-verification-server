@@ -135,6 +135,16 @@ public class TanServiceTest {
   }
 
   @Test
+  public void testTANFormat() {
+    assertThat(tanService.syntaxVerification("b430ce08-246d-4301-822c-c5d95f1edd13")).isTrue();
+    assertThat(tanService.syntaxVerification("ffc079f1-7060-4adb-93f8-6a6b95ad1124")).isTrue();
+    assertThat(tanService.syntaxVerification("ffc079f1")).isFalse();
+    assertThat(tanService.syntaxVerification("xfc079f1-7060-4adb-93f8-6a6b95ad1124")).isFalse();
+    assertThat(tanService.syntaxVerification("too-long-ffc079f1-7060-4adb-93f8-6a6b95ad1124")).isFalse();
+    assertThat(tanService.syntaxVerification("ffc079f1-7060-4adb-93f8-6a6b95ad1124-too-long")).isFalse();
+  }
+
+  @Test
   public void testTeleTANFormat() {
     assertThat(tanService.isTeleTanValid("29zAE4E")).isTrue();
     assertThat(tanService.isTeleTanValid("29zAE4O")).isFalse();

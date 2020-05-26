@@ -76,11 +76,9 @@ public class TanServiceTest {
 
   /**
    * Test delete Tan.
-   *
-   * @throws Exception if the test cannot be performed.
    */
   @Test
-  public void deleteTan() throws Exception {
+  public void deleteTan() {
     VerificationTan tan = new VerificationTan();
     LocalDateTime start = LocalDateTime.parse(LocalDateTime.now().format(FORMATTER));
     tan.setCreatedAt(start);
@@ -91,7 +89,7 @@ public class TanServiceTest {
     tan.setValidFrom(start);
     tan.setValidUntil(LocalDateTime.parse((TAN_VALID_UNTIL_IN_DAYS.format(FORMATTER))));
     tan.setType(TEST_TAN_TYPE);
-    tan.setSourceOfTrust("");
+    tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
     tanService.saveTan(tan);
 
     Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
@@ -103,11 +101,9 @@ public class TanServiceTest {
 
   /**
    * Test saveTan.
-   *
-   * @throws Exception if the test cannot be performed.
    */
   @Test
-  public void saveTanTest() throws Exception {
+  public void saveTanTest() {
     VerificationTan tan = new VerificationTan();
     tan.setCreatedAt(LocalDateTime.now());
     tan.setUpdatedAt(LocalDateTime.now());
@@ -116,7 +112,7 @@ public class TanServiceTest {
     tan.setValidFrom(LocalDateTime.now());
     tan.setValidUntil(TAN_VALID_UNTIL_IN_DAYS);
     tan.setType(TEST_TAN_TYPE);
-    tan.setSourceOfTrust("");
+    tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
 
     VerificationTan retunedTan = tanService.saveTan(tan);
     Assert.assertEquals(retunedTan, tan);
@@ -134,7 +130,7 @@ public class TanServiceTest {
     tan.setValidFrom(start);
     tan.setValidUntil(LocalDateTime.parse((TAN_VALID_UNTIL_IN_DAYS.format(FORMATTER))));
     tan.setType(TEST_TAN_TYPE);
-    tan.setSourceOfTrust("");
+    tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
     tanService.saveTan(tan);
 
     Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
@@ -153,14 +149,14 @@ public class TanServiceTest {
     tan.setValidFrom(start);
     tan.setValidUntil(LocalDateTime.parse((TAN_VALID_UNTIL_IN_DAYS.format(FORMATTER))));
     tan.setType(TanType.TELETAN.name());
-    tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST.getSourceName());
+    tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
     tanService.saveTan(tan);
     assertFalse(tanService.checkTanNotExist(TEST_TELE_TAN));
   }
 
   @Test
   public void generateVerificationTan() {
-    String tan = tanService.generateVerificationTan("test");
+    String tan = tanService.generateVerificationTan(TEST_TELE_TAN_SOURCE_OF_TRUST);
     assertTrue(tanService.syntaxVerification(tan));
     assertFalse(tan.isEmpty());
   }
@@ -200,16 +196,6 @@ public class TanServiceTest {
   public void verifyUnknownTeleTan() {
     String teleTan = tanService.generateTeleTan();
     assertFalse(tanService.verifyTeleTan(teleTan));
-  }
-
-  @Test
-  public void testTANFormat() {
-    assertThat(tanService.syntaxVerification("b430ce08-246d-4301-822c-c5d95f1edd13")).isTrue();
-    assertThat(tanService.syntaxVerification("ffc079f1-7060-4adb-93f8-6a6b95ad1124")).isTrue();
-    assertThat(tanService.syntaxVerification("ffc079f1")).isFalse();
-    assertThat(tanService.syntaxVerification("xfc079f1-7060-4adb-93f8-6a6b95ad1124")).isFalse();
-    assertThat(tanService.syntaxVerification("too-long-ffc079f1-7060-4adb-93f8-6a6b95ad1124")).isFalse();
-    assertThat(tanService.syntaxVerification("ffc079f1-7060-4adb-93f8-6a6b95ad1124-too-long")).isFalse();
   }
 
   @Test

@@ -21,10 +21,13 @@
 
 package app.coronawarn.verification.domain;
 
+import app.coronawarn.verification.model.TanSourceOfTrust;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -69,7 +72,8 @@ public class VerificationTan implements Serializable {
   private LocalDateTime validUntil;
 
   @Column(name = "sot")
-  private String sourceOfTrust;
+  @Enumerated(EnumType.STRING)
+  private TanSourceOfTrust sourceOfTrust;
 
   @Column(name = "redeemed")
   private boolean redeemed;

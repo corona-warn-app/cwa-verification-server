@@ -74,7 +74,7 @@ public class VerificationApplicationTest {
   public static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2);
   public static final TestResult TEST_LAB_NEGATIVE_RESULT = new TestResult(1);
   public static final String TEST_TAN = "1ea6ce8a-9740-11ea-bb37-0242ac130002";
-  public static final String TEST_SOT = "connectedLab17";
+  public static final TanSourceOfTrust TEST_SOT = TanSourceOfTrust.CONNECTED_LAB;
   public static final String TEST_HASHED_TAN = "16154ea91c2c59d6ef9d0e7f902a59283b1e7ff9111570d20139a4e6b1832876";
   public static final String TEST_TAN_TYPE = "TAN";
   private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
@@ -120,7 +120,7 @@ public class VerificationApplicationTest {
     List<VerificationAppSession> verficationList = appSessionrepository.findAll();
     assertNotNull(verficationList);
     assertEquals(TEST_GUI_HASH, verficationList.get(0).getHashedGuid());
-    assertEquals(AppSessionSourceOfTrust.HASHED_GUID.getSourceName(), verficationList.get(0).getSourceOfTrust());
+    assertEquals(AppSessionSourceOfTrust.HASHED_GUID, verficationList.get(0).getSourceOfTrust());
     assertEquals(TEST_REG_TOK_HASH, verficationList.get(0).getRegistrationTokenHash());
 
   }
@@ -168,7 +168,7 @@ public class VerificationApplicationTest {
     log.info("VerificationAppTests callGenerateTanWithTeleTanAppSession()");
     appSessionrepository.deleteAll();
     VerificationAppSession appSessionTestData = getAppSessionTestData();
-    appSessionTestData.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN.getSourceName());
+    appSessionTestData.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
     appSessionrepository.save(appSessionTestData);
     doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
 
@@ -188,7 +188,7 @@ public class VerificationApplicationTest {
     log.info("VerificationAppTests callGenerateTanWithUnknownSourceOfTrust()");
     appSessionrepository.deleteAll();
     VerificationAppSession appSessionTestData = getAppSessionTestData();
-    appSessionTestData.setSourceOfTrust("TestSourceOfTrust");
+    appSessionTestData.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
     appSessionrepository.save(appSessionTestData);
     doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
 
@@ -234,7 +234,7 @@ public class VerificationApplicationTest {
     List<VerificationAppSession> verificationList = appSessionrepository.findAll();
     assertNotNull(verificationList);
     assertEquals(TEST_GUI_HASH, verificationList.get(0).getHashedGuid());
-    assertEquals(AppSessionSourceOfTrust.HASHED_GUID.getSourceName(), verificationList.get(0).getSourceOfTrust());
+    assertEquals(AppSessionSourceOfTrust.HASHED_GUID, verificationList.get(0).getSourceOfTrust());
     assertNotNull(verificationList.get(0).getRegistrationTokenHash());
   }
 
@@ -265,7 +265,7 @@ public class VerificationApplicationTest {
     List<VerificationAppSession> verificationList = appSessionrepository.findAll();
     assertNotNull(verificationList);
     assertNull(verificationList.get(0).getHashedGuid());
-    assertEquals(AppSessionSourceOfTrust.TELETAN.getSourceName(), verificationList.get(0).getSourceOfTrust());
+    assertEquals(AppSessionSourceOfTrust.TELETAN, verificationList.get(0).getSourceOfTrust());
     assertNotNull(verificationList.get(0).getRegistrationTokenHash());
   }
 
@@ -507,7 +507,7 @@ public class VerificationApplicationTest {
     cv.setCreatedAt(LocalDateTime.now());
     cv.setUpdatedAt(LocalDateTime.now());
     cv.setTanCounter(0);
-    cv.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID.getSourceName());
+    cv.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
     cv.setRegistrationTokenHash(TEST_REG_TOK_HASH);
     return cv;
   }
@@ -530,7 +530,7 @@ public class VerificationApplicationTest {
     cvtan.setCreatedAt(LocalDateTime.now());
     cvtan.setUpdatedAt(LocalDateTime.now());
     cvtan.setRedeemed(false);
-    cvtan.setSourceOfTrust(TanSourceOfTrust.TELETAN.getSourceName());
+    cvtan.setSourceOfTrust(TanSourceOfTrust.TELETAN);
     cvtan.setTanHash(TEST_HASHED_TAN);
     cvtan.setType(TanType.TELETAN.name());
     cvtan.setValidFrom(LocalDateTime.now());

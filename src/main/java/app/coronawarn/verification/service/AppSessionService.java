@@ -57,11 +57,6 @@ public class AppSessionService {
    */
   @Autowired
   private HashingService hashingService;
-  /**
-   * The {@link TanService}.
-   */
-  @Autowired
-  private TanService tanService;
 
   /**
    * Creates an AppSession-Entity.
@@ -116,22 +111,18 @@ public class AppSessionService {
         break;
       case TELETAN:
         String teleTan = key;
-        if (tanService.isTeleTanValid(teleTan)) {
-          if (checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
-            log.warn("The registration token already exists for this TeleTAN.");
-          } else {
-            log.info("Start generating a new registration token for the given tele TAN.");
-            registrationToken = generateRegistrationToken();
-            appSession = generateAppSession(registrationToken);
-            appSession.setTeleTanHash(hashingService.hash(teleTan));
-            appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN.getSourceName());
-            saveAppSession(appSession);
-            return ResponseEntity
-              .status(HttpStatus.CREATED)
-              .body(new RegistrationToken(registrationToken));
-          }
+        if (checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
+          log.warn("The registration token already exists for this TeleTAN.");
         } else {
-          log.warn("The Tele Tan supplied is not valid.");
+          log.info("Start generating a new registration token for the given tele TAN.");
+          registrationToken = generateRegistrationToken();
+          appSession = generateAppSession(registrationToken);
+          appSession.setTeleTanHash(hashingService.hash(teleTan));
+          appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN.getSourceName());
+          saveAppSession(appSession);
+          return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(new RegistrationToken(registrationToken));
         }
         break;
       default:
@@ -189,7 +180,7 @@ public class AppSessionService {
   public boolean checkRegistrationTokenAlreadyExistForTeleTan(String teleTan) {
     log.info("VerificationAppSessionService start checkTeleTanAlreadyExistForTeleTan.");
     VerificationAppSession appSession = new VerificationAppSession();
-    appSession.setRegistrationTokenHash(hashingService.hash(teleTan));
+    appSession.setTeleTanHash(hashingService.hash(teleTan));
     return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
   }
 

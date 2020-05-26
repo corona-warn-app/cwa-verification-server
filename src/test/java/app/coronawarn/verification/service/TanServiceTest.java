@@ -23,6 +23,7 @@ package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.VerificationApplication;
 import app.coronawarn.verification.domain.VerificationTan;
+import app.coronawarn.verification.repository.VerificationTanRepository;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -34,6 +35,7 @@ import static org.junit.Assert.assertFalse;
 import org.junit.Assert;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +60,42 @@ public class TanServiceTest {
   private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
 
   @Autowired
-  TanService tanService;
+  private TanService tanService;
+
+  @Autowired
+  private VerificationTanRepository tanRepository;
+
+  @Before
+  public void setUp() {
+    tanRepository.deleteAll();
+  }
+
+  /**
+   * Test delete Tan.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void deleteTan() throws Exception {
+    VerificationTan tan = new VerificationTan();
+    LocalDateTime start = LocalDateTime.parse(LocalDateTime.now().format(FORMATTER));
+    tan.setCreatedAt(start);
+    tan.setUpdatedAt(start);
+    tan.setRedeemed(false);
+    tan.setTanHash(TEST_TAN_HASH);
+
+    tan.setValidFrom(start);
+    tan.setValidUntil(LocalDateTime.parse((TAN_VALID_UNTIL_IN_DAYS.format(FORMATTER))));
+    tan.setType(TEST_TAN_TYPE);
+    tan.setSourceOfTrust("");
+    tanService.saveTan(tan);
+
+    Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
+    Assert.assertEquals(tan, tanFromDB.get());
+    tanService.deleteTan(tan);
+    tanFromDB = tanService.getEntityByTan(TEST_TAN);
+    assertFalse(tanFromDB.isPresent());
+  }
 
   /**
    * Test saveTan.

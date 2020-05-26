@@ -151,17 +151,13 @@ public class TanService {
    * @return a Valid TAN String
    */
   public String generateValidTan() {
-    return generateTanFromUuid();
-  }
-
-  /**
-   * Check for existing TAN in the {@link VerificationTanRepository}.
-   *
-   * @param tan the TAN
-   * @return flag for existing TAN
-   */
-  public boolean checkTanAlreadyExist(String tan) {
-    return hashTanAndCheckAvailability(tan);
+    boolean validTan = false;
+    String newTan = "";
+    while (!validTan) {
+      newTan = generateTanFromUuid();
+      validTan = checkTanNotExist(newTan);
+    }
+    return newTan;
   }
 
   /**
@@ -206,7 +202,13 @@ public class TanService {
     return UUID.randomUUID().toString();
   }
 
-  private boolean hashTanAndCheckAvailability(String tan) {
+  /**
+   * Check for existing TAN in the {@link VerificationTanRepository}.
+   *
+   * @param tan the TAN
+   * @return flag for existing TAN
+   */
+  public boolean checkTanNotExist(String tan) {
     String tanHash = hashingService.hash(tan);
     return !tanRepository.existsByTanHash(tanHash);
   }

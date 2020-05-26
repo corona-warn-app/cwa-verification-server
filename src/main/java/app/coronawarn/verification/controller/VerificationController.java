@@ -160,19 +160,20 @@ public class VerificationController {
     if (actual.isPresent()) {
       VerificationAppSession appSession = actual.get();
       if (appSession.getTanCounter() < tanCounterMax) {
-        String sourceOfTrust = appSession.getSourceOfTrust();
-        if (AppSessionSourceOfTrust.HASHED_GUID.getSourceName().equals(sourceOfTrust)) {
-          sourceOfTrust = TanSourceOfTrust.CONNECTED_LAB.getSourceName();
+        AppSessionSourceOfTrust appSessionSourceOfTrust = appSession.getSourceOfTrust();
+        TanSourceOfTrust tanSourceOfTrust = TanSourceOfTrust.CONNECTED_LAB;
+
+        if (AppSessionSourceOfTrust.HASHED_GUID == appSessionSourceOfTrust) {
           TestResult covidTestResult = labServerService.result(new HashedGuid(appSession.getHashedGuid()));
           if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()) {
             return ResponseEntity.badRequest().build();
           }
-        } else if (AppSessionSourceOfTrust.TELETAN.getSourceName().equals(sourceOfTrust)) {
-          sourceOfTrust = TanSourceOfTrust.TELETAN.getSourceName();
+        } else if (AppSessionSourceOfTrust.TELETAN == appSessionSourceOfTrust) {
+          tanSourceOfTrust = TanSourceOfTrust.TELETAN;
         } else {
           return ResponseEntity.badRequest().build();
         }
-        String generatedTan = tanService.generateVerificationTan(sourceOfTrust);
+        String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
         appSession.incrementTanCounter();
         appSessionService.saveAppSession(appSession);
         return ResponseEntity.status(HttpStatus.CREATED).body(new Tan(generatedTan));

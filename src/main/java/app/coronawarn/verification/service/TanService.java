@@ -170,7 +170,7 @@ public class TanService {
    * @param tanType the TAN type
    * @return the persisted TAN
    */
-  private VerificationTan persistTan(String tan, TanType tanType, String sourceOfTrust) {
+  private VerificationTan persistTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
     VerificationTan newTan = generateVerificationTan(tan, tanType, sourceOfTrust);
     return tanRepository.save(newTan);
   }
@@ -223,7 +223,7 @@ public class TanService {
    */
   public String generateVerificationTeleTan() {
     String teleTan = generateTeleTan();
-    persistTan(teleTan, TanType.TELETAN, TanSourceOfTrust.TELETAN.getSourceName());
+    persistTan(teleTan, TanType.TELETAN, TanSourceOfTrust.TELETAN);
     return teleTan;
   }
 
@@ -234,13 +234,13 @@ public class TanService {
    * @param sourceOfTrust sets the source of Trust for the Tan
    * @return a valid tan with given source of Trust
    */
-  public String generateVerificationTan(String sourceOfTrust) {
+  public String generateVerificationTan(TanSourceOfTrust sourceOfTrust) {
     String tan = generateValidTan();
     persistTan(tan, TanType.TAN, sourceOfTrust);
     return tan;
   }
 
-  protected VerificationTan generateVerificationTan(String tan, TanType tanType, String sourceOfTrust) {
+  protected VerificationTan generateVerificationTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
     LocalDateTime from = LocalDateTime.now();
     LocalDateTime until;
 

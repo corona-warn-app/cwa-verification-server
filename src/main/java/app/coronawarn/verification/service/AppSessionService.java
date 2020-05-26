@@ -101,7 +101,7 @@ public class AppSessionService {
             registrationToken = generateRegistrationToken();
             appSession = generateAppSession(registrationToken);
             appSession.setHashedGuid(hashedGuid);
-            appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID.getSourceName());
+            appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
             saveAppSession(appSession);
             return ResponseEntity
               .status(HttpStatus.CREATED)
@@ -118,7 +118,7 @@ public class AppSessionService {
           registrationToken = generateRegistrationToken();
           appSession = generateAppSession(registrationToken);
           appSession.setTeleTanHash(hashingService.hash(teleTan));
-          appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN.getSourceName());
+          appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
           saveAppSession(appSession);
           return ResponseEntity
             .status(HttpStatus.CREATED)

@@ -249,6 +249,38 @@ public class VerificationApplicationTest {
   }
 
   /**
+   * Test get registration token by a keytype which is null.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGetRegistrationTokenWithNullKeyType() throws Exception {
+    log.info("VerificationAppTests callGetRegistrationTokenWithNullKeyType() ");
+    appSessionrepository.deleteAll();
+    RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, null);
+    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(request)))
+      .andExpect(status().isBadRequest());
+  }
+
+  /**
+   * Test get registration token by a key which is null.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGetRegistrationTokenWithNullKey() throws Exception {
+    log.info("VerificationAppTests callGetRegistrationTokenWithNullKey() ");
+    appSessionrepository.deleteAll();
+    RegistrationTokenRequest request = new RegistrationTokenRequest(null, RegistrationTokenKeyType.GUID);
+    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(request)))
+      .andExpect(status().isBadRequest());
+  }
+
+  /**
    * Test get registration token by a tele tan.
    *
    * @throws Exception if the test cannot be performed.

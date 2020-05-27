@@ -29,8 +29,9 @@ import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
@@ -43,25 +44,21 @@ import org.springframework.stereotype.Component;
  * @author T-Systems International GmbH
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class AppSessionService {
 
   /**
    * The {@link VerificationAppSessionRepository}.
    */
-  @Autowired
-  private VerificationAppSessionRepository appSessionRepository;
+  @NonNull
+  private final VerificationAppSessionRepository appSessionRepository;
 
   /**
    * The {@link HashingService}.
    */
-  @Autowired
-  private HashingService hashingService;
-  /**
-   * The {@link TanService}.
-   */
-  @Autowired
-  private TanService tanService;
+  @NonNull
+  private final HashingService hashingService;
 
   /**
    * Creates an AppSession-Entity.
@@ -97,16 +94,15 @@ public class AppSessionService {
 
     switch (keyType) {
       case GUID:
-        String hashedGuid = key;
         if (hashingService.isHashValid(key)) {
-          if (checkRegistrationTokenAlreadyExistsForGuid(hashedGuid)) {
+          if (checkRegistrationTokenAlreadyExistsForGuid(key)) {
             log.warn("The registration token already exists for the hashed guid.");
           } else {
             log.info("Start generating a new registration token for the given hashed guid.");
             registrationToken = generateRegistrationToken();
             appSession = generateAppSession(registrationToken);
-            appSession.setHashedGuid(hashedGuid);
-            appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID.getSourceName());
+            appSession.setHashedGuid(key);
+            appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
             saveAppSession(appSession);
             return ResponseEntity
               .status(HttpStatus.CREATED)
@@ -115,23 +111,18 @@ public class AppSessionService {
         }
         break;
       case TELETAN:
-        String teleTan = key;
-        if (tanService.isTeleTanValid(teleTan)) {
-          if (checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
-            log.warn("The registration token already exists for this TeleTAN.");
-          } else {
-            log.info("Start generating a new registration token for the given tele TAN.");
-            registrationToken = generateRegistrationToken();
-            appSession = generateAppSession(registrationToken);
-            appSession.setTeleTanHash(hashingService.hash(teleTan));
-            appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN.getSourceName());
-            saveAppSession(appSession);
-            return ResponseEntity
-              .status(HttpStatus.CREATED)
-              .body(new RegistrationToken(registrationToken));
-          }
+        if (checkRegistrationTokenAlreadyExistForTeleTan(key)) {
+          log.warn("The registration token already exists for this TeleTAN.");
         } else {
-          log.warn("The Tele Tan supplied is not valid.");
+          log.info("Start generating a new registration token for the given tele TAN.");
+          registrationToken = generateRegistrationToken();
+          appSession = generateAppSession(registrationToken);
+          appSession.setTeleTanHash(hashingService.hash(key));
+          appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
+          saveAppSession(appSession);
+          return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(new RegistrationToken(registrationToken));
         }
         break;
       default:
@@ -189,7 +180,7 @@ public class AppSessionService {
   public boolean checkRegistrationTokenAlreadyExistForTeleTan(String teleTan) {
     log.info("VerificationAppSessionService start checkTeleTanAlreadyExistForTeleTan.");
     VerificationAppSession appSession = new VerificationAppSession();
-    appSession.setRegistrationTokenHash(hashingService.hash(teleTan));
+    appSession.setTeleTanHash(hashingService.hash(teleTan));
     return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
   }
 

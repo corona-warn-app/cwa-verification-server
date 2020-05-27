@@ -25,16 +25,6 @@ package app.coronawarn.verification.model;
  * This class represents the possible sources of trust for an appsession entity.
  */
 public enum AppSessionSourceOfTrust {
-  HASHED_GUID("hashedGUID"),
-  TELETAN("teleTAN");
-
-  private final String sourceName;
-
-  AppSessionSourceOfTrust(String sourceName) {
-    this.sourceName = sourceName;
-  }
-
-  public String getSourceName() {
-    return this.sourceName;
-  }
+  HASHED_GUID,
+  TELETAN
 }

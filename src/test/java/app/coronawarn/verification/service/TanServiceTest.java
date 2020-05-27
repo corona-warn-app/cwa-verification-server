@@ -26,17 +26,13 @@ import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
-import lombok.extern.slf4j.Slf4j;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import static org.junit.Assert.assertFalse;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +40,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Slf4j
 @RunWith(SpringRunner.class)

@@ -25,52 +25,44 @@ import app.coronawarn.verification.VerificationApplication;
 import app.coronawarn.verification.client.HashedGuid;
 import app.coronawarn.verification.client.LabServerClient;
 import app.coronawarn.verification.client.TestResult;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-
-import static org.mockito.Mockito.doReturn;
-
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
 public class LabServerServiceTest {
+
   public static final String TEST_GUI_HASH = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
   public static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2);
-
-  @Mock
-  LabServerClient labServerClient;
-
-  @Autowired
-  @InjectMocks
   private LabServerService labServerService;
 
   @Before
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    labServerService = new LabServerService(new LabServerClientMock());
   }
 
   /**
    * Test result method.
-   *
-   * @throws Exception if the test cannot be performed.
    */
   @Test
-  public void resultTest() throws Exception {
+  public void resultTest() {
     HashedGuid hashedGuid = new HashedGuid(TEST_GUI_HASH);
-    doReturn(TEST_LAB_POSITIVE_RESULT).when(labServerClient).result(hashedGuid);
     TestResult testResult = labServerService.result(hashedGuid);
     assertThat(testResult).isEqualTo(TEST_LAB_POSITIVE_RESULT);
+  }
+
+  public static class LabServerClientMock implements LabServerClient {
+
+    @Override
+    public TestResult result(HashedGuid guid) {
+      return new TestResult(2);
+    }
   }
 }

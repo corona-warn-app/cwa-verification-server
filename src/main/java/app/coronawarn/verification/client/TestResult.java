@@ -27,8 +27,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * This class represents the TestResult.
- *
- * @author T-Systems International GmbH
  */
 @Data
 @NoArgsConstructor

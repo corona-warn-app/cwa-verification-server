@@ -27,8 +27,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * This class represents the GUID.
- *
- * @author T-Systems International GmbH
  */
 @Data
 @NoArgsConstructor

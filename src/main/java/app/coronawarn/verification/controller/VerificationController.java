@@ -118,21 +118,28 @@ public class VerificationController {
     if (request != null && request.getKey() != null && request.getKeyType() != null) {
       String key = request.getKey();
       RegistrationTokenKeyType keyType = request.getKeyType();
-      if (keyType == RegistrationTokenKeyType.TELETAN) {
-        if (tanService.verifyTeleTan(key)) {
-          ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
-          Optional<VerificationTan> optional = tanService.getEntityByTan(key);
-          if (optional.isPresent()) {
-            VerificationTan teleTan = optional.get();
-            teleTan.setRedeemed(true);
-            tanService.saveTan(teleTan);
-            return response;
-          } else {
-            log.warn("Teletan is not found");
+      switch (keyType) {
+        case TELETAN:
+          if (tanService.verifyTeleTan(key)) {
+            ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
+            Optional<VerificationTan> optional = tanService.getEntityByTan(key);
+            if (optional.isPresent()) {
+              VerificationTan teleTan = optional.get();
+              teleTan.setRedeemed(true);
+              tanService.saveTan(teleTan);
+              return response;
+            } else {
+              log.warn("Teletan is not found");
+            }
           }
-        }
-      } else {
-        return appSessionService.generateRegistrationToken(key, keyType);
+          break;
+        case GUID:
+          if (appSessionService.verifyHashedGuid(key)) {
+            return appSessionService.generateRegistrationToken(key, keyType);
+          }
+          break;
+        default:
+          break;
       }
     }
     return ResponseEntity.badRequest().build();

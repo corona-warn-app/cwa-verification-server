@@ -81,4 +81,16 @@ public class VerificationTan implements Serializable {
   @Column(name = "type")
   private String type;
 
+  /**
+   * Check if the tan can be redeemed by date.
+   *
+   * @param reference the date to check if it is in between from and until range
+   * @return true or false if it can be redeemed
+   */
+  public boolean canBeRedeemed(LocalDateTime reference) {
+    return validFrom.isBefore(reference)
+      && validUntil.isAfter(reference)
+      && !isRedeemed();
+  }
+
 }

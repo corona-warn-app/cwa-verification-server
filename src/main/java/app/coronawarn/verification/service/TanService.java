@@ -55,7 +55,7 @@ public class TanService {
   private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
 
   // Tele-TANs are a shorter, easier to communicate form of TAN
-  private static final Integer TELE_TAN_LENGTH = 7;
+  private static final int TELE_TAN_LENGTH = 7;
   // Exclude characters which can be confusing in some fonts like 0-O or i-I-l.
   private static final String TELE_TAN_ALLOWED_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz";
   private static final String TELE_TAN_PATTERN = "^[" + TELE_TAN_ALLOWED_CHARS + "]{" + TELE_TAN_LENGTH + "}$";
@@ -72,9 +72,9 @@ public class TanService {
   @NonNull
   private final HashingService hashingService;
   @Value("${tan.valid.days}")
-  private Integer tanValidInDays;
+  private int tanValidInDays;
   @Value("${tan.tele.valid.hours}")
-  private Integer teleTanValidInHours;
+  private int teleTanValidInHours;
 
   /**
    * Saves a {@link VerificationTan} into the database.

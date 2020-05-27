@@ -93,7 +93,7 @@ public class VerificationController {
   private final TanService tanService;
 
   @Value("${appsession.tancountermax}")
-  private Integer tanCounterMax;
+  private int tanCounterMax;
 
   /**
    * This method generates a registrationToken by a hashed guid or a teleTan.

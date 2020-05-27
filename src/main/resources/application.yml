@@ -12,19 +12,6 @@ spring:
       ddl-auto: validate
   liquibase:
     change-log: classpath:db/changelog.yml
-server:
-  port: 8080
-management:
-  server:
-    port: 8090
-  endpoints:
-    web:
-      exposure:
-        include: health
-  endpoint:
-    health:
-      show-details: ALWAYS
-      show-components: ALWAYS
 feign:
   client:
     config:

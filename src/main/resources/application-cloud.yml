@@ -6,3 +6,16 @@ spring:
     password: ${POSTGRESQL_PASSWORD}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+server:
+  port: 8080
+management:
+  server:
+    port: 8090
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: ALWAYS
+      show-components: ALWAYS

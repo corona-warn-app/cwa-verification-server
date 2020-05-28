@@ -21,6 +21,7 @@
 
 package app.coronawarn.verification.service;
 
+import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
@@ -71,10 +72,9 @@ public class TanService {
    */
   @NonNull
   private final HashingService hashingService;
-  @Value("${tan.valid.days}")
-  private Integer tanValidInDays;
-  @Value("${tan.tele.valid.hours}")
-  private Integer teleTanValidInHours;
+
+  @NonNull
+  private VerificationApplicationConfig verificationApplicationConfig;
 
   /**
    * Saves a {@link VerificationTan} into the database.
@@ -234,7 +234,8 @@ public class TanService {
   protected VerificationTan generateVerificationTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
     LocalDateTime from = LocalDateTime.now();
     LocalDateTime until;
-
+    int tanValidInDays = verificationApplicationConfig.getTan().getValid().getDays();
+    int teleTanValidInHours = verificationApplicationConfig.getTan().getTele().getValid().getHours();
     if (tanType == TanType.TELETAN) {
       until = from.plusHours(teleTanValidInHours);
     } else {

@@ -203,15 +203,17 @@ public class VerificationController {
     produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<TestResult> getTestState(@RequestBody RegistrationToken registrationToken) {
-    return appSessionService.getAppSessionByToken(registrationToken.getToken())
-      .map(VerificationAppSession::getHashedGuid)
-      .map(HashedGuid::new)
-      .map(labServerService::result)
-      .map(ResponseEntity::ok)
-      .orElseGet(() -> {
-        log.info("The registration token is invalid.");
-        return ResponseEntity.badRequest().build();
-      });
+    Optional<VerificationAppSession> appSession =
+      appSessionService.getAppSessionByToken(registrationToken.getToken());
+    if (appSession.isPresent()) {
+      String hash = appSession.get().getHashedGuid() != null
+        ? appSession.get().getHashedGuid() : appSession.get().getTeleTanHash();
+      log.info("Requested result for registration token with Hashed Guid.");
+      TestResult testResult = labServerService.result(new HashedGuid(hash));
+      return ResponseEntity.ok(testResult);
+    }
+    log.info("The registration token is doesn't exists.");
+    return ResponseEntity.badRequest().build();
   }
 
   /**

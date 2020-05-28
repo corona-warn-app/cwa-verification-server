@@ -25,16 +25,16 @@ import app.coronawarn.verification.VerificationApplication;
 import app.coronawarn.verification.client.HashedGuid;
 import app.coronawarn.verification.client.LabServerClient;
 import app.coronawarn.verification.client.TestResult;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
 public class LabServerServiceTest {
@@ -43,7 +43,7 @@ public class LabServerServiceTest {
   public static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2);
   private LabServerService labServerService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     labServerService = new LabServerService(new LabServerClientMock());
   }

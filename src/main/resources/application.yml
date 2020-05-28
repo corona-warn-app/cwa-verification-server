@@ -12,6 +12,8 @@ spring:
       ddl-auto: validate
   liquibase:
     change-log: classpath:db/changelog.yml
+server:
+  max-post-size: 10000
 feign:
   client:
     config:

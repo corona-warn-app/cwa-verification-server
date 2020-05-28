@@ -27,8 +27,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * This class represents the Labor Server service client.
- *
- * @author T-Systems International GmbH
  */
 @FeignClient(name = "labServerService", url = "${uri.endpoint.labserver}")
 public interface LabServerClient {

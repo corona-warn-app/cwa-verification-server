@@ -22,40 +22,47 @@
 package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.VerificationApplication;
+import app.coronawarn.verification.client.HashedGuid;
+import app.coronawarn.verification.client.LabServerClient;
+import app.coronawarn.verification.client.TestResult;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
-public class HashingServiceTest {
+public class LabServerServiceTest {
 
-  @Autowired
-  HashingService hashingService;
+  public static final String TEST_GUI_HASH = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
+  public static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2);
+  private LabServerService labServerService;
 
-  @Test
-  public void testValidSha256Hash() {
-
-    assertTrue(hashingService.isHashValid("523463041ef9ffa2950d8450feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
-    assertTrue(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000"));
-    assertTrue(hashingService.isHashValid("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"));
+  @Before
+  public void setUp() {
+    labServerService = new LabServerService(new LabServerClientMock());
   }
 
+  /**
+   * Test result method.
+   */
   @Test
-  public void testInvalidSha256Hash() {
-
-    assertFalse(hashingService.isHashValid("x23463041ef9ffa2950d8z50feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
-    assertFalse(hashingService.isHashValid("523463041ef9ffa2950d8z50feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
-    assertFalse(hashingService.isHashValid("0"));
-    assertFalse(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000f"));
+  public void resultTest() {
+    HashedGuid hashedGuid = new HashedGuid(TEST_GUI_HASH);
+    TestResult testResult = labServerService.result(hashedGuid);
+    assertThat(testResult).isEqualTo(TEST_LAB_POSITIVE_RESULT);
   }
 
+  public static class LabServerClientMock implements LabServerClient {
 
+    @Override
+    public TestResult result(HashedGuid guid) {
+      return new TestResult(2);
+    }
+  }
 }

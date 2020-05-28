@@ -25,16 +25,6 @@ package app.coronawarn.verification.model;
  * This class represents the possible sources of trust for a TAN entity.
  */
 public enum TanSourceOfTrust {
-  CONNECTED_LAB("connectedLab"),
-  TELETAN("teleTAN");
-
-  private final String sourceName;
-
-  TanSourceOfTrust(String sourceName) {
-    this.sourceName = sourceName;
-  }
-
-  public String getSourceName() {
-    return this.sourceName;
-  }
+  CONNECTED_LAB,
+  TELETAN
 }

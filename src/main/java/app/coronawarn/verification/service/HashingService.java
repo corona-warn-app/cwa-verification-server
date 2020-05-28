@@ -34,9 +34,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class HashingService {
 
-  private static final String GUID_HASH_PATTERN = "[0-9A-Fa-f]{64}";
+  private static final String GUID_HASH_PATTERN = "^[0-9A-Fa-f]{64}$";
   private static final Pattern pattern = Pattern.compile(GUID_HASH_PATTERN);
-
 
   /**
    * Returns the hash of the supplied string.

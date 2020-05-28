@@ -22,6 +22,7 @@
 package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.domain.VerificationTan;
+import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
 import java.security.SecureRandom;
@@ -32,52 +33,48 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.utility.RandomString;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
 
-
 /**
  * This class represents the TanService service.
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class TanService {
 
+  // TANs are UUIDs
+  private static final String UUID_PATTERN = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$";
+  private static final String TAN_TAN_PATTERN = UUID_PATTERN;
+  private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
+
+  // Tele-TANs are a shorter, easier to communicate form of TAN
   private static final Integer TELE_TAN_LENGTH = 7;
   // Exclude characters which can be confusing in some fonts like 0-O or i-I-l.
   private static final String TELE_TAN_ALLOWED_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz";
   private static final String TELE_TAN_PATTERN = "^[" + TELE_TAN_ALLOWED_CHARS + "]{" + TELE_TAN_LENGTH + "}$";
   private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
 
+  /**
+   * The {@link VerificationTanRepository}.
+   */
+  @NonNull
+  private final VerificationTanRepository tanRepository;
+  /**
+   * The {@link HashingService}.
+   */
+  @NonNull
+  private final HashingService hashingService;
   @Value("${tan.valid.days}")
   private Integer tanValidInDays;
   @Value("${tan.tele.valid.hours}")
   private Integer teleTanValidInHours;
-
-  /**
-   * The {@link VerificationTanRepository}.
-   */
-  @Autowired
-  private VerificationTanRepository tanRepository;
-
-  /**
-   * The {@link HashingService}.
-   */
-  @Autowired
-  private HashingService hashingService;
-
-  /*
-   * The random number generator used by this class to create random
-   * based UUIDs. In a holder class to defer initialization until needed.
-   */
-  private static class Holder {
-    static final SecureRandom numberGenerator = new SecureRandom();
-  }
 
   /**
    * Saves a {@link VerificationTan} into the database.
@@ -90,14 +87,23 @@ public class TanService {
   }
 
   /**
+   * Deletes a {@link VerificationTan} from the database.
+   *
+   * @param tan the tan which will be deleted
+   */
+  public void deleteTan(VerificationTan tan) {
+    tanRepository.delete(tan);
+  }
+
+  /**
    * Check TAN syntax constraints.
    *
    * @param tan the TAN
    * @return TAN verification flag
    */
-  // TODO syntax constraints
   public boolean syntaxVerification(String tan) {
-    return true;
+    Matcher matcher = TAN_PATTERN.matcher(tan);
+    return matcher.find();
   }
 
   /**
@@ -121,6 +127,7 @@ public class TanService {
     boolean verified = false;
     if (syntaxTeleTanVerification(teleTan)) {
       Optional<VerificationTan> teleTanEntity = getEntityByTan(teleTan);
+      log.info(teleTanEntity.toString());
       if (teleTanEntity.isPresent() && !teleTanEntity.get().isRedeemed()) {
         verified = true;
       } else {
@@ -138,23 +145,13 @@ public class TanService {
    * @return a Valid TAN String
    */
   public String generateValidTan() {
-    return IntStream.range(0, TELE_TAN_LENGTH)
-      .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.numberGenerator.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
-      .collect(Collector.of(
-        StringBuilder::new,
-        StringBuilder::append,
-        StringBuilder::append,
-        StringBuilder::toString));
-  }
-
-  /**
-   * Check for existing TAN in the {@link VerificationTanRepository}.
-   *
-   * @param tan the TAN
-   * @return flag for existing TAN
-   */
-  public boolean checkTanAlreadyExist(String tan) {
-    return hashTanAndCheckAvailability(tan);
+    boolean validTan = false;
+    String newTan = "";
+    while (!validTan) {
+      newTan = generateTanFromUuid();
+      validTan = checkTanNotExist(newTan);
+    }
+    return newTan;
   }
 
   /**
@@ -164,7 +161,7 @@ public class TanService {
    * @param tanType the TAN type
    * @return the persisted TAN
    */
-  private VerificationTan persistTan(String tan, TanType tanType, String sourceOfTrust) {
+  private VerificationTan persistTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
     VerificationTan newTan = generateVerificationTan(tan, tanType, sourceOfTrust);
     return tanRepository.save(newTan);
   }
@@ -175,17 +172,13 @@ public class TanService {
    * @return a new TeleTan
    */
   public String generateTeleTan() {
-    /*
-     * The generation of a TeleTan is a temporary solution and may be subject to later changes.
-     */
-    String generatedTeleTan = "";
-    boolean isTeleTanValid = false;
-
-    while (!isTeleTanValid) {
-      generatedTeleTan = RandomString.make(TELE_TAN_LENGTH);
-      isTeleTanValid = isTeleTanValid(generatedTeleTan);
-    }
-    return generatedTeleTan;
+    return IntStream.range(0, TELE_TAN_LENGTH)
+      .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
+      .collect(Collector.of(
+        StringBuilder::new,
+        StringBuilder::append,
+        StringBuilder::append,
+        StringBuilder::toString));
   }
 
   /**
@@ -203,24 +196,42 @@ public class TanService {
     return UUID.randomUUID().toString();
   }
 
-  private boolean hashTanAndCheckAvailability(String tan) {
+  /**
+   * Check for existing TAN in the {@link VerificationTanRepository}.
+   *
+   * @param tan the TAN
+   * @return flag for existing TAN
+   */
+  public boolean checkTanNotExist(String tan) {
     String tanHash = hashingService.hash(tan);
     return !tanRepository.existsByTanHash(tanHash);
   }
 
   /**
-   * This Method generates a valid TAN and persists it. Returns the generated TAN.
+   * Returns a generated valid tele TAN and persists it.
+   *
+   * @return a valid tele TAN
+   */
+  public String generateVerificationTeleTan() {
+    String teleTan = generateTeleTan();
+    persistTan(teleTan, TanType.TELETAN, TanSourceOfTrust.TELETAN);
+    return teleTan;
+  }
+
+  /**
+   * This Method generates a valid TAN and persists it. Returns the generated
+   * TAN.
    *
    * @param sourceOfTrust sets the source of Trust for the Tan
-   * @return Tan a valid tan with given source of Trust
+   * @return a valid tan with given source of Trust
    */
-  public String generateVerificationTan(String sourceOfTrust) {
+  public String generateVerificationTan(TanSourceOfTrust sourceOfTrust) {
     String tan = generateValidTan();
     persistTan(tan, TanType.TAN, sourceOfTrust);
     return tan;
   }
 
-  private VerificationTan generateVerificationTan(String tan, TanType tanType, String sourceOfTrust) {
+  protected VerificationTan generateVerificationTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
     LocalDateTime from = LocalDateTime.now();
     LocalDateTime until;
 
@@ -243,8 +254,7 @@ public class TanService {
   }
 
   /**
-   * Get existing VerificationTan by TAN from
-   * {@link VerificationTanRepository}.
+   * Get existing VerificationTan by TAN from {@link VerificationTanRepository}.
    *
    * @param tan the TAN
    * @return Optional VerificationTan
@@ -254,5 +264,14 @@ public class TanService {
     VerificationTan tanEntity = new VerificationTan();
     tanEntity.setTanHash(hashingService.hash(tan));
     return tanRepository.findOne(Example.of(tanEntity, ExampleMatcher.matching()));
+  }
+
+  /*
+   * The random number generator used by this class to create random
+   * based UUIDs. In a holder class to defer initialization until needed.
+   */
+  private static class Holder {
+
+    static final SecureRandom NUMBER_GENERATOR = new SecureRandom();
   }
 }

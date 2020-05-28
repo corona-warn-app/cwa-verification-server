@@ -23,6 +23,7 @@ package app.coronawarn.verification.controller;
 
 import app.coronawarn.verification.client.HashedGuid;
 import app.coronawarn.verification.client.TestResult;
+import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
@@ -44,7 +45,6 @@ import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -92,8 +92,8 @@ public class VerificationController {
   @NonNull
   private final TanService tanService;
 
-  @Value("${appsession.tancountermax}")
-  private Integer tanCounterMax;
+  @NonNull
+  private VerificationApplicationConfig verificationApplicationConfig;
 
   /**
    * This method generates a registrationToken by a hashed guid or a teleTan.
@@ -161,7 +161,8 @@ public class VerificationController {
       = appSessionService.getAppSessionByToken(registrationToken.getToken());
     if (actual.isPresent()) {
       VerificationAppSession appSession = actual.get();
-      if (appSession.getTanCounter() < tanCounterMax) {
+      int tancountermax = verificationApplicationConfig.getAppsession().getTancountermax();
+      if (appSession.getTanCounter() < tancountermax) {
         AppSessionSourceOfTrust appSessionSourceOfTrust = appSession.getSourceOfTrust();
         TanSourceOfTrust tanSourceOfTrust = TanSourceOfTrust.CONNECTED_LAB;
 

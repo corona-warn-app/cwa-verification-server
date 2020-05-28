@@ -28,8 +28,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * This class represents the tele transaction number (Tele TAN).
- *
- * @author T-Systems International GmbH
  */
 @Schema
 @Data

@@ -40,8 +40,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * This class represents the VerificationAppSession service.
- *
- * @author T-Systems International GmbH
  */
 @Slf4j
 @RequiredArgsConstructor

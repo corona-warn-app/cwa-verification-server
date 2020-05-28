@@ -33,26 +33,29 @@ public class VerificationApplicationConfig {
 
   public static class TeleCfg {
     public static class TeleValidCfg {
-      @Getter @Setter private int hours;
+      /// Lifespan of TeleTAN in hours
+      @Getter @Setter private int hours = 1;
     }
 
-    @Getter @Setter private TeleValidCfg valid;
+    @Getter @Setter private TeleValidCfg valid = new TeleValidCfg();
   }
 
   public static class ValidCfg {
-    @Getter @Setter int days;
+    /// Lifespan of TAN in days
+    @Getter @Setter int days = 14;
   }
 
   public static class TanCfg {
-    @Getter @Setter private TeleCfg tele;
-    @Getter @Setter private ValidCfg valid;
+    @Getter @Setter private TeleCfg tele = new TeleCfg();
+    @Getter @Setter private ValidCfg valid = new ValidCfg();
   }
 
   public static class AppSessionCfg {
-    @Getter @Setter int tancountermax;
+    /// maximum number of TANs generated for a session
+    @Getter @Setter int tancountermax = 2;
   }
   
-  @Getter @Setter private TanCfg tan;
-  @Getter @Setter private AppSessionCfg appsession;
+  @Getter @Setter private TanCfg tan = new TanCfg();
+  @Getter @Setter private AppSessionCfg appsession = new AppSessionCfg();
 
 }

@@ -28,8 +28,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * This class represents the transaction number.
- *
- * @author T-Systems International GmbH
  */
 @Schema
 @Data

@@ -28,8 +28,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * This class represents the registration Token.
- *
- * @author T-Systems International GmbH
  */
 @Schema
 @Data

@@ -26,38 +26,39 @@ The goal of this project is to develop the official Corona-Warn-App for Germany 
 [![coverage](https://sonarcloud.io/api/project_badges/measure?project=corona-warn-app_cwa-verification-server&metric=coverage)](https://sonarcloud.io/dashboard?id=corona-warn-app_cwa-verification-server)
 [![bugs](https://sonarcloud.io/api/project_badges/measure?project=corona-warn-app_cwa-verification-server&metric=bugs)](https://sonarcloud.io/dashboard?id=corona-warn-app_cwa-verification-server)
 
-## Architecture Overview
-You can find an architectural overview of the component in the [solution architecture document](https://github.com/corona-warn-app/cwa-documentation/blob/master/solution_architecture.md)  
-This component of the Corona-warn-app whereas named **verification process** provides indeed two functionalities:  
+## Architecture overview
+You can find an architectural overview of the component in the [solution architecture document](https://github.com/corona-warn-app/cwa-documentation/blob/master/solution_architecture.md).  
+This component of the Corona-Warn-App whereas named **verification process** provides indeed two functionalities:  
 1. prove that a pretended positive case is indeed positive  
-2. provide the result of a Covid-19 Test  
+2. provide the result of a COVID-19 test  
 
-To achieve this, the verification service gets the result of covid-19 tests from LIS (**L**abor **I**nformation **S**ystem) which deliver test results to it. The complete process is described in [cwa-documentation/Solution Architecture](https://github.com/corona-warn-app/cwa-documentation/blob/master/solution_architecture.md) to which you may refer for detailed information about the workflow.
+To achieve this, the verification service gets the result of COVID-19 tests from LIS (**L**abor **I**nformation **S**ystem) which delivers test results to it. The complete process is described in [cwa-documentation/Solution Architecture](https://github.com/corona-warn-app/cwa-documentation/blob/master/solution_architecture.md) to which you may refer for detailed information about the workflow.
 
-The software stack of the verification server is based on spring boot, currently with an in-memory H2 database. As the persistence relies on the liquibase.
-
+The software stack of the verification server is based on [Spring Boot](https://spring.io/projects/spring-boot), currently with an in-memory H2 database. As the persistence relies on [Liquibase](https://www.liquibase.org).
 
 ## Development
+This component can be locally build in order to test the functionality of the interfaces and verify the concepts it is built upon.  
 
-This component can be locally build in order to test the functionality of the interfaces and verify the concepts it is build upon.  
 There are two ways to build:
  - [Maven](https:///maven.apache.org) build - to run this component as spring application on your local machine
  - [Docker](https://www.docker.com) build - to run it as docker container build from the provided docker build [file](https://github.com/corona-warn-app/cwa-verification-server/blob/master/Dockerfile)
- ### Prerequisites
- [Open JDK 11](https://openjdk.java.net)  
- [Maven](https://apache.maven.org)  
- *(optional)*: [Docker](https://www.docker.com)  
- ### Build
- Whether you cloned or downloaded the 'zipped' sources you will either find the sources in the chosen checkout-directory or get a zip file with the source code, which you can expand to a folder of your choice.
+ 
+### Prerequisites
+ - [Open JDK 11](https://openjdk.java.net)  
+ - [Maven](https://apache.maven.org)  
+ - *(optional)*: [Docker](https://www.docker.com)  
+ 
+### Build
+Whether you cloned or downloaded the 'zipped' sources you will either find the sources in the chosen checkout-directory or get a zip file with the source code, which you can expand to a folder of your choice.
 
- In either case open a terminal pointing to the directory you put the sources in. The local build process is described afterwards depending on the way you choose.
+In either case open a terminal pointing to the directory you put the sources in. The local build process is described afterwards depending on the way you choose.
+ 
 #### Maven based build
-For actively take part on the development this is the way you should choose.   
-Please check, whether following prerequisites are fulfilled
+This is the recommmended way for taking part in the development.  
+Please check, whether following prerequisites are installed on your machine:
 - [Open JDK 11](https://openjdk.java.net) or a similar JDK 11 compatible VM  
 - [Maven](https://apache.maven.org)  
-
-is installed on your machine.  
+ 
 You can then open a terminal pointing to the root directory of the verification server and do the following:
 
     mvn package
@@ -66,12 +67,9 @@ You can then open a terminal pointing to the root directory of the verification 
 The verification server will start up and run locally on your machine available on port 8080.
 
 #### Docker based build  
-We recommend that you first check the prerequisites to ensure that  
-- [Docker](https://www.docker.com)  
+We recommend that you first check to ensure that [Docker](https://www.docker.com) is installed on your machine.
 
-is installed on you machine  
-
-On the commandline do the following:
+On the command line do the following:
 ```bash
 docker build -f|--file <path to dockerfile>  -t <imagename>  <path-to-verificationserver-root>
 docker run -p 127.0.0.1:8080:8080/tcp -it <imagename>
@@ -83,49 +81,40 @@ docker run -p 127.0.0.1:8080:8080/tcp -it cwa-verificationserver
 ```
 if you are in the root of the checked out repository.  
 The docker image will then run on your local machine on port 8080 assuming you configured docker for shared network mode.
-#### API Documentation  
 
-Along with the application there comes a swagger2 api documentation which you can access in your web browser, when the verification server applications runs:
+#### API documentation  
+Along with the application there comes a [swagger2](https://swagger.io) API documentation, which you can access in your web browser when the verification server applications runs:
 
     <base-url>/swagger-ui.html#/verification-controller
 
-mostly like:  
-
+Which results in the following URL on your local machine: 
 http://localhost:8080/swagger-ui.html#/verification-controller
-
-
 
 #### Remarks
 This repository contains files which support our CI/CD pipeline and will be removed without further notice  
  - DockerfileCi - used for the GitHub build chain
  - Jenkinsfile - used for Telekom internal SBS (**S**oftware**B**uild**S**ervice)
 
-
-
-## Documentation
-
+## Documentation  
 The full documentation for the Corona-Warn-App can be found in the [cwa-documentation](https://github.com/corona-warn-app/cwa-documentation) repository. The documentation repository contains technical documents, architecture information, and white papers related to this implementation.
 
-## Support and Feedback
+## Support and feedback
 The following channels are available for discussions, feedback, and support requests:
 
 | Type                     | Channel                                                |
 | ------------------------ | ------------------------------------------------------ |
-| **General Discussion**   | <a href="https://github.com/corona-warn-app/cwa-verification-server/issues/new/choose" title="General Discussion"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-verification-server/question.svg?style=flat-square"></a> </a>   |
-| **Concept Feedback**    | <a href="https://github.com/corona-warn-app/cwa-verification-server/issues/new/choose" title="Open Concept Feedback"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-verification-server/architecture.svg?style=flat-square"></a>  |
-| **Verification Server Issue**    | <a href="https://github.com/corona-warn-app/cwa-verification-server/issues" title="Open Issues"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-verification-server?style=flat"></a>  |
-| **Other Requests**    | <a href="mailto:opensource@telekom.de" title="Email CWA Team"><img src="https://img.shields.io/badge/email-CWA%20team-green?logo=mail.ru&style=flat-square&logoColor=white"></a>   |
+| **General discussion**   | <a href="https://github.com/corona-warn-app/cwa-verification-server/issues/new/choose" title="General Discussion"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-verification-server/question.svg?style=flat-square"></a> </a>   |
+| **Concept feedback**    | <a href="https://github.com/corona-warn-app/cwa-verification-server/issues/new/choose" title="Open Concept Feedback"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-verification-server/architecture.svg?style=flat-square"></a>  |
+| **Verification server issues**    | <a href="https://github.com/corona-warn-app/cwa-verification-server/issues" title="Open Issues"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-verification-server?style=flat"></a>  |
+| **Other requests**    | <a href="mailto:opensource@telekom.de" title="Email CWA Team"><img src="https://img.shields.io/badge/email-CWA%20team-green?logo=mail.ru&style=flat-square&logoColor=white"></a>   |
 
-## How to Contribute
-
+## How to contribute  
 Contribution and feedback is encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](./CONTRIBUTING.md). By participating in this project, you agree to abide by its [Code of Conduct](./CODE_OF_CONDUCT.md) at all times.
 
-## Contributors
-
+## Contributors  
 The German government has asked SAP AG and Deutsche Telekom AG to develop the Corona-Warn-App for Germany as open source software. Deutsche Telekom is providing the network and mobile technology and will operate and run the backend for the app in a safe, scalable and stable manner. SAP is responsible for the app development, its framework and the underlying platform. Therefore, development teams of SAP and Deutsche Telekom are contributing to this project. At the same time our commitment to open source means that we are enabling -in fact encouraging- all interested parties to contribute and become part of its developer community.
 
 ## Repositories
-
 The following public repositories are currently available for the Corona-Warn-App:
 
 | Repository          | Description                                                           |
@@ -139,7 +128,6 @@ The following public repositories are currently available for the Corona-Warn-Ap
 [cwa-verification-server]: https://github.com/corona-warn-app/cwa-verification-server
 
 ## Licensing
-
 Copyright (c) 2020 Deutsche Telekom AG.
 
 Licensed under the **Apache License, Version 2.0** (the "License"); you may not use this file except in compliance with the License.

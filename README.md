@@ -26,6 +26,15 @@ The goal of this project is to develop the official Corona-Warn-App for Germany 
 [![coverage](https://sonarcloud.io/api/project_badges/measure?project=corona-warn-app_cwa-verification-server&metric=coverage)](https://sonarcloud.io/dashboard?id=corona-warn-app_cwa-verification-server)
 [![bugs](https://sonarcloud.io/api/project_badges/measure?project=corona-warn-app_cwa-verification-server&metric=bugs)](https://sonarcloud.io/dashboard?id=corona-warn-app_cwa-verification-server)
 
+## About this component
+
+In the world of the Corona Warn App the Verification Server helps validating whether upload requests from the mobile App are valid or not. The parts of the verification component cooperate in the following manner:
+
+- The Verification Server of the Corona Warn App (repository: cwa-verification-server) helps validating whether upload requests from the mobile App are valid or not.
+- The Verification Portal of the Corona Warn App (repository: cwa-verification-portal) allows hotline employees to generate teleTANs which are used by users of the mobile App to upload their diagnostic keys.
+- The Verification Identity and Access of the Corona Warn App (repository: cwa-verification-iam) ensures that only authorized health personnel get access to the Verification Portal.
+- The Testresult Server of the Corona Warn App (repository: cwa-testresult-server) receives the results from laboratories and delivers these results to the app via the verification-server.
+
 ## Architecture overview
 You can find an architectural overview of the component in the [solution architecture document](https://github.com/corona-warn-app/cwa-documentation/blob/master/solution_architecture.md).  
 This component of the Corona-Warn-App whereas named **verification process** provides indeed two functionalities:  
@@ -42,23 +51,23 @@ This component can be locally build in order to test the functionality of the in
 There are two ways to build:
  - [Maven](https:///maven.apache.org) build - to run this component as spring application on your local machine
  - [Docker](https://www.docker.com) build - to run it as docker container build from the provided docker build [file](https://github.com/corona-warn-app/cwa-verification-server/blob/master/Dockerfile)
- 
+
 ### Prerequisites
  - [Open JDK 11](https://openjdk.java.net)  
  - [Maven](https://apache.maven.org)  
  - *(optional)*: [Docker](https://www.docker.com)  
- 
+
 ### Build
 Whether you cloned or downloaded the 'zipped' sources you will either find the sources in the chosen checkout-directory or get a zip file with the source code, which you can expand to a folder of your choice.
 
 In either case open a terminal pointing to the directory you put the sources in. The local build process is described afterwards depending on the way you choose.
- 
+
 #### Maven based build
 This is the recommmended way for taking part in the development.  
 Please check, whether following prerequisites are installed on your machine:
 - [Open JDK 11](https://openjdk.java.net) or a similar JDK 11 compatible VM  
 - [Maven](https://apache.maven.org)  
- 
+
 You can then open a terminal pointing to the root directory of the verification server and do the following:
 
     mvn package
@@ -87,7 +96,7 @@ Along with the application there comes a [swagger2](https://swagger.io) API docu
 
     <base-url>/swagger-ui.html#/verification-controller
 
-Which results in the following URL on your local machine: 
+Which results in the following URL on your local machine:
 http://localhost:8080/swagger-ui.html#/verification-controller
 
 #### Remarks
@@ -103,8 +112,8 @@ The following channels are available for discussions, feedback, and support requ
 
 | Type                     | Channel                                                |
 | ------------------------ | ------------------------------------------------------ |
-| **General discussion**   | <a href="https://github.com/corona-warn-app/cwa-verification-server/issues/new/choose" title="General Discussion"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-verification-server/question.svg?style=flat-square"></a> </a>   |
-| **Concept feedback**    | <a href="https://github.com/corona-warn-app/cwa-verification-server/issues/new/choose" title="Open Concept Feedback"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-verification-server/architecture.svg?style=flat-square"></a>  |
+| **General Discussion**   | <a href="https://github.com/corona-warn-app/cwa-documentation/issues/new/choose" title="General Discussion"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-documentation/question.svg?style=flat-square"></a> </a>   |
+| **Concept Feedback**    | <a href="https://github.com/corona-warn-app/cwa-documentation/issues/new/choose" title="Open Concept Feedback"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-documentation/architecture.svg?style=flat-square"></a>  |
 | **Verification server issues**    | <a href="https://github.com/corona-warn-app/cwa-verification-server/issues" title="Open Issues"><img src="https://img.shields.io/github/issues/corona-warn-app/cwa-verification-server?style=flat"></a>  |
 | **Other requests**    | <a href="mailto:opensource@telekom.de" title="Email CWA Team"><img src="https://img.shields.io/badge/email-CWA%20team-green?logo=mail.ru&style=flat-square&logoColor=white"></a>   |
 

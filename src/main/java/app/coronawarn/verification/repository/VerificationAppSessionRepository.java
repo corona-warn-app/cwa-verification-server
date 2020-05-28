@@ -22,10 +22,12 @@
 package app.coronawarn.verification.repository;
 
 import app.coronawarn.verification.domain.VerificationAppSession;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * This class represents the AppSession repository.
  */
 public interface VerificationAppSessionRepository extends JpaRepository<VerificationAppSession, Long> {
+  Optional<VerificationAppSession> findByRegistrationTokenHash(String registrationTokenHash);
 }

@@ -19,9 +19,8 @@ feign:
         connect-timeout: 5000
         read-timeout: 5000
         logger-level: basic
-
 jwt:
-  secret: javainuse
+  secret: covid19
 tan:
   tele:
     valid:

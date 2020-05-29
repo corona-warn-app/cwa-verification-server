@@ -6,6 +6,8 @@ spring:
     password: ${POSTGRESQL_PASSWORD}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+jwt:
+  secret: covid19
 server:
   port: 8080
 management:

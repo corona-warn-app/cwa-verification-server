@@ -211,7 +211,7 @@ API Endpoint:
 		1.	If yes, return error HTTP 400
 	1.	If no, return error HTTP 400
 3.	If AppSession.sourceOfTrust == “hashedGUID”
-	1. Get test result from Lab Sever
+	1. Get test result from Test Result Sever
 	1. Verify whether test result is positive, otherwise exit with error HTTP 400
 4.	generate TAN
 	1. Generate random TAN

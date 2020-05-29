@@ -25,11 +25,11 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class VerificationServerFailedException extends RuntimeException {
+public class VerificationServerException extends RuntimeException {
 
   private final HttpStatus httpStatus;
 
-  public VerificationServerFailedException(HttpStatus httpStatus, String message) {
+  public VerificationServerException(HttpStatus httpStatus, String message) {
     super(message);
     this.httpStatus = httpStatus;
   }

@@ -21,7 +21,7 @@
 
 package app.coronawarn.verification.controller;
 
-import app.coronawarn.verification.exception.VerificationServerFailedException;
+import app.coronawarn.verification.exception.VerificationServerException;
 import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -61,8 +61,8 @@ public class VerificationExceptionHandler {
     return ResponseEntity.badRequest().build();
   }
 
-  @ExceptionHandler(VerificationServerFailedException.class)
-  public ResponseEntity<Void> handleVerificationServerFailedExceptions(VerificationServerFailedException exception) {
+  @ExceptionHandler(VerificationServerException.class)
+  public ResponseEntity<Void> handleVerificationServerExceptions(VerificationServerException exception) {
     log.error("Cannot get a valid response from the verification server {}", exception);
     return ResponseEntity.status(exception.getHttpStatus()).build();
   }

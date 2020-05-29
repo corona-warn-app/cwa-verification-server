@@ -26,7 +26,7 @@ import app.coronawarn.verification.client.TestResult;
 import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
-import app.coronawarn.verification.exception.VerificationServerFailedException;
+import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
 import app.coronawarn.verification.model.LabTestResult;
 import app.coronawarn.verification.model.RegistrationToken;
@@ -125,7 +125,7 @@ public class VerificationController {
         if (appSessionService.verifyHashedGuid(key)) {
           return appSessionService.generateRegistrationToken(key, keyType);
         } 
-        throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, "Hashed guid has no valid pattern");
+        throw new VerificationServerException(HttpStatus.BAD_REQUEST, "Hashed guid has no valid pattern");
       case TELETAN:
         if (tanService.verifyTeleTan(key)) {
           ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
@@ -137,9 +137,9 @@ public class VerificationController {
             return response;
           }
         } 
-        throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, "TeleTan verification failed");
+        throw new VerificationServerException(HttpStatus.BAD_REQUEST, "TeleTan verification failed");
       default:
-        throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, 
+        throw new VerificationServerException(HttpStatus.BAD_REQUEST, 
           "Unknown registration key type for registration token");
     }
   }
@@ -176,7 +176,7 @@ public class VerificationController {
           case HASHED_GUID:
             TestResult covidTestResult = labServerService.result(new HashedGuid(appSession.getHashedGuid()));
             if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()) {
-              throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, 
+              throw new VerificationServerException(HttpStatus.BAD_REQUEST, 
                 "Tan cannot be created, caused by the result of the labserver");
             }
             break;
@@ -184,7 +184,7 @@ public class VerificationController {
             tanSourceOfTrust = TanSourceOfTrust.TELETAN;
             break;
           default:
-            throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, 
+            throw new VerificationServerException(HttpStatus.BAD_REQUEST, 
               "Unknown source of trust inside the appsession for the registration token");
         }
         String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
@@ -192,10 +192,10 @@ public class VerificationController {
         appSessionService.saveAppSession(appSession);
         return ResponseEntity.status(HttpStatus.CREATED).body(new Tan(generatedTan));
       }
-      throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST,
+      throw new VerificationServerException(HttpStatus.BAD_REQUEST,
         "The maximum of generating tans for this registration token is reached");
     }
-    throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, 
+    throw new VerificationServerException(HttpStatus.BAD_REQUEST, 
         "Appsession not found for the registration token");
   }
 
@@ -232,7 +232,7 @@ public class VerificationController {
       return ResponseEntity.ok(testResult);
     }
     log.info("The registration token doesn't exists.");
-    throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, 
+    throw new VerificationServerException(HttpStatus.BAD_REQUEST, 
       "Returning the testresult for the registration token failed");
   }
 
@@ -262,7 +262,7 @@ public class VerificationController {
         .map(t -> ResponseEntity.ok().build())
         .orElseGet(() -> {
           log.info("The registration token is invalid.");
-          throw new VerificationServerFailedException(HttpStatus.NOT_FOUND, "Tan not found inside the database");
+          throw new VerificationServerException(HttpStatus.NOT_FOUND, "Tan not found inside the database");
         });
   }
 

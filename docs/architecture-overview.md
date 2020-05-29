@@ -20,7 +20,7 @@ The Verification Server provides proof of a positive SARS-CoV-2 test to other co
 - The Corona-Warn-App is a system which requests test result status and obtains proofs. 
 - The Corona-Warn-App Server is a system which needs to verify proof.
 - The Portal Server is a system which creates and obtains proof and therefore acts as source for proof.
-- The Lab Server/Laboratory Information System (LIS) is a system which acts as trusted source for proof.
+- The Test Result Server is a system which acts as trusted source for proof.
 
 Proof is represented by a Transaction Authorization Number (TAN), which is not bound to a specific transaction.
 
@@ -67,7 +67,7 @@ Logfiles are kept for 30 days.
 - **Test Center**: Facility where the user can donate a probe to be tested for SARS-CoV-2, such as hospitals or practicing doctors 
 - **Lab**: Facility which tests the probe of the user and produces a trusted test result on SARS-CoV-2. 
 - **Verification Server**: Software service which proves that a user, who is taking part in the Corona Warn App and who is willing to file his Diagnosis Keys, has been really tested positive by an established authority 
-- **Lab Server**: Software service, that imports the test results provided by the Labs and stores them for further use. 
+- **Test Result Server**: Software service, that imports the SARS-CoV-2 test results provided by the Labs and stores them for further use. 
 - **Corona Warn App Backend**: Software service, which collects the Diagnosis Keys of users, proves them to be valid, i.e. they are really from an infected person and transmits them to other users who have been exposed to the user during last two weeks.
 - **Hotline User**: user with the role “c19hotline”
 - **Health Authority User**: user with the role “c19healthauthority”
@@ -88,8 +88,8 @@ Steps:
 5.	Polling for result, at a regular interval the mobile app uses the Registration Token to request the result of the test
 - defined in User Story E07.02 – Notify user if a test result is available
 - partly implemented in Use Case Get Test Result
-6.	The Lab Server is requested whether a result is available, for interface definition see [Lab Server API]
-7.	The Lab Server is returning the Test result, if no test is available a result with state “pending” is returned
+6.	The Test Result Server is requested whether a result is available, for interface definition see [Test Result Server API]
+7.	The Test Result Server is returning the Test result, if no test is available a result with state “pending” is returned
 8.	The result is returned to the mobile App
 9.	The mobile app will request a TAN if a positive test result becomes available
 - defined in User Story E07.04 Upload my Diagnosis Keys
@@ -174,7 +174,7 @@ API Endpoint:
 Steps:
 1.	Verify whether the provided RegistrationToken exists, if not exit with error HTTP 400
 2.	Obtain hashed GUID by RegistrationToken
-3.	Get Test status from Lab Server
+3.	Get Test status from Test Result Server
 4.	Return Result of API Call
 
 ###	Use Case Create Registration Token

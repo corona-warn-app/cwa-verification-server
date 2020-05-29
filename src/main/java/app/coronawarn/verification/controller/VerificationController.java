@@ -26,6 +26,7 @@ import app.coronawarn.verification.client.TestResult;
 import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
+import app.coronawarn.verification.exception.VerificationServerFailedException;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
 import app.coronawarn.verification.model.LabTestResult;
 import app.coronawarn.verification.model.RegistrationToken;
@@ -42,12 +43,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,6 +63,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/version/v1")
+@Validated
 public class VerificationController {
 
   /**
@@ -99,119 +103,132 @@ public class VerificationController {
    * This method generates a registrationToken by a hashed guid or a teleTan.
    *
    * @param request {@link RegistrationTokenRequest}
-   * @return RegistrationToken - the created registration token
-   * {@link RegistrationToken}
+   * @return RegistrationToken - the created registration token {@link RegistrationToken}
    */
   @Operation(
-    summary = "Get registration Token",
-    description = "Get a registration token by providing a SHA-256 hasehd GUID or a TeleTAN"
+      summary = "Get registration Token",
+      description = "Get a registration token by providing a SHA-256 hasehd GUID or a TeleTAN"
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "201", description = "registration token generated."),
     @ApiResponse(responseCode = "400", description = "GUID/TeleTAN already exists."),})
   @PostMapping(value = REGISTRATION_TOKEN_ROUTE,
-    consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public ResponseEntity<RegistrationToken> generateRegistrationToken(@RequestBody RegistrationTokenRequest request) {
+  public ResponseEntity<RegistrationToken> generateRegistrationToken(
+      @Valid @RequestBody RegistrationTokenRequest request) {
     String key = request.getKey();
     RegistrationTokenKeyType keyType = request.getKeyType();
-
-    if (keyType == RegistrationTokenKeyType.TELETAN) {
-      if (tanService.verifyTeleTan(key)) {
-        ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
-        Optional<VerificationTan> optional = tanService.getEntityByTan(key);
-        if (optional.isPresent()) {
-          VerificationTan teleTan = optional.get();
-          teleTan.setRedeemed(true);
-          tanService.saveTan(teleTan);
-          return response;
-        } else {
-          log.warn("Teletan is not found");
-        }
-      }
-    } else {
-      return appSessionService.generateRegistrationToken(key, keyType);
+    switch (keyType) {
+      case GUID:
+        if (appSessionService.verifyHashedGuid(key)) {
+          return appSessionService.generateRegistrationToken(key, keyType);
+        } 
+        throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, "Hashed guid has no valid pattern");
+      case TELETAN:
+        if (tanService.verifyTeleTan(key)) {
+          ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
+          Optional<VerificationTan> optional = tanService.getEntityByTan(key);
+          if (optional.isPresent()) {
+            VerificationTan teleTan = optional.get();
+            teleTan.setRedeemed(true);
+            tanService.saveTan(teleTan);
+            return response;
+          }
+        } 
+        throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, "TeleTan verification failed");
+      default:
+        throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, 
+          "Unknown registration key type for registration token");
     }
-    return ResponseEntity.badRequest().build();
   }
 
   /**
-   * This method generates a transaction number by a Registration Token, if the
-   * state of the COVID-19 lab-test is positive.
+   * This method generates a transaction number by a Registration Token, if the state of the COVID-19 lab-test is
+   * positive.
    *
-   * @param registrationToken generated by a hashed guid or a teleTan.
-   *                          {@link RegistrationToken}
+   * @param registrationToken generated by a hashed guid or a teleTan. {@link RegistrationToken}
    * @return A generated transaction number {@link Tan}.
    */
   @Operation(
-    summary = "Generates a Tan",
-    description = "Generates a TAN on input of Registration Token. With the TAN one can submit his Diagnosis keys"
+      summary = "Generates a Tan",
+      description = "Generates a TAN on input of Registration Token. With the TAN one can submit his Diagnosis keys"
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "201", description = "Registration Token is valid"),
     @ApiResponse(responseCode = "400", description = "Registration Token does not exist"),})
   @PostMapping(value = TAN_ROUTE,
-    consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public ResponseEntity<Tan> generateTan(@RequestBody RegistrationToken registrationToken) {
+  public ResponseEntity<Tan> generateTan(@Valid @RequestBody RegistrationToken registrationToken) {
 
     Optional<VerificationAppSession> actual
-      = appSessionService.getAppSessionByToken(registrationToken.getToken());
+        = appSessionService.getAppSessionByToken(registrationToken.getToken());
     if (actual.isPresent()) {
       VerificationAppSession appSession = actual.get();
       int tancountermax = verificationApplicationConfig.getAppsession().getTancountermax();
       if (appSession.getTanCounter() < tancountermax) {
         AppSessionSourceOfTrust appSessionSourceOfTrust = appSession.getSourceOfTrust();
         TanSourceOfTrust tanSourceOfTrust = TanSourceOfTrust.CONNECTED_LAB;
-
-        if (AppSessionSourceOfTrust.HASHED_GUID == appSessionSourceOfTrust) {
-          TestResult covidTestResult = labServerService.result(new HashedGuid(appSession.getHashedGuid()));
-          if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()) {
-            return ResponseEntity.badRequest().build();
-          }
-        } else if (AppSessionSourceOfTrust.TELETAN == appSessionSourceOfTrust) {
-          tanSourceOfTrust = TanSourceOfTrust.TELETAN;
-        } else {
-          return ResponseEntity.badRequest().build();
+        switch (appSessionSourceOfTrust) {
+          case HASHED_GUID:
+            TestResult covidTestResult = labServerService.result(new HashedGuid(appSession.getHashedGuid()));
+            if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()) {
+              throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, 
+                "Tan cannot be created, caused by the result of the labserver");
+            }
+            break;
+          case TELETAN:
+            tanSourceOfTrust = TanSourceOfTrust.TELETAN;
+            break;
+          default:
+            throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, 
+              "Unknown source of trust inside the appsession for the registration token");
         }
         String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
         appSession.incrementTanCounter();
         appSessionService.saveAppSession(appSession);
         return ResponseEntity.status(HttpStatus.CREATED).body(new Tan(generatedTan));
       }
+      throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST,
+        "The maximum of generating tans for this registration token is reached");
     }
-    return ResponseEntity.badRequest().build();
+    throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, 
+        "Appsession not found for the registration token");
   }
 
   /**
    * Returns the test status of the COVID-19 test.
    *
-   * @param registrationToken generated by a hashed guid
-   *                          {@link RegistrationToken}
-   * @return the test result of the COVID-19 test {@link LabTestResult}
-   */
+   * @param registrationToken generated by a hashed guid {@link RegistrationToken}
+   * @return the test result / status of the COVID-19 test, which can be POSITIVE, NEGATIVE, INVALID, PENDING or FAILED
+   *        and will always be POSITIVE for a TeleTan*/
   @Operation(
-    summary = "COVID-19 test result",
-    description = "Gets the result of COVID-19 Test."
+      summary = "COVID-19 test result for given RegistrationToken",
+      description = "Gets the result of COVID-19 Test. "
+      + "If the RegistrationToken belongs to a TeleTan the result is always positve"
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Testresult retrieved"),})
   @PostMapping(value = TESTRESULT_ROUTE,
-    consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public ResponseEntity<TestResult> getTestState(@RequestBody RegistrationToken registrationToken) {
-    return appSessionService.getAppSessionByToken(registrationToken.getToken())
-      .map(VerificationAppSession::getHashedGuid)
-      .map(HashedGuid::new)
-      .map(labServerService::result)
-      .map(ResponseEntity::ok)
-      .orElseGet(() -> {
-        log.info("The registration token is invalid.");
-        return ResponseEntity.badRequest().build();
-      });
+  public ResponseEntity<TestResult> getTestState(@Valid @RequestBody RegistrationToken registrationToken) {
+    Optional<VerificationAppSession> appSession =
+      appSessionService.getAppSessionByToken(registrationToken.getToken());
+    if (appSession.isPresent()) {
+      String hash = appSession.get().getHashedGuid() != null
+        ? appSession.get().getHashedGuid() : appSession.get().getTeleTanHash();
+      log.info("Requested result for registration token with Hashed Guid.");
+      TestResult testResult = labServerService.result(new HashedGuid(hash));
+      return ResponseEntity.ok(testResult);
+    }
+    log.info("The registration token doesn't exists.");
+    throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, 
+      "Returning the testresult for the registration token failed");
   }
 
   /**
@@ -221,27 +238,27 @@ public class VerificationController {
    * @return HTTP 200, if the verification was successful. Otherwise HTTP 404.
    */
   @Operation(
-    summary = "Verify provided Tan",
-    description = "The provided Tan is verified to be formerly issued by the verification server"
+      summary = "Verify provided Tan",
+      description = "The provided Tan is verified to be formerly issued by the verification server"
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Tan is valid an formerly issued by the verification server"),
     @ApiResponse(responseCode = "404", description = "Tan could not be verified"),})
   @PostMapping(value = TAN_VERIFY_ROUTE,
-    consumes = MediaType.APPLICATION_JSON_VALUE
+      consumes = MediaType.APPLICATION_JSON_VALUE
   )
-  public ResponseEntity<?> verifyTan(@RequestBody Tan tan) {
-    if (!tanService.syntaxVerification(tan.getValue())) {
-      return ResponseEntity.notFound().build();
-    }
+  public ResponseEntity<?> verifyTan(@Valid @RequestBody Tan tan) {
     return tanService.getEntityByTan(tan.getValue())
-      .filter(t -> t.canBeRedeemed(LocalDateTime.now()))
-      .map(t -> {
-        tanService.deleteTan(t);
-        return t;
-      })
-      .map(t -> ResponseEntity.ok().build())
-      .orElseGet(() -> ResponseEntity.notFound().build());
+        .filter(t -> t.canBeRedeemed(LocalDateTime.now()))
+        .map(t -> {
+          tanService.deleteTan(t);
+          return t;
+        })
+        .map(t -> ResponseEntity.ok().build())
+        .orElseGet(() -> {
+          log.info("The registration token is invalid.");
+          throw new VerificationServerFailedException(HttpStatus.NOT_FOUND, "Tan not found inside the database");
+        });
   }
 
   /**
@@ -250,8 +267,8 @@ public class VerificationController {
    * @return a created teletan
    */
   @Operation(
-    summary = "Request generation of a TeleTan",
-    description = "A TeleTan is a human readable TAN with 7 characters which is supposed to be issued via call line"
+      summary = "Request generation of a TeleTan",
+      description = "A TeleTan is a human readable TAN with 7 characters which is supposed to be issued via call line"
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "201", description = "TeleTan created"),})

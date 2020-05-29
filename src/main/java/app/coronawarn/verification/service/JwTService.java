@@ -59,7 +59,7 @@ public class JwTService implements Serializable {
   }
 
   /**
-   * Validates the given token. If one of the given roles {@link Roles} is.
+   * Validates the given token. If one of the given roles {@link Roles} exists.
    *
    * @param token The token to validate
    * @return <code>true</code>, if the token is valid, otherwise <code>false</code>

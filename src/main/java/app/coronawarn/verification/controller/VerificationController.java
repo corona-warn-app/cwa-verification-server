@@ -234,7 +234,6 @@ public class VerificationController {
     log.info("The registration token doesn't exists.");
     throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, 
       "Returning the testresult for the registration token failed");
-    return ResponseEntity.badRequest().build();
   }
 
   /**

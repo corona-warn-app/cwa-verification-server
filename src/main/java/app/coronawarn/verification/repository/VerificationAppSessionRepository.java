@@ -22,6 +22,7 @@
 package app.coronawarn.verification.repository;
 
 import app.coronawarn.verification.domain.VerificationAppSession;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -29,5 +30,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * This class represents the AppSession repository.
  */
 public interface VerificationAppSessionRepository extends JpaRepository<VerificationAppSession, Long> {
+
   Optional<VerificationAppSession> findByRegistrationTokenHash(String registrationTokenHash);
+
+  void deleteByCreatedAtBefore(LocalDateTime before);
 }

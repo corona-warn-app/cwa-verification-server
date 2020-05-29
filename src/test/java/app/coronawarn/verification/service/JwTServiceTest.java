@@ -70,7 +70,6 @@ public class JwTServiceTest {
   /**
    * Test of getRoleNameFromToken method, of class JwTService.
    */
-
   private String getJwtTestToken(JwTService.Roles... role) throws UnsupportedEncodingException {
     final Map<String, List<String>> realm_accessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();

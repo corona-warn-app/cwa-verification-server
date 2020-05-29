@@ -15,7 +15,7 @@ The primary scope of the component is to provide a proof whether users were test
 ##	Context
 The Verification Server provides proof of a positive SARS-CoV-2 test to other components of the system. In addition it also provides information about specific SARS-CoV-2 test results. The Verification Server uses several sources to provide such proof and information.
 
-![Overview Architecture](https://github.com/corona-warn-app/cwa-documentation/raw/master/images/solution_architecture/figure_1.svg?sanitize=true)
+![Overview Architecture](architecture_overview.svg?sanitize=true)
 
 - The Corona-Warn-App is a system which requests test result status and obtains proofs. 
 - The Corona-Warn-App Server is a system which needs to verify proof.
@@ -75,7 +75,7 @@ Logfiles are kept for 30 days.
 ##	Big Picture - User Journeys
 ###	User Journey TAN Verification based on integrated Laboratories 
 
-![User Journey TAN Verification based on integrated Laboratories](https://github.com/corona-warn-app/cwa-documentation/raw/master/images/solution_architecture/figure_3.svg?sanitize=true )
+![User Journey TAN Verification based on integrated Laboratories](sw_design_verification.svg?sanitize=true )
 
 
 Steps:

@@ -37,8 +37,6 @@ import java.util.stream.IntStream;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
 
 /**
@@ -73,7 +71,7 @@ public class TanService {
   private final HashingService hashingService;
 
   @NonNull
-  private VerificationApplicationConfig verificationApplicationConfig;
+  private final VerificationApplicationConfig verificationApplicationConfig;
 
   /**
    * Saves a {@link VerificationTan} into the database.
@@ -248,9 +246,7 @@ public class TanService {
    */
   public Optional<VerificationTan> getEntityByTan(String tan) {
     log.info("TanService start getEntityByTan.");
-    VerificationTan tanEntity = new VerificationTan();
-    tanEntity.setTanHash(hashingService.hash(tan));
-    return tanRepository.findOne(Example.of(tanEntity, ExampleMatcher.matching()));
+    return tanRepository.findByTanHash(hashingService.hash(tan));
   }
 
   /*

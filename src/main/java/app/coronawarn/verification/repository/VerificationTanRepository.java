@@ -22,12 +22,18 @@
 package app.coronawarn.verification.repository;
 
 import app.coronawarn.verification.domain.VerificationTan;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * This class represents the AppSession repository.
+ * This class represents the Tan repository.
  */
 public interface VerificationTanRepository extends JpaRepository<VerificationTan, Long> {
 
   boolean existsByTanHash(String tanHash);
+
+  Optional<VerificationTan> findByTanHash(String tanHash);
+
+  void deleteByCreatedAtBefore(LocalDateTime before);
 }

@@ -126,7 +126,6 @@ public class TanService {
     boolean verified = false;
     if (syntaxTeleTanVerification(teleTan)) {
       Optional<VerificationTan> teleTanEntity = getEntityByTan(teleTan);
-      log.info(teleTanEntity.toString());
       if (teleTanEntity.isPresent() && !teleTanEntity.get().isRedeemed()) {
         verified = true;
       } else {
@@ -271,7 +270,6 @@ public class TanService {
    * based UUIDs. In a holder class to defer initialization until needed.
    */
   private static class Holder {
-
     static final SecureRandom NUMBER_GENERATOR = new SecureRandom();
   }
 }

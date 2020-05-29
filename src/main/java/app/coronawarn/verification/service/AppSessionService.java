@@ -148,9 +148,7 @@ public class AppSessionService {
    */
   public Optional<VerificationAppSession> getAppSessionByToken(String registrationToken) {
     log.info("VerificationAppSessionService start getAppSessionByToken.");
-    VerificationAppSession appSession = new VerificationAppSession();
-    appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
-    return appSessionRepository.findOne(Example.of(appSession, ExampleMatcher.matchingAny()));
+    return appSessionRepository.findByRegistrationTokenHash(hashingService.hash(registrationToken));
   }
 
   /**

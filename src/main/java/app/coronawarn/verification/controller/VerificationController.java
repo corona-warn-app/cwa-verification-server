@@ -229,7 +229,7 @@ public class VerificationController {
       TestResult testResult = labServerService.result(new HashedGuid(hash));
       return ResponseEntity.ok(testResult);
     }
-    log.info("The registration token is doesn't exists.");
+    log.info("The registration token doesn't exists.");
     throw new VerificationServerFailedException(HttpStatus.BAD_REQUEST, 
       "Returning the testresult for the registration token failed");
   }

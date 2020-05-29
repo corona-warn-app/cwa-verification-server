@@ -93,17 +93,6 @@ public class TanService {
   }
 
   /**
-   * Check TAN syntax constraints.
-   *
-   * @param tan the TAN
-   * @return TAN verification flag
-   */
-  public boolean syntaxVerification(String tan) {
-    Matcher matcher = TAN_PATTERN.matcher(tan);
-    return matcher.find();
-  }
-
-  /**
    * Check Tele-TAN syntax constraints.
    *
    * @param teleTan the Tele TAN
@@ -153,7 +142,7 @@ public class TanService {
   /**
    * This method generates a {@link VerificationTan} - entity and saves it.
    *
-   * @param tan     the TAN
+   * @param tan the TAN
    * @param tanType the TAN type
    * @return the persisted TAN
    */
@@ -169,12 +158,12 @@ public class TanService {
    */
   public String generateTeleTan() {
     return IntStream.range(0, TELE_TAN_LENGTH)
-      .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
-      .collect(Collector.of(
-        StringBuilder::new,
-        StringBuilder::append,
-        StringBuilder::append,
-        StringBuilder::toString));
+        .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
+        .collect(Collector.of(
+            StringBuilder::new,
+            StringBuilder::append,
+            StringBuilder::append,
+            StringBuilder::toString));
   }
 
   /**
@@ -215,8 +204,7 @@ public class TanService {
   }
 
   /**
-   * This Method generates a valid TAN and persists it. Returns the generated
-   * TAN.
+   * This Method generates a valid TAN and persists it. Returns the generated TAN.
    *
    * @param sourceOfTrust sets the source of Trust for the Tan
    * @return a valid tan with given source of Trust
@@ -266,6 +254,7 @@ public class TanService {
    * based UUIDs. In a holder class to defer initialization until needed.
    */
   private static class Holder {
+
     static final SecureRandom NUMBER_GENERATOR = new SecureRandom();
   }
 }

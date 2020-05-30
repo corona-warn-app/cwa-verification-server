@@ -74,7 +74,7 @@ public class VerificationAppSession implements Serializable {
   private String teleTanHash;
 
   @Column(name = "tan_counter")
-  private Integer tanCounter;
+  private int tanCounter;
 
   @Column(name = "sot")
   @Enumerated(EnumType.STRING)

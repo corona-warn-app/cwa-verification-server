@@ -81,7 +81,7 @@ public class VerificationAppSession implements Serializable {
   private AppSessionSourceOfTrust sourceOfTrust;
 
   /**
-   * This method increments the tan counter
+   * This method increments the tan counter.
    */
   public void incrementTanCounter() {
     this.tanCounter++;

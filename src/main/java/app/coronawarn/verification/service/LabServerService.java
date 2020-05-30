@@ -29,8 +29,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 /**
  * This class represents the lab server service.
  */
@@ -43,7 +41,7 @@ public class LabServerService {
   private final LabServerClient labServerClient;
 
   /**
-   * This method returns an TestResult for a guig
+   * This method gives an TestResult for a guid.
    * @param guid hashed GUID
    * @return Testresult for GUID
    */

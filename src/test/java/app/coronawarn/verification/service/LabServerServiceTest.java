@@ -59,7 +59,6 @@ public class LabServerServiceTest {
   }
 
   public static class LabServerClientMock implements LabServerClient {
-
     @Override
     public TestResult result(HashedGuid guid) {
       return new TestResult(2);

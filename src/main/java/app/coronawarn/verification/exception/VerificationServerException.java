@@ -23,12 +23,18 @@ package app.coronawarn.verification.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-
+/**
+ * This class represents an Exception of the VerificationServer.
+ */
 @Getter
 public class VerificationServerException extends RuntimeException {
 
   private final HttpStatus httpStatus;
-
+  /**
+   * The Constructor for the Exception class.
+   * @param httpStatus the state of the server
+   * @param message the message
+   */
   public VerificationServerException(HttpStatus httpStatus, String message) {
     super(message);
     this.httpStatus = httpStatus;

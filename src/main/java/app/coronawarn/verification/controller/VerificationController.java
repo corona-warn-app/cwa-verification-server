@@ -111,7 +111,7 @@ public class VerificationController {
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "201", description = "registration token generated."),
-    @ApiResponse(responseCode = "400", description = "GUID/TeleTAN already exists."),})
+    @ApiResponse(responseCode = "400", description = "GUID/TeleTAN already exists.")})
   @PostMapping(value = REGISTRATION_TOKEN_ROUTE,
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE
@@ -157,7 +157,7 @@ public class VerificationController {
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "201", description = "Registration Token is valid"),
-    @ApiResponse(responseCode = "400", description = "Registration Token does not exist"),})
+    @ApiResponse(responseCode = "400", description = "Registration Token does not exist")})
   @PostMapping(value = TAN_ROUTE,
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE
@@ -212,7 +212,7 @@ public class VerificationController {
       + "If the RegistrationToken belongs to a TeleTan the result is always positve"
   )
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Testresult retrieved"),})
+    @ApiResponse(responseCode = "200", description = "Testresult retrieved")})
   @PostMapping(value = TESTRESULT_ROUTE,
       consumes = MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE
@@ -248,7 +248,7 @@ public class VerificationController {
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Tan is valid an formerly issued by the verification server"),
-    @ApiResponse(responseCode = "404", description = "Tan could not be verified"),})
+    @ApiResponse(responseCode = "404", description = "Tan could not be verified")})
   @PostMapping(value = TAN_VERIFY_ROUTE,
       consumes = MediaType.APPLICATION_JSON_VALUE
   )
@@ -276,7 +276,7 @@ public class VerificationController {
       description = "A TeleTan is a human readable TAN with 7 characters which is supposed to be issued via call line"
   )
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "201", description = "TeleTan created"),})
+    @ApiResponse(responseCode = "201", description = "TeleTan created")})
   @PostMapping(TELE_TAN_ROUTE)
   public ResponseEntity<TeleTan> createTeleTan() {
     String teleTan = tanService.generateVerificationTeleTan();

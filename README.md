@@ -54,7 +54,7 @@ There are two ways to build:
 
 ### Prerequisites
  - [Open JDK 11](https://openjdk.java.net)  
- - [Maven](https://apache.maven.org)  
+ - [Maven](https://maven.apache.org)
  - *(optional)*: [Docker](https://www.docker.com)  
 
 ### Build
@@ -66,7 +66,7 @@ In either case open a terminal pointing to the directory you put the sources in.
 This is the recommmended way for taking part in the development.  
 Please check, whether following prerequisites are installed on your machine:
 - [Open JDK 11](https://openjdk.java.net) or a similar JDK 11 compatible VM  
-- [Maven](https://apache.maven.org)  
+- [Maven](https://maven.apache.org)
 
 You can then open a terminal pointing to the root directory of the verification server and do the following:
 

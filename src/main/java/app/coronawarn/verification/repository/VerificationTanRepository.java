@@ -31,9 +31,23 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface VerificationTanRepository extends JpaRepository<VerificationTan, Long> {
 
+  /**
+   * This method looks in the Database for an if a VerificationTan exists for the tan hash.
+   * @param tanHash hash to search for
+   * @return Boolean if there is an Entity for the tanHash
+   */
   boolean existsByTanHash(String tanHash);
 
+  /**
+   * This method looks in the Database for an if a VerificationTan exists for the tan hash.
+   * @param tanHash hash to search for
+   * @return Optional VerificationTan
+   */
   Optional<VerificationTan> findByTanHash(String tanHash);
 
+  /**
+   * This method purges Entities from the database that are older than before value.
+   * @param before LocalDateTime to delete older entities
+   */
   void deleteByCreatedAtBefore(LocalDateTime before);
 }

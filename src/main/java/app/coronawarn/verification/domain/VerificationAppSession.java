@@ -80,6 +80,9 @@ public class VerificationAppSession implements Serializable {
   @Enumerated(EnumType.STRING)
   private AppSessionSourceOfTrust sourceOfTrust;
 
+  /**
+   * This method increments the tan counter
+   */
   public void incrementTanCounter() {
     this.tanCounter++;
   }

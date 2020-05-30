@@ -225,8 +225,7 @@ public class VerificationController {
       if ((appSession.get().getHashedGuid() == null) && (appSession.get().getTeleTanHash() != null)) {
         return ResponseEntity.ok(new TestResult(LabTestResult.POSITIVE.getTestResult()));
       }
-      String hash = appSession.get().getHashedGuid() != null
-        ? appSession.get().getHashedGuid() : appSession.get().getTeleTanHash();
+      String hash = appSession.get().getHashedGuid();
       log.info("Requested result for registration token with Hashed Guid.");
       TestResult testResult = labServerService.result(new HashedGuid(hash));
       return ResponseEntity.ok(testResult);

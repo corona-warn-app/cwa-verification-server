@@ -30,6 +30,11 @@ import org.springframework.web.bind.annotation.PostMapping;
  */
 @FeignClient(name = "labServerService", url = "${uri.endpoint.labserver}")
 public interface LabServerClient {
+  /**
+   * This method gets a testResult from the LabServer
+   * @param guid
+   * @return
+   */
   @PostMapping(value = "/api/v1/app/result",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE

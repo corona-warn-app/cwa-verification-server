@@ -45,7 +45,7 @@ public enum LabTestResult {
    *
    * @param stateValue the lab test state
    */
-  LabTestResult(Integer stateValue) {
+  LabTestResult(final int stateValue) {
     this.testResult = stateValue;
   }
 

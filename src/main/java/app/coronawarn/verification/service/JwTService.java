@@ -22,6 +22,7 @@
 package app.coronawarn.verification.service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -46,13 +47,13 @@ public class JwTService implements Serializable {
     AUTH_C19_HOTLINE("c19hotline"),
     AUTH_C19_HEALTHAUTHORITY("c19healthauthority");
 
-    private String roleName;
+    private final String roleName;
 
     Roles(final String role) {
       this.roleName = role;
     }
 
-    String getRoleName() {
+    public String getRoleName() {
       return this.roleName;
     }
 
@@ -65,12 +66,17 @@ public class JwTService implements Serializable {
    * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
    */
   public boolean validateToken(final String token) {
-    List<String> roleNames = getRoles(token);
-    Roles[] roles = Roles.values();
-    for (Roles role : roles) {
-      if (roleNames.contains(role.getRoleName())) {
-        return true;
+    try {
+      List<String> roleNames = getRoles(token);
+      Roles[] roles = Roles.values();
+      for (Roles role : roles) {
+        if (roleNames.contains(role.getRoleName())) {
+          return true;
+        }
       }
+    } catch (JwtException ex) {
+      log.warn("Token is not valid.");
+      return false;
     }
     return false;
   }
@@ -107,7 +113,7 @@ public class JwTService implements Serializable {
     try {
       return secret.getBytes("UTF-8");
     } catch (UnsupportedEncodingException ex) {
-      log.warn(ex.getMessage(), ex);
+      //log.warn(ex.getMessage(), ex);
     }
 
     return new byte[0];

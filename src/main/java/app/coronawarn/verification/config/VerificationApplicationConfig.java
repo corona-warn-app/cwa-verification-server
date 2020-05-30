@@ -27,32 +27,59 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * This class is used to read in values from configuration file application.yml.
- * It is loaded via the @EnableConfigurationProperties annotation from SpringBootApplication main class. */
+ * It is loaded via the @EnableConfigurationProperties annotation from SpringBootApplication main class.
+ */
+@Getter
+@Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
 
-  public static class TeleCfg {
-    public static class TeleValidCfg {
-      @Getter @Setter private int hours;
-    }
+  private TanCfg tan;
+  private AppSessionCfg appsession;
+  private EntitiesCfg entities;
 
-    @Getter @Setter private TeleValidCfg valid;
+  public static class TeleCfg {
+    @Getter
+    @Setter
+    private TeleValidCfg valid;
+
+    public static class TeleValidCfg {
+      @Getter
+      @Setter
+      private int hours;
+    }
   }
 
   public static class ValidCfg {
-    @Getter @Setter int days;
+    @Getter
+    @Setter
+    int days;
   }
 
   public static class TanCfg {
-    @Getter @Setter private TeleCfg tele;
-    @Getter @Setter private ValidCfg valid;
+    @Getter
+    @Setter
+    private TeleCfg tele;
+    @Getter
+    @Setter
+    private ValidCfg valid;
   }
 
   public static class AppSessionCfg {
-    @Getter @Setter int tancountermax;
+    @Getter
+    @Setter
+    int tancountermax;
   }
-  
-  @Getter @Setter private TanCfg tan;
-  @Getter @Setter private AppSessionCfg appsession;
 
+  public static class EntitiesCfg {
+    @Getter
+    @Setter
+    private CleanupCfg cleanup;
+  }
+
+  public static class CleanupCfg {
+    @Getter
+    @Setter
+    private Integer days;
+  }
 }

@@ -37,8 +37,6 @@ import java.util.stream.IntStream;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
 
 /**
@@ -73,7 +71,7 @@ public class TanService {
   private final HashingService hashingService;
 
   @NonNull
-  private VerificationApplicationConfig verificationApplicationConfig;
+  private final VerificationApplicationConfig verificationApplicationConfig;
 
   /**
    * Saves a {@link VerificationTan} into the database.
@@ -92,17 +90,6 @@ public class TanService {
    */
   public void deleteTan(VerificationTan tan) {
     tanRepository.delete(tan);
-  }
-
-  /**
-   * Check TAN syntax constraints.
-   *
-   * @param tan the TAN
-   * @return TAN verification flag
-   */
-  public boolean syntaxVerification(String tan) {
-    Matcher matcher = TAN_PATTERN.matcher(tan);
-    return matcher.find();
   }
 
   /**
@@ -155,7 +142,7 @@ public class TanService {
   /**
    * This method generates a {@link VerificationTan} - entity and saves it.
    *
-   * @param tan     the TAN
+   * @param tan the TAN
    * @param tanType the TAN type
    * @return the persisted TAN
    */
@@ -171,12 +158,12 @@ public class TanService {
    */
   public String generateTeleTan() {
     return IntStream.range(0, TELE_TAN_LENGTH)
-      .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
-      .collect(Collector.of(
-        StringBuilder::new,
-        StringBuilder::append,
-        StringBuilder::append,
-        StringBuilder::toString));
+        .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
+        .collect(Collector.of(
+            StringBuilder::new,
+            StringBuilder::append,
+            StringBuilder::append,
+            StringBuilder::toString));
   }
 
   /**
@@ -217,8 +204,7 @@ public class TanService {
   }
 
   /**
-   * This Method generates a valid TAN and persists it. Returns the generated
-   * TAN.
+   * This Method generates a valid TAN and persists it. Returns the generated TAN.
    *
    * @param sourceOfTrust sets the source of Trust for the Tan
    * @return a valid tan with given source of Trust
@@ -260,9 +246,7 @@ public class TanService {
    */
   public Optional<VerificationTan> getEntityByTan(String tan) {
     log.info("TanService start getEntityByTan.");
-    VerificationTan tanEntity = new VerificationTan();
-    tanEntity.setTanHash(hashingService.hash(tan));
-    return tanRepository.findOne(Example.of(tanEntity, ExampleMatcher.matching()));
+    return tanRepository.findByTanHash(hashingService.hash(tan));
   }
 
   /*
@@ -270,6 +254,7 @@ public class TanService {
    * based UUIDs. In a holder class to defer initialization until needed.
    */
   private static class Holder {
+
     static final SecureRandom NUMBER_GENERATOR = new SecureRandom();
   }
 }

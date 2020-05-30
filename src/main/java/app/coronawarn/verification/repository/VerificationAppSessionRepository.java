@@ -34,7 +34,7 @@ public interface VerificationAppSessionRepository extends JpaRepository<Verifica
   /**
    * This method looks in the Database for an Appsession with the given registrationTokenHash.
    * @param registrationTokenHash hash to search for
-   * @return Optional<VerificationAppSession> the optional Appsession
+   * @return Optional VerificationAppSession the optional Appsession
    */
   Optional<VerificationAppSession> findByRegistrationTokenHash(String registrationTokenHash);
 

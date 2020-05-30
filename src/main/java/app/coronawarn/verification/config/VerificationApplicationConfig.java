@@ -47,6 +47,7 @@ public class VerificationApplicationConfig {
     @Getter
     @Setter
     private TeleValidCfg valid;
+
     /**
      * Configure the TeleValidCfg with build property values.
      *
@@ -69,6 +70,7 @@ public class VerificationApplicationConfig {
     @Setter
     int days;
   }
+
   /**
    * Configure the TanCfg with build property values.
    *

@@ -41,6 +41,12 @@
     <plugin.sonar.version>3.6.1.1688</plugin.sonar.version>
     <plugin.jacoco.version>0.8.5</plugin.jacoco.version>
     <guava.version>29.0-jre</guava.version>
+    
+    <sonar.exclusions>
+      **/VerificationApplication.java,
+      **/model/*.java,
+      **/domain/*.java
+    </sonar.exclusions>    
   </properties>
 
   <dependencyManagement>
@@ -230,14 +236,7 @@
               <goal>report</goal>
             </goals>
           </execution>
-        </executions>
-        <configuration>
-            <excludes>
-                <exclude>app.coronawarn.verification.model/*</exclude>
-                <exclude>app.coronawarn.verification.domain/*</exclude>
-                <exclude>app.coronawarn.verification/VerificationApplication.class</exclude>              
-            </excludes>
-        </configuration>        
+        </executions>      
       </plugin>
     </plugins>
   </build>

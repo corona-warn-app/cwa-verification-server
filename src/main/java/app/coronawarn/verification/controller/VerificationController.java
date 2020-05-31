@@ -21,13 +21,12 @@
 
 package app.coronawarn.verification.controller;
 
-import app.coronawarn.verification.model.HashedGuid;
-import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
+import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.LabTestResult;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenKeyType;
@@ -35,6 +34,7 @@ import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.model.Tan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TeleTan;
+import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.LabServerService;
 import app.coronawarn.verification.service.TanService;

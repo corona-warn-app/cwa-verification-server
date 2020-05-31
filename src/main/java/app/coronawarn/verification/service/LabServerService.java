@@ -21,8 +21,8 @@
 
 package app.coronawarn.verification.service;
 
-import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.client.LabServerClient;
+import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.TestResult;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

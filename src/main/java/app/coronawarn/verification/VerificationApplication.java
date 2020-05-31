@@ -29,7 +29,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * The Application class
+ * The Application class.
  */
 @EnableFeignClients
 @SpringBootApplication
@@ -38,8 +38,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class VerificationApplication {
 
   /**
-   * The main Method
-   * @param args
+   * The main Method.
+   * @param args the args for the main method
    */
   public static void main(String[] args) {
     SpringApplication.run(VerificationApplication.class, args);

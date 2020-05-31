@@ -28,12 +28,19 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+/**
+ * The Application class
+ */
 @EnableFeignClients
 @SpringBootApplication
 @EnableScheduling
 @EnableConfigurationProperties({VerificationApplicationConfig.class})
 public class VerificationApplication {
 
+  /**
+   * The main Method
+   * @param args
+   */
   public static void main(String[] args) {
     SpringApplication.run(VerificationApplication.class, args);
   }

@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * This class represents the different types of tans.
+ * @see <a href="https://github.com/corona-warn-app/cwa-verification-server/blob/master/docs/architecture-overview.md#entity-tan">Entity TAN - Type</a>
  */
 @Schema
 public enum TanType {

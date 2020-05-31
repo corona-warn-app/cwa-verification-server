@@ -35,5 +35,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TeleTan {
 
-  private String teleTan;
+  private String value;
 }

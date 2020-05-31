@@ -165,7 +165,7 @@ public class VerificationController {
   public ResponseEntity<Tan> generateTan(@Valid @RequestBody RegistrationToken registrationToken) {
 
     Optional<VerificationAppSession> actual
-        = appSessionService.getAppSessionByToken(registrationToken.getToken());
+        = appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
     if (actual.isPresent()) {
       VerificationAppSession appSession = actual.get();
       int tancountermax = verificationApplicationConfig.getAppsession().getTancountermax();
@@ -220,7 +220,7 @@ public class VerificationController {
 
   public ResponseEntity<TestResult> getTestState(@Valid @RequestBody RegistrationToken registrationToken) {
     Optional<VerificationAppSession> appSession =
-      appSessionService.getAppSessionByToken(registrationToken.getToken());
+      appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
     if (appSession.isPresent()) {
       if ((appSession.get().getHashedGuid() == null) && (appSession.get().getTeleTanHash() != null)) {
         return ResponseEntity.ok(new TestResult(LabTestResult.POSITIVE.getTestResult()));
@@ -253,7 +253,7 @@ public class VerificationController {
       consumes = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<?> verifyTan(@Valid @RequestBody Tan tan) {
-    return tanService.getEntityByTan(tan.getValue())
+    return tanService.getEntityByTan(tan.getTan())
         .filter(t -> t.canBeRedeemed(LocalDateTime.now()))
         .map(t -> {
           tanService.deleteTan(t);

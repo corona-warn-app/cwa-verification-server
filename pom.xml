@@ -42,11 +42,13 @@
     <plugin.jacoco.version>0.8.5</plugin.jacoco.version>
     <guava.version>29.0-jre</guava.version>
     
-    <sonar.exclusions>
+    <sonar.coverage.exclusions>
       **/VerificationApplication.java,
-      **/model/*.java,
-      **/domain/*.java
-    </sonar.exclusions>    
+      **/model/*,
+      **/domain/*,
+      **/config/*,
+      **/exception/*
+    </sonar.coverage.exclusions>    
   </properties>
 
   <dependencyManagement>

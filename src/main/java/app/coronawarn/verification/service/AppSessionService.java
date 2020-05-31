@@ -70,7 +70,6 @@ public class AppSessionService {
     appSession.setCreatedAt(LocalDateTime.now());
     appSession.setUpdatedAt(LocalDateTime.now());
     appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
-    appSession.setTanCounter(0);
     return appSession;
   }
 

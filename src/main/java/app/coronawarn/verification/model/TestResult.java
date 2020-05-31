@@ -19,18 +19,18 @@
  * under the License.
  */
 
-package app.coronawarn.verification.client;
+package app.coronawarn.verification.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * This class represents the GUID.
+ * This class represents the TestResult.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HashedGuid {
-  private String id;
+public class TestResult {
+  private int testResult;
 }

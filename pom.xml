@@ -231,8 +231,14 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+            <excludes>
+                <exclude>app.coronawarn.verification.model/*</exclude>
+                <exclude>app.coronawarn.verification.domain/*</exclude>
+                <exclude>app.coronawarn.verification/VerificationApplication.class</exclude>              
+            </excludes>
+        </configuration>        
       </plugin>
     </plugins>
   </build>
-
 </project>

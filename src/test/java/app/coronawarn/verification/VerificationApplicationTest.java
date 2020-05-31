@@ -21,8 +21,8 @@
 
 package app.coronawarn.verification;
 
-import app.coronawarn.verification.client.HashedGuid;
-import app.coronawarn.verification.client.TestResult;
+import app.coronawarn.verification.model.HashedGuid;
+import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.*;

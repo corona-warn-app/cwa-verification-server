@@ -21,6 +21,8 @@
 
 package app.coronawarn.verification.client;
 
+import app.coronawarn.verification.model.TestResult;
+import app.coronawarn.verification.model.HashedGuid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;

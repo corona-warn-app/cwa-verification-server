@@ -22,7 +22,7 @@
 package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.VerificationApplication;
-import app.coronawarn.verification.client.HashedGuid;
+import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.client.LabServerClient;
 import app.coronawarn.verification.client.TestResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,7 +59,6 @@ public class LabServerServiceTest {
   }
 
   public static class LabServerClientMock implements LabServerClient {
-
     @Override
     public TestResult result(HashedGuid guid) {
       return new TestResult(2);

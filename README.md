@@ -33,7 +33,7 @@ In the world of the Corona Warn App the Verification Server helps validating whe
 - The Verification Server of the Corona Warn App (repository: cwa-verification-server) helps validating whether upload requests from the mobile App are valid or not.
 - The Verification Portal of the Corona Warn App (repository: cwa-verification-portal) allows hotline employees to generate teleTANs which are used by users of the mobile App to upload their diagnostic keys.
 - The Verification Identity and Access of the Corona Warn App (repository: cwa-verification-iam) ensures that only authorized health personnel get access to the Verification Portal.
-- The Testresult Server of the Corona Warn App (repository: cwa-testresult-server) receives the results from laboratories and delivers these results to the app via the verification-server.
+- The Test Result Server of the Corona Warn App (repository: cwa-testresult-server) receives the results from laboratories and delivers these results to the app via the verification-server.
 
 ## Architecture overview
 You can find an architectural overview of the component in the [solution architecture document](https://github.com/corona-warn-app/cwa-documentation/blob/master/solution_architecture.md).  
@@ -54,7 +54,7 @@ There are two ways to build:
 
 ### Prerequisites
  - [Open JDK 11](https://openjdk.java.net)  
- - [Maven](https://apache.maven.org)  
+ - [Maven](https://maven.apache.org)
  - *(optional)*: [Docker](https://www.docker.com)  
 
 ### Build
@@ -66,7 +66,7 @@ In either case open a terminal pointing to the directory you put the sources in.
 This is the recommmended way for taking part in the development.  
 Please check, whether following prerequisites are installed on your machine:
 - [Open JDK 11](https://openjdk.java.net) or a similar JDK 11 compatible VM  
-- [Maven](https://apache.maven.org)  
+- [Maven](https://maven.apache.org)
 
 You can then open a terminal pointing to the root directory of the verification server and do the following:
 

@@ -22,8 +22,7 @@
 package app.coronawarn.verification.model;
 
 /**
- * This class represent the different key types, with whom you can generate a
- * registration token.
+ * This class represent the different key types, with whom you can generate a registration token.
  */
 public enum RegistrationTokenKeyType {
 

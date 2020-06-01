@@ -30,3 +30,7 @@ appsession:
 uri:
   endpoint:
     labserver: http://localhost:8088
+entities:
+  cleanup:
+    days: 21
+    rate: 3600000

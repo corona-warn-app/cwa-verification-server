@@ -27,32 +27,94 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * This class is used to read in values from configuration file application.yml.
- * It is loaded via the @EnableConfigurationProperties annotation from SpringBootApplication main class. */
+ * It is loaded via the @EnableConfigurationProperties annotation from SpringBootApplication main class.
+ */
+@Getter
+@Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
 
+  private TanCfg tan;
+  private AppSessionCfg appsession;
+  private EntitiesCfg entities;
+
+  /**
+   * Configure the TeleValidCfg with build property values.
+   *
+   * @return the configured paramters
+   */
   public static class TeleCfg {
+    @Getter
+    @Setter
+    private TeleValidCfg valid;
+
+    /**
+     * Configure the TeleValidCfg with build property values.
+     *
+     * @return the configured paramters
+     */
     public static class TeleValidCfg {
-      @Getter @Setter private int hours;
+      @Getter
+      @Setter
+      private int hours;
     }
-
-    @Getter @Setter private TeleValidCfg valid;
   }
 
+  /**
+   * Configure the ValidCfg with build property values.
+   *
+   * @return the configured paramters
+   */
   public static class ValidCfg {
-    @Getter @Setter int days;
+    @Getter
+    @Setter
+    int days;
   }
 
+  /**
+   * Configure the TanCfg with build property values.
+   *
+   * @return the configured paramters
+   */
   public static class TanCfg {
-    @Getter @Setter private TeleCfg tele;
-    @Getter @Setter private ValidCfg valid;
+    @Getter
+    @Setter
+    private TeleCfg tele;
+    @Getter
+    @Setter
+    private ValidCfg valid;
   }
 
+  /**
+   * Configure the AppSessionCfg with build property values.
+   *
+   * @return the configured paramters
+   */
   public static class AppSessionCfg {
-    @Getter @Setter int tancountermax;
+    @Getter
+    @Setter
+    int tancountermax;
   }
-  
-  @Getter @Setter private TanCfg tan;
-  @Getter @Setter private AppSessionCfg appsession;
 
+  /**
+   * Configure the CleanupCfg with build property values.
+   *
+   * @return the configured paramters
+   */
+  public static class EntitiesCfg {
+    @Getter
+    @Setter
+    private CleanupCfg cleanup;
+  }
+
+  /**
+   * Configure the CleanupCfg with build property values.
+   *
+   * @return the configured paramters
+   */
+  public static class CleanupCfg {
+    @Getter
+    @Setter
+    private Integer days;
+  }
 }

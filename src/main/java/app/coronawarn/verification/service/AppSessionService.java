@@ -70,7 +70,6 @@ public class AppSessionService {
     appSession.setCreatedAt(LocalDateTime.now());
     appSession.setUpdatedAt(LocalDateTime.now());
     appSession.setRegistrationTokenHash(hashingService.hash(registrationToken));
-    appSession.setTanCounter(0);
     return appSession;
   }
 
@@ -92,20 +91,18 @@ public class AppSessionService {
 
     switch (keyType) {
       case GUID:
-        if (hashingService.isHashValid(key)) {
-          if (checkRegistrationTokenAlreadyExistsForGuid(key)) {
-            log.warn("The registration token already exists for the hashed guid.");
-          } else {
-            log.info("Start generating a new registration token for the given hashed guid.");
-            registrationToken = generateRegistrationToken();
-            appSession = generateAppSession(registrationToken);
-            appSession.setHashedGuid(key);
-            appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
-            saveAppSession(appSession);
-            return ResponseEntity
-              .status(HttpStatus.CREATED)
-              .body(new RegistrationToken(registrationToken));
-          }
+        if (checkRegistrationTokenAlreadyExistsForGuid(key)) {
+          log.warn("The registration token already exists for the hashed guid.");
+        } else {
+          log.info("Start generating a new registration token for the given hashed guid.");
+          registrationToken = generateRegistrationToken();
+          appSession = generateAppSession(registrationToken);
+          appSession.setHashedGuid(key);
+          appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
+          saveAppSession(appSession);
+          return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(new RegistrationToken(registrationToken));
         }
         break;
       case TELETAN:
@@ -179,5 +176,13 @@ public class AppSessionService {
     appSession.setTeleTanHash(hashingService.hash(teleTan));
     return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
   }
-
+  
+  /**
+   * Verifies the hashed guid.
+   * @param hashedGuid the hashed Guid
+   * @return flag for verification
+   */
+  public boolean verifyHashedGuid(String hashedGuid) {
+    return hashingService.isHashValid(hashedGuid);
+  }
 }

@@ -22,12 +22,13 @@
 package app.coronawarn.verification.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * This class represents a registration token request.
+ * This class represents a registration token request parameter with a hashed guid or a teleTAN.
  */
 @Schema
 @Data
@@ -38,10 +39,12 @@ public class RegistrationTokenRequest {
   /**
    * The key which can be a teletan or a hashed guid.
    */
+  @NotNull
   private String key;
 
   /**
-   * The type of key, which can be "hashedGUID" or "teleTAN".
+   * The type of key, which can be "GUID" or "TELETAN".
    */
+  @NotNull
   private RegistrationTokenKeyType keyType;
 }

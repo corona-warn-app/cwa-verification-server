@@ -55,7 +55,7 @@ public class TanService {
   // Tele-TANs are a shorter, easier to communicate form of TAN
   private static final int TELE_TAN_LENGTH = 7;
   // Exclude characters which can be confusing in some fonts like 0-O or i-I-l.
-  private static final String TELE_TAN_ALLOWED_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz";
+  private static final String TELE_TAN_ALLOWED_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
   private static final String TELE_TAN_PATTERN = "^[" + TELE_TAN_ALLOWED_CHARS + "]{" + TELE_TAN_LENGTH + "}$";
   private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
 

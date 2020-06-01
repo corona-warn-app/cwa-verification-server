@@ -38,11 +38,21 @@ public class VerificationApplicationConfig {
   private AppSessionCfg appsession;
   private EntitiesCfg entities;
 
+  /**
+   * Configure the TeleValidCfg with build property values.
+   *
+   * @return the configured paramters
+   */
   public static class TeleCfg {
     @Getter
     @Setter
     private TeleValidCfg valid;
 
+    /**
+     * Configure the TeleValidCfg with build property values.
+     *
+     * @return the configured paramters
+     */
     public static class TeleValidCfg {
       @Getter
       @Setter
@@ -50,12 +60,22 @@ public class VerificationApplicationConfig {
     }
   }
 
+  /**
+   * Configure the ValidCfg with build property values.
+   *
+   * @return the configured paramters
+   */
   public static class ValidCfg {
     @Getter
     @Setter
     int days;
   }
 
+  /**
+   * Configure the TanCfg with build property values.
+   *
+   * @return the configured paramters
+   */
   public static class TanCfg {
     @Getter
     @Setter
@@ -65,18 +85,33 @@ public class VerificationApplicationConfig {
     private ValidCfg valid;
   }
 
+  /**
+   * Configure the AppSessionCfg with build property values.
+   *
+   * @return the configured paramters
+   */
   public static class AppSessionCfg {
     @Getter
     @Setter
     int tancountermax;
   }
 
+  /**
+   * Configure the CleanupCfg with build property values.
+   *
+   * @return the configured paramters
+   */
   public static class EntitiesCfg {
     @Getter
     @Setter
     private CleanupCfg cleanup;
   }
 
+  /**
+   * Configure the CleanupCfg with build property values.
+   *
+   * @return the configured paramters
+   */
   public static class CleanupCfg {
     @Getter
     @Setter

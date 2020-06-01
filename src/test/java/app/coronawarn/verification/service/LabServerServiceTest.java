@@ -24,7 +24,7 @@ package app.coronawarn.verification.service;
 import app.coronawarn.verification.VerificationApplication;
 import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.client.LabServerClient;
-import app.coronawarn.verification.client.TestResult;
+import app.coronawarn.verification.model.TestResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

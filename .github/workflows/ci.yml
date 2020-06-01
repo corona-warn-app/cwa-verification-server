@@ -25,6 +25,16 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: environment
+      run: |
+        sudo apt-get install --yes --no-install-recommends libxml-xpath-perl
+        export ARTIFACT_ID=$(xpath -q -e "/project/artifactId/text()" pom.xml)
+        echo "::set-env name=ARTIFACT_ID::${ARTIFACT_ID}"
+        export VERSION=$(xpath -q -e "/project/version/text()" pom.xml)
+        export VERSION=${VERSION//-SNAPSHOT}-$(git rev-parse --short ${GITHUB_SHA})
+        echo "::set-env name=VERSION::${VERSION}"
+    - name: mvn version
+      run: mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=${VERSION}
     - name: mvn package
       if: ${{ github.event_name == 'pull_request' }}
       run: mvn --batch-mode package
@@ -49,24 +59,12 @@ jobs:
       with:
         name: target
         path: target
-  package:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/download-artifact@v1
-      with:
-        name: target
-        path: target
     - name: docker build
       if: ${{ github.event_name == 'pull_request' }}
       run: docker build .
     - name: docker build and push
       if: ${{ github.event_name == 'push' }}
       run: |
-        sudo apt-get install --yes --no-install-recommends libxml-xpath-perl
-        ARTIFACT_ID=$(xpath -q -e "/project/artifactId/text()" pom.xml)
-        VERSION=$(xpath -q -e "/project/version/text()" pom.xml)
         echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY_OWNER} --password-stdin
         docker build --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION} .
         docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION}

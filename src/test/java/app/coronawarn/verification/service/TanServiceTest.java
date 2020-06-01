@@ -58,7 +58,7 @@ public class TanServiceTest {
   public static final String TEST_TAN_TYPE = TanType.TAN.name();
   public static final String TEST_TELE_TAN = "R3ZNUeV";
   public static final String TEST_TELE_TAN_HASH = "eeaa54dc40aa84f587e3bc0cbbf18f7c05891558a5fe1348d52f3277794d8730";
-  private static final String TELE_TAN_REGEX = "^[2-9A-HJ-KMNP-Za-kmnp-z]{7}$";
+  private static final String TELE_TAN_REGEX = "^[2-9A-HJ-KMNP-Z]{7}$";
   private static final String TAN_REGEX = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$";
   private static final TanSourceOfTrust TEST_TELE_TAN_SOURCE_OF_TRUST = TanSourceOfTrust.TELETAN;
   private static final Pattern TELE_TAN_PATTERN = Pattern.compile(TELE_TAN_REGEX);

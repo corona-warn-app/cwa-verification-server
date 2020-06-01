@@ -277,7 +277,9 @@ public class VerificationController {
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "201", description = "teleTAN created"),})
-  @PostMapping(TELE_TAN_ROUTE)
+  @PostMapping(value = TELE_TAN_ROUTE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
   public ResponseEntity<TeleTan> createTeleTan() {
     String teleTan = tanService.generateVerificationTeleTan();
     return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));

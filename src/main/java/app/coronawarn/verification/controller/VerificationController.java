@@ -232,7 +232,7 @@ public class VerificationController {
     }
     log.info("The registration token doesn't exists.");
     throw new VerificationServerException(HttpStatus.BAD_REQUEST, 
-      "Returning the testresult for the registration token failed");
+      "Returning the test result for the registration token failed");
   }
 
   /**

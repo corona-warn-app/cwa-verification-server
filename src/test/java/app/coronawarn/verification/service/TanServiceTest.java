@@ -26,11 +26,6 @@ import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,6 +35,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
@@ -115,7 +116,6 @@ public class TanServiceTest {
     tan.setValidUntil(TAN_VALID_UNTIL_IN_DAYS);
     tan.setType(TEST_TAN_TYPE);
     tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
-
     VerificationTan retunedTan = tanService.saveTan(tan);
     Assert.assertEquals(retunedTan, tan);
   }
@@ -147,7 +147,6 @@ public class TanServiceTest {
     tan.setUpdatedAt(start);
     tan.setRedeemed(false);
     tan.setTanHash(TEST_TELE_TAN_HASH);
-
     tan.setValidFrom(start);
     tan.setValidUntil(LocalDateTime.parse((TAN_VALID_UNTIL_IN_DAYS.format(FORMATTER))));
     tan.setType(TanType.TELETAN.name());

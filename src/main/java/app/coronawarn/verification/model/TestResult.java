@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package app.coronawarn.verification.client;
+package app.coronawarn.verification.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,6 +27,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * This class represents the TestResult.
+ * @see <a href="https://github.com/corona-warn-app/cwa-testresult-server/blob/master/docs/architecture-overview.md#core-entities">Core Entities</a>
  */
 @Data
 @NoArgsConstructor

@@ -28,7 +28,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * This class represents a registration token request.
+ * This class represents a registration token request parameter with a hashed guid or a teleTAN.
  */
 @Schema
 @Data

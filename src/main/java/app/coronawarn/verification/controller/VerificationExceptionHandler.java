@@ -63,7 +63,7 @@ public class VerificationExceptionHandler {
 
   @ExceptionHandler(VerificationServerException.class)
   public ResponseEntity<Void> handleVerificationServerExceptions(VerificationServerException exception) {
-    log.error("Cannot get a valid response from the verification server {}", exception);
+    log.warn("The verification server response preventation due to: {}", exception.getMessage());
     return ResponseEntity.status(exception.getHttpStatus()).build();
   }
 }

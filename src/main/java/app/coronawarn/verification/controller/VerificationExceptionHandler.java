@@ -74,7 +74,7 @@ public class VerificationExceptionHandler {
     MethodArgumentNotValidException.class,
     ConstraintViolationException.class
   })
-  public ResponseEntity<Void> handleValidationExceptions() {
+  public ResponseEntity<?> handleValidationExceptions() {
     return ResponseEntity.badRequest().build();
   }
 

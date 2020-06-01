@@ -201,7 +201,7 @@ public class TanServiceTest {
 
   @Test
   public void testTeleTANFormat() {
-    assertThat(tanService.isTeleTanValid("29zAE4E")).isTrue();
+    assertThat(tanService.isTeleTanValid("29ZAE4E")).isTrue();
     assertThat(tanService.isTeleTanValid("29zAE4O")).isFalse();
     assertThat(tanService.isTeleTanValid("29zAE40")).isFalse();
     assertThat(tanService.isTeleTanValid("29zAE41")).isFalse();

@@ -263,7 +263,7 @@ public class VerificationApplicationTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(request)))
       .andExpect(status().isCreated())
-      .andExpect(jsonPath("$.token").exists());
+      .andExpect(jsonPath("$.registrationToken").exists());
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
@@ -326,7 +326,7 @@ public class VerificationApplicationTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(request)))
       .andExpect(status().isCreated())
-      .andExpect(jsonPath("$.token").exists());
+      .andExpect(jsonPath("$.registrationToken").exists());
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);

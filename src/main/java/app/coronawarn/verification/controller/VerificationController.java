@@ -93,11 +93,11 @@ public class VerificationController {
   /**
    * The lower bound for the Secure Random.
    */
-  private static final int MIN_CALCULATION_TIME = 100;
+  public static final int MIN_CALCULATION_TIME = 100;
   /**
    * The upper bound for the Secure Random.
    */
-  private static final int RANDOM_UPPER_BOUND = 150;
+  public static final int RANDOM_UPPER_BOUND = 150;
   @NonNull
   private final AppSessionService appSessionService;
 
@@ -217,7 +217,7 @@ public class VerificationController {
 
   private ResponseEntity<Tan> handleFakeTan() {
     Single.fromCallable(() -> true).delay(fakeDelay(), TimeUnit.MILLISECONDS).toBlocking().value();
-    return ResponseEntity.status(201).body(new Tan("00000000-0000-0000-0000-000000000000"));
+    return ResponseEntity.status(HttpStatus.CREATED).body(new Tan("00000000-0000-0000-0000-000000000000"));
   }
 
   private int fakeDelay() {

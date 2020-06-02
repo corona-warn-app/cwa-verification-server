@@ -178,11 +178,7 @@ public class VerificationController {
     @RequestHeader("CWA-Fake") int fakeTan,
     @Valid @RequestBody RegistrationToken registrationToken) {
     if (fakeTan == 1) {
-      try {
-        return handleFakeTan();
-      } catch (InterruptedException e) {
-        log.warn("Failed to create Fake Tan");
-      }
+      return handleFakeTan();
     }
     Optional<VerificationAppSession> actual
         = appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
@@ -219,7 +215,7 @@ public class VerificationController {
         "VerificationAppSession not found for the registration token");
   }
 
-  private ResponseEntity<Tan> handleFakeTan() throws InterruptedException {
+  private ResponseEntity<Tan> handleFakeTan() {
     Single.fromCallable(() -> true).delay(fakeDelay(), TimeUnit.MILLISECONDS).toBlocking().value();
     return ResponseEntity.status(201).body(new Tan("00000000-0000-0000-0000-000000000000"));
   }

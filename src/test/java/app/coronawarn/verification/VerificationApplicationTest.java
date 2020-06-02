@@ -122,6 +122,37 @@ public class VerificationApplicationTest {
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
+      .header("CWA-Fake",0)
+      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+      .andExpect(status().isCreated());
+
+    long count = appSessionrepository.count();
+    log.info("Got {} verification entries from db repository.", count);
+    assertEquals("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", 1, count);
+
+    List<VerificationAppSession> verficationList = appSessionrepository.findAll();
+    assertNotNull(verficationList);
+    assertEquals(TEST_GUI_HASH, verficationList.get(0).getHashedGuid());
+    assertEquals(AppSessionSourceOfTrust.HASHED_GUID, verficationList.get(0).getSourceOfTrust());
+    assertEquals(TEST_REG_TOK_HASH, verficationList.get(0).getRegistrationTokenHash());
+
+  }
+
+  /**
+   * Test generateTAN.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGenerateTANWithFake() throws Exception {
+    log.info("VerificationAppTests callGenerateTAN()");
+
+    prepareAppSessionTestData();
+    doReturn(TEST_LAB_POSITIVE_RESULT).when(labServerService).result(any());
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
+      .contentType(MediaType.APPLICATION_JSON)
+      .header("CWA-Fake",1)
       .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
       .andExpect(status().isCreated());
 
@@ -218,10 +249,13 @@ public class VerificationApplicationTest {
     doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
+      .header("CWA-Fake",0)
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
       .andExpect(status().isCreated());
   }
+
+
 
   /**
    * Test generateTAN with an unknown source of trust in the appsession.

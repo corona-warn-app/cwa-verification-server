@@ -31,7 +31,9 @@ import lombok.NoArgsConstructor;
 /**
  * This class represents the transaction number.
  */
-@Schema
+@Schema(
+  description = "The the transaction number model."
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

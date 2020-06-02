@@ -133,7 +133,7 @@ public class AppSessionService {
    * @param appSession the verification app session entity
    */
   public void saveAppSession(VerificationAppSession appSession) {
-    log.info("VerificationAppSessionService start saveAppSession.");
+    log.info("Start saveAppSession.");
     appSessionRepository.save(appSession);
   }
 
@@ -145,7 +145,7 @@ public class AppSessionService {
    * @return Optional VerificationAppSession
    */
   public Optional<VerificationAppSession> getAppSessionByToken(String registrationToken) {
-    log.info("VerificationAppSessionService start getAppSessionByToken.");
+    log.info("Start getAppSessionByToken.");
     return appSessionRepository.findByRegistrationTokenHash(hashingService.hash(registrationToken));
   }
 
@@ -157,7 +157,7 @@ public class AppSessionService {
    * @return flag for existing guid
    */
   public boolean checkRegistrationTokenAlreadyExistsForGuid(String hashedGuid) {
-    log.info("VerificationAppSessionService start checkRegistrationTokenAlreadyExistsForGuid.");
+    log.info("Start checkRegistrationTokenAlreadyExistsForGuid.");
     VerificationAppSession appSession = new VerificationAppSession();
     appSession.setHashedGuid(hashedGuid);
     return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
@@ -171,7 +171,7 @@ public class AppSessionService {
    * @return flag for existing teleTAN
    */
   public boolean checkRegistrationTokenAlreadyExistForTeleTan(String teleTan) {
-    log.info("VerificationAppSessionService start checkTeleTanAlreadyExistForTeleTan.");
+    log.info("Start checkTeleTanAlreadyExistForTeleTan.");
     VerificationAppSession appSession = new VerificationAppSession();
     appSession.setTeleTanHash(hashingService.hash(teleTan));
     return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));

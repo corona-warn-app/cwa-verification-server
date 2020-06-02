@@ -47,6 +47,13 @@
     <license.projectName>Corona-Warn-App / cwa-verification</license.projectName>
     <license.inceptionYear>2020</license.inceptionYear>
     <license.licenseName>apache_v2</license.licenseName>
+    <sonar.coverage.exclusions>
+      **/VerificationApplication.java,
+      **/model/*,
+      **/domain/*,
+      **/config/*,
+      **/exception/*
+    </sonar.coverage.exclusions>    
   </properties>
 
   <dependencyManagement>
@@ -255,5 +262,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

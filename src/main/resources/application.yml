@@ -32,5 +32,5 @@ uri:
     labserver: http://localhost:8088
 entities:
   cleanup:
-    days: 14
-    rate: 60000
+    days: 21
+    rate: 3600000

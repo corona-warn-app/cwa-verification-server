@@ -27,7 +27,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * This class represents the tele transaction number (Tele TAN).
+ * This class represents the tele transaction number (teleTAN).
  */
 @Schema
 @Data

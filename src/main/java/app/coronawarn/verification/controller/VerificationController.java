@@ -93,11 +93,11 @@ public class VerificationController {
   /**
    * The lower bound for the Secure Random.
    */
-  private static int MIN_CALCULATION_TIME = 100;
+  private static final int MIN_CALCULATION_TIME = 100;
   /**
    * The upper bound for the Secure Random.
    */
-  private static int RANDOM_UPPER_BOUND = 150;
+  private static final int RANDOM_UPPER_BOUND = 150;
   @NonNull
   private final AppSessionService appSessionService;
 

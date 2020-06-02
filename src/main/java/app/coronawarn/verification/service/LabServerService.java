@@ -40,6 +40,11 @@ public class LabServerService {
   @NonNull
   private final LabServerClient labServerClient;
 
+  /**
+   * This method gives an TestResult for a guid.
+   * @param guid hashed GUID
+   * @return Testresult for GUID
+   */
   public TestResult result(HashedGuid guid) {
     return labServerClient.result(guid);
   }

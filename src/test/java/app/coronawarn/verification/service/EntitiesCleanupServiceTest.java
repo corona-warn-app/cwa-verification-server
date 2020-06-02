@@ -70,7 +70,7 @@ public class EntitiesCleanupServiceTest {
 
   @Test
   public void cleanupDatabaseTest() {
-    LocalDateTime testCreationTime = LocalDateTime.now().minus(Period.ofDays(14));
+    LocalDateTime testCreationTime = LocalDateTime.now().minus(Period.ofDays(21));
     // create repo 1
     VerificationAppSession session = appSessionRepository.save(getAppSessionTestData(testCreationTime));
     Assert.assertNotNull(session);

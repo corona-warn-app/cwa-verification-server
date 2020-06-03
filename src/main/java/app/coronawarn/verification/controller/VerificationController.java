@@ -286,7 +286,7 @@ public class VerificationController {
       description = "A teleTAN is a human readable TAN with 7 characters which is supposed to be issued via call line"
   )
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "201", description = "TeleTan created"),})
+    @ApiResponse(responseCode = "201", description = "TeleTan created")})
   @PostMapping(value = TELE_TAN_ROUTE,
       produces = MediaType.APPLICATION_JSON_VALUE
   )

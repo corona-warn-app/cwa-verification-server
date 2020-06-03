@@ -56,12 +56,10 @@ public class JwtService {
   private VerificationApplicationConfig verificationApplicationConfig;
 
   /**
-   * Validates the given token. If one of the given roles
-   * {@link AuthorizationRole} exists.
+   * Validates the given token is null and starts with the needed prefix.
    *
    * @param authorizationToken The authorization token to validate
-   * @return <code>true</code>, if the token is valid, otherwise
-   * <code>false</code>
+   * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
    */
   public boolean isAuthorized(String authorizationToken) {
     if (null != authorizationToken && authorizationToken.startsWith(JwtService.TOKEN_PREFIX)) {
@@ -71,7 +69,13 @@ public class JwtService {
     return false;
   }
 
-  private boolean validateToken(final String token) {
+  /**
+   * Validates the given token. If one of the given roles {@link AuthorizationRole} exists.
+   *
+   * @param token The authorization token to validate
+   * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
+   */
+  public boolean validateToken(final String token) {
     try {
       List<String> roleNames = getRoles(token);
       AuthorizationRole[] roles = AuthorizationRole.values();

@@ -107,7 +107,7 @@ public class VerificationApplicationTest {
   private ObjectMapper mapper;
 
   @Autowired
-  private JwtService jwTService;
+  private JwtService jwtService;
   @Value("${jwt.secret}")
   private String secret;
 
@@ -193,8 +193,7 @@ public class VerificationApplicationTest {
   }
 
   /**
-   * Test generateTAN with an registration token where the tancounter maximum is
-   * reached.
+   * Test generateTAN with an registration token where the tancounter maximum is reached.
    *
    * @throws Exception if the test cannot be performed.
    */
@@ -213,8 +212,7 @@ public class VerificationApplicationTest {
   }
 
   /**
-   * Test generateTAN with an registration token connected to an appsession
-   * based on a tele Tan.
+   * Test generateTAN with an registration token connected to an appsession based on a tele Tan.
    *
    * @throws Exception if the test cannot be performed.
    */
@@ -262,8 +260,7 @@ public class VerificationApplicationTest {
   public void callGenerateTeleTAN() throws Exception {
     log.info("process callGenerateTeleTAN()");
     String jwtString = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    mockMvc
-      .perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
       .andExpect(status().isCreated());
   }
 
@@ -394,8 +391,7 @@ public class VerificationApplicationTest {
   }
 
   /**
-   * Test get registration token for a guid, but the guid already has a
-   * registration token.
+   * Test get registration token for a guid, but the guid already has a registration token.
    *
    * @throws Exception if the test cannot be performed.
    */
@@ -412,8 +408,7 @@ public class VerificationApplicationTest {
   }
 
   /**
-   * Test get registration token for a teletan, but the teletan already has a
-   * registration token.
+   * Test get registration token for a teletan, but the teletan already has a registration token.
    *
    * @throws Exception if the test cannot be performed.
    */

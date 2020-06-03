@@ -29,7 +29,9 @@ import lombok.NoArgsConstructor;
 /**
  * This class represents a registration token request.
  */
-@Schema
+@Schema(
+  description = "The registration token request model."
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

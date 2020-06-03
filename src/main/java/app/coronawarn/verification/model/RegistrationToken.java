@@ -31,11 +31,12 @@ import lombok.NoArgsConstructor;
  *
  * @author T-Systems International GmbH
  */
-@Schema
+@Schema(
+  description = "The registration token model."
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegistrationToken {
-
   private String token;
 }

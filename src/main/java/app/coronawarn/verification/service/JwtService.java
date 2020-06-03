@@ -71,7 +71,7 @@ public class JwtService {
     return false;
   }
 
-  boolean validateToken(final String token) {
+  final boolean validateToken(final String token) {
     try {
       List<String> roleNames = getRoles(token);
       AuthorizationRole[] roles = AuthorizationRole.values();

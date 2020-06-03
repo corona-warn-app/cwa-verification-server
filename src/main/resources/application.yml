@@ -24,6 +24,33 @@ springdoc:
     path: /api/docs
   swagger-ui:
     path: /api/swagger
+management:
+  server:
+    port: 8081
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        include: info,health,metrics,prometheus
+    jmx:
+      exposure:
+        include: info,health,metrics,prometheus
+  health:
+    probes:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 tan:
   tele:
     valid:

@@ -47,15 +47,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
-public class JwTServiceTest {
+public class JwtServiceTest {
 
   @Value("${jwt.secret}")
   private String secret;
 
   @Autowired
-  private JwTService jwTService;
+  private JwtService jwTService;
 
-  public JwTServiceTest() {
+  public JwtServiceTest() {
   }
 
   @BeforeClass
@@ -75,18 +75,18 @@ public class JwTServiceTest {
   }
 
   /**
-   * Test of validateToken method, of class JwTService.
+   * Test of validateToken method, of class JwtService.
    */
   @Test
   public void testValidateToken() throws UnsupportedEncodingException {
-    String jwToken = getJwtTestData(JwTService.Roles.AUTH_C19_HOTLINE, JwTService.Roles.AUTH_C19_HEALTHAUTHORITY);
+    String jwToken = getJwtTestData(JwtService.Roles.AUTH_C19_HOTLINE, JwtService.Roles.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertTrue(jwTService.validateToken(jwToken));
   }
 
-  private String getJwtTestData(JwTService.Roles... role) throws UnsupportedEncodingException {
+  private String getJwtTestData(JwtService.Roles... role) throws UnsupportedEncodingException {
     final Map<String, List<String>> realm_accessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
-    for (JwTService.Roles r : role) {
+    for (JwtService.Roles r : role) {
       roleNames.add(r.getRoleName());
     }
 

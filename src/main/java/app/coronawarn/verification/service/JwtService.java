@@ -21,10 +21,10 @@
 
 package app.coronawarn.verification.service;
 
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,30 +34,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class represents the JWT service for token validation.
+ */
 @Slf4j
 @Component
-public class JwTService implements Serializable {
-
-  @Value("${jwt.secret}")
-  private String secret;
+public class JwtService {
 
   public static final String TOKEN_PREFIX = "Bearer ";
-
-  public enum Roles {
-    AUTH_C19_HOTLINE("c19hotline"),
-    AUTH_C19_HEALTHAUTHORITY("c19healthauthority");
-
-    private final String roleName;
-
-    Roles(final String role) {
-      this.roleName = role;
-    }
-
-    public String getRoleName() {
-      return this.roleName;
-    }
-
-  }
+  private static final String ROLES = "roles";
+  private static final String REALM_ACCESS = "realm_access";
+  @Value("${jwt.secret}")
+  private String secret;
 
   /**
    * Validates the given token. If one of the given roles {@link Roles} exists.
@@ -90,15 +78,11 @@ public class JwTService implements Serializable {
     return realm.getOrDefault(ROLES, new ArrayList<>());
   }
 
-  private static final String ROLES = "roles";
-
   private Map<String, List<String>> getRealmFromToken(final String token) {
     final Claims claims = getAllClaimsFromToken(token);
     Map<String, List<String>> realms = claims.get(REALM_ACCESS, Map.class);
     return realms;
   }
-
-  private static final String REALM_ACCESS = "realm_access";
 
   public <T> T getClaimFromToken(final String token, Function<Claims, T> claimsResolver) {
     final Claims claims = getAllClaimsFromToken(token);
@@ -119,4 +103,19 @@ public class JwTService implements Serializable {
     return new byte[0];
   }
 
+  public enum Roles {
+    AUTH_C19_HOTLINE("c19hotline"),
+    AUTH_C19_HEALTHAUTHORITY("c19healthauthority");
+
+    private final String roleName;
+
+    Roles(final String role) {
+      this.roleName = role;
+    }
+
+    public String getRoleName() {
+      return this.roleName;
+    }
+
+  }
 }

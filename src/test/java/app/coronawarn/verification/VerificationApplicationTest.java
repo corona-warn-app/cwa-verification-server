@@ -26,7 +26,7 @@ import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.*;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
-import app.coronawarn.verification.service.JwTService;
+import app.coronawarn.verification.service.JwtService;
 import app.coronawarn.verification.service.LabServerService;
 import app.coronawarn.verification.service.TanService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -116,7 +116,7 @@ public class VerificationApplicationTest {
   private ObjectMapper mapper;
 
   @Autowired
-  private JwTService jwTService;
+  private JwtService jwTService;
   @Value("${jwt.secret}")
   private String secret;
 
@@ -268,7 +268,7 @@ public class VerificationApplicationTest {
   @Test
   public void callGenerateTeleTAN() throws Exception {
     log.info("process callGenerateTeleTAN()");
-    String jwtString = getJwtTestData(JwTService.Roles.AUTH_C19_HEALTHAUTHORITY);
+    String jwtString = getJwtTestData(JwtService.Roles.AUTH_C19_HEALTHAUTHORITY);
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
     .andExpect(status().isCreated());
   }
@@ -583,10 +583,10 @@ public class VerificationApplicationTest {
     .andExpect(status().isNotFound());
   }
 
-  private String getJwtTestData(JwTService.Roles... role) throws UnsupportedEncodingException {
+  private String getJwtTestData(JwtService.Roles... role) throws UnsupportedEncodingException {
     final Map<String, List<String>> realm_accessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
-    for (JwTService.Roles r : role) {
+    for (JwtService.Roles r : role) {
       roleNames.add(r.getRoleName());
     }
 

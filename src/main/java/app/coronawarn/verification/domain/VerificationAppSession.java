@@ -74,12 +74,15 @@ public class VerificationAppSession implements Serializable {
   private String teleTanHash;
 
   @Column(name = "tan_counter")
-  private Integer tanCounter;
+  private int tanCounter;
 
   @Column(name = "sot")
   @Enumerated(EnumType.STRING)
   private AppSessionSourceOfTrust sourceOfTrust;
 
+  /**
+   * This method increments the tan counter.
+   */
   public void incrementTanCounter() {
     this.tanCounter++;
   }

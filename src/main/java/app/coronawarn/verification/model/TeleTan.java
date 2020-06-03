@@ -27,15 +27,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * This class represents the tele transaction number (Tele TAN).
- *
- * @author T-Systems International GmbH
+ * This class represents the tele transaction number (teleTAN).
  */
-@Schema
+@Schema(
+  description = "The teleTAN model."
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeleTan {
-
   private String value;
 }

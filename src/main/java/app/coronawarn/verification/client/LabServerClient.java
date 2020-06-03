@@ -21,15 +21,22 @@
 
 package app.coronawarn.verification.client;
 
+import app.coronawarn.verification.model.HashedGuid;
+import app.coronawarn.verification.model.TestResult;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 
 /**
- * This class represents the Labor Server service client.
+ * This class represents the Labor Server service feign client.
  */
 @FeignClient(name = "labServerService", url = "${uri.endpoint.labserver}")
 public interface LabServerClient {
+  /**
+   * This method gets a testResult from the LabServer.
+   * @param guid for Testresult
+   * @return Testresult from server
+   */
   @PostMapping(value = "/api/v1/app/result",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE

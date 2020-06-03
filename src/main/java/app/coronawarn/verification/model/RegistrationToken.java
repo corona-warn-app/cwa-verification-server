@@ -22,14 +22,14 @@
 package app.coronawarn.verification.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
  * This class represents the registration Token.
- *
- * @author T-Systems International GmbH
  */
 @Schema(
   description = "The registration token model."
@@ -38,5 +38,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegistrationToken {
-  private String token;
+  @NotNull
+  @Pattern(regexp = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$")
+  private String registrationToken;
 }

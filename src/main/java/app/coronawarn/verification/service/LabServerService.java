@@ -21,9 +21,9 @@
 
 package app.coronawarn.verification.service;
 
-import app.coronawarn.verification.client.HashedGuid;
 import app.coronawarn.verification.client.LabServerClient;
-import app.coronawarn.verification.client.TestResult;
+import app.coronawarn.verification.model.HashedGuid;
+import app.coronawarn.verification.model.TestResult;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +40,11 @@ public class LabServerService {
   @NonNull
   private final LabServerClient labServerClient;
 
+  /**
+   * This method gives an TestResult for a guid.
+   * @param guid hashed GUID
+   * @return Testresult for GUID
+   */
   public TestResult result(HashedGuid guid) {
     return labServerClient.result(guid);
   }

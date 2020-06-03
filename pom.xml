@@ -5,7 +5,7 @@
 
   <groupId>app.coronawarn.verification</groupId>
   <artifactId>cwa-verification-server</artifactId>
-  <version>0.3.2-SNAPSHOT</version>
+  <version>0.5.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>cwa-verification-server</name>
@@ -42,6 +42,14 @@
     <plugin.sonar.version>3.6.1.1688</plugin.sonar.version>
     <plugin.jacoco.version>0.8.5</plugin.jacoco.version>
     <guava.version>29.0-jre</guava.version>
+    
+    <sonar.coverage.exclusions>
+      **/VerificationApplication.java,
+      **/model/*,
+      **/domain/*,
+      **/config/*,
+      **/exception/*
+    </sonar.coverage.exclusions>    
   </properties>
 
   <dependencyManagement>
@@ -92,6 +100,10 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
     <dependency>
@@ -101,6 +113,10 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.cloud</groupId>
@@ -118,6 +134,10 @@
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt</artifactId>
       <version>${jsonwebtoken.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-sleuth</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -244,5 +264,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

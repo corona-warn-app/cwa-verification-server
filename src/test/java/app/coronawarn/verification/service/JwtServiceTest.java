@@ -79,11 +79,11 @@ public class JwtServiceTest {
    */
   @Test
   public void testValidateToken() throws UnsupportedEncodingException {
-    String jwToken = getJwtTestData(JwtService.Roles.AUTH_C19_HOTLINE, JwtService.Roles.AUTH_C19_HEALTHAUTHORITY);
+    String jwToken = getJwtTestData(3000, JwtService.Roles.AUTH_C19_HOTLINE, JwtService.Roles.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertTrue(jwTService.validateToken(jwToken));
   }
 
-  private String getJwtTestData(JwtService.Roles... role) throws UnsupportedEncodingException {
+  private String getJwtTestData(final long expirationSecondsToAdd, JwtService.Roles... role) throws UnsupportedEncodingException {
     final Map<String, List<String>> realm_accessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
     for (JwtService.Roles r : role) {
@@ -93,7 +93,7 @@ public class JwtServiceTest {
     realm_accessMap.put("roles", roleNames);
 
     return Jwts.builder()
-            .setExpiration(Date.from(Instant.now().plusSeconds(3000)))
+            .setExpiration(Date.from(Instant.now().plusSeconds(expirationSecondsToAdd)))
             .setIssuedAt(Date.from(Instant.now()))
             .setId("baeaa733-521e-4d2e-8abe-95bb440a9f5f")
             .setIssuer("http://localhost:8080/auth/realms/cwa")

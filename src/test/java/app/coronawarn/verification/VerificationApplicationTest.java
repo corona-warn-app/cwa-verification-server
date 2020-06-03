@@ -262,7 +262,7 @@ public class VerificationApplicationTest {
   @Test
   public void callGenerateTeleTAN() throws Exception {
     log.info("process callGenerateTeleTAN()");
-    String jwtString = getJwtTestData(3000, JwtService.Roles.AUTH_C19_HEALTHAUTHORITY);
+    String jwtString = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     mockMvc
       .perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
       .andExpect(status().isCreated());
@@ -580,7 +580,7 @@ public class VerificationApplicationTest {
       .andExpect(status().isNotFound());
   }
 
-  private String getJwtTestData(final long expirationSecondsToAdd, JwtService.Roles... role) throws UnsupportedEncodingException {
+  private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException {
     final Map<String, List<String>> realm_accessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
     for (AuthorizationRole role : roles) {

@@ -56,11 +56,11 @@ public class JwtServiceTest {
    */
   @Test
   public void testValidateToken() throws UnsupportedEncodingException {
-    String jwToken = getJwtTestData(3000, JwtService.Roles.AUTH_C19_HOTLINE, JwtService.Roles.AUTH_C19_HEALTHAUTHORITY);
+    String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertTrue(jwTService.validateToken(jwToken));
   }
 
-  private String getJwtTestData(final long expirationSecondsToAdd, JwtService.Roles... role) throws UnsupportedEncodingException {
+  private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException {
     final Map<String, List<String>> realm_accessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
     for (AuthorizationRole role : roles) {

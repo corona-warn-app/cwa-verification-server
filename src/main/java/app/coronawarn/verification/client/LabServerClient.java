@@ -28,7 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 
 /**
- * This class represents the Labor Server service client.
+ * This class represents the Labor Server service feign client.
  */
 @FeignClient(name = "labServerService", url = "${uri.endpoint.labserver}")
 public interface LabServerClient {

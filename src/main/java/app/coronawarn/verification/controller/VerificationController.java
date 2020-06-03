@@ -177,7 +177,7 @@ public class VerificationController {
             TestResult covidTestResult = labServerService.result(new HashedGuid(appSession.getHashedGuid()));
             if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()) {
               throw new VerificationServerException(HttpStatus.BAD_REQUEST, 
-                "Tan cannot be created, caused by the result of the labserver");
+                "Tan cannot be created, caused by the non positive result of the labserver");
             }
             break;
           case TELETAN:
@@ -260,7 +260,7 @@ public class VerificationController {
         })
         .map(t -> ResponseEntity.ok().build())
         .orElseGet(() -> {
-          log.info("The registration token is invalid.");
+          log.info("The Tan is invalid.");
           throw new VerificationServerException(HttpStatus.NOT_FOUND, "No Tan found");
         });
   }
@@ -281,6 +281,7 @@ public class VerificationController {
   )
   public ResponseEntity<TeleTan> createTeleTan() {
     String teleTan = tanService.generateVerificationTeleTan();
+    log.info("The teleTAN is generated.");
     return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));
   }
 }

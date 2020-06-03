@@ -36,7 +36,7 @@ import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TeleTan;
 import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.service.AppSessionService;
-import app.coronawarn.verification.service.JwTService;
+import app.coronawarn.verification.service.JwtService;
 import app.coronawarn.verification.service.LabServerService;
 import app.coronawarn.verification.service.TanService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -107,7 +107,7 @@ public class VerificationController {
   private VerificationApplicationConfig verificationApplicationConfig;
 
   @Autowired
-  private JwTService jwTService;
+  private JwtService jwTService;
 
   /**
    * This method generates a registrationToken by a hashed guid or a teleTAN.
@@ -300,8 +300,8 @@ public class VerificationController {
   }
 
   private boolean isAuthorized(String authorization) {
-    if (null != authorization && authorization.startsWith(JwTService.TOKEN_PREFIX)) {
-      String requestToken = authorization.substring(JwTService.TOKEN_PREFIX.length());
+    if (null != authorization && authorization.startsWith(JwtService.TOKEN_PREFIX)) {
+      String requestToken = authorization.substring(JwtService.TOKEN_PREFIX.length());
       return jwTService.validateToken(requestToken);
     }
     return false;

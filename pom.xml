@@ -32,6 +32,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <!-- dependencies -->
     <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
+    <spring-security.version>5.2.3.RELEASE</spring-security.version>
     <spring.cloud.version>Hoxton.SR4</spring.cloud.version>
     <lombok.version>1.18.12</lombok.version>
     <liquibase.version>3.9.0</liquibase.version>
@@ -179,7 +180,7 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
-      <version>4.1.4.RELEASE</version>
+      <version>${spring-security.version}</version>
       <type>jar</type>
     </dependency>
   </dependencies>

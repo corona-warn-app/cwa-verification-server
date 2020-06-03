@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>app.coronawarn.verification</groupId>
-    <artifactId>cwa-verification-server</artifactId>
-    <version>0.5.2-SNAPSHOT</version>
-    <packaging>jar</packaging>
+  <groupId>app.coronawarn.verification</groupId>
+  <artifactId>cwa-verification-server</artifactId>
+  <version>0.5.2-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
-    <name>cwa-verification-server</name>
-    <description>CWA verification server project.</description>
+  <name>cwa-verification-server</name>
+  <description>CWA verification server project.</description>
 
-    <url>https://www.coronawarn.app/</url>
-    <ciManagement>
-        <url>https://github.com/corona-warn-app/cwa-verification-server/actions?query=workflow%3Aci</url>
-    </ciManagement>
-    <issueManagement>
-        <url>https://github.com/corona-warn-app/cwa-verification-server/issues</url>
-    </issueManagement>
-    <scm>
-        <url>https://github.com/corona-warn-app/cwa-verification-server</url>
-    </scm>
+  <url>https://www.coronawarn.app/</url>
+  <ciManagement>
+    <url>https://github.com/corona-warn-app/cwa-verification-server/actions?query=workflow%3Aci</url>
+  </ciManagement>
+  <issueManagement>
+    <url>https://github.com/corona-warn-app/cwa-verification-server/issues</url>
+  </issueManagement>
+  <scm>
+    <url>https://github.com/corona-warn-app/cwa-verification-server</url>
+  </scm>
 
   <properties>
     <!-- java -->
@@ -43,49 +43,48 @@
     <plugin.sonar.version>3.6.1.1688</plugin.sonar.version>
     <plugin.jacoco.version>0.8.5</plugin.jacoco.version>
     <guava.version>29.0-jre</guava.version>
-    
-        <sonar.coverage.exclusions>
-            **/VerificationApplication.java,
-            **/model/*,
-            **/domain/*,
-            **/config/*,
-            **/exception/*
-        </sonar.coverage.exclusions>    
-    </properties>
+    <sonar.coverage.exclusions>
+      **/VerificationApplication.java,
+      **/model/*,
+      **/domain/*,
+      **/config/*,
+      **/exception/*
+    </sonar.coverage.exclusions>    
+  </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring.cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-ui</artifactId>
-                <version>${springdoc.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-core</artifactId>
-                <version>${liquibase.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring.cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-ui</artifactId>
+        <version>${springdoc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-core</artifactId>
+        <version>${liquibase.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <distributionManagement>
     <repository>

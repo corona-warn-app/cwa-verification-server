@@ -106,8 +106,8 @@ public class VerificationController {
   @NonNull
   private VerificationApplicationConfig verificationApplicationConfig;
 
-  @Autowired
-  private JwtService jwTService;
+  @NonNull
+  private JwtService jwtService;
 
   /**
    * This method generates a registrationToken by a hashed guid or a teleTAN.
@@ -302,9 +302,8 @@ public class VerificationController {
   private boolean isAuthorized(String authorization) {
     if (null != authorization && authorization.startsWith(JwtService.TOKEN_PREFIX)) {
       String requestToken = authorization.substring(JwtService.TOKEN_PREFIX.length());
-      return jwTService.validateToken(requestToken);
+      return jwtService.validateToken(requestToken);
     }
     return false;
   }
 }
-  

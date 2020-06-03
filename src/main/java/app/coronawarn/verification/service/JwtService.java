@@ -21,7 +21,8 @@
 
 package app.coronawarn.verification.service;
 
-
+import app.coronawarn.verification.config.VerificationApplicationConfig;
+import app.coronawarn.verification.model.AuthorizationRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -30,25 +31,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
  * This class represents the JWT service for token validation.
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class JwtService {
 
+  /**
+   * The prefix for the json web token.
+   */
   public static final String TOKEN_PREFIX = "Bearer ";
+
   private static final String ROLES = "roles";
   private static final String REALM_ACCESS = "realm_access";
-  @Value("${jwt.secret}")
-  private String secret;
+
+  @NonNull
+  private VerificationApplicationConfig verificationApplicationConfig;
 
   /**
-   * Validates the given token. If one of the given roles {@link Roles} exists.
+   * Validates the given token. If one of the given roles {@link AuthorizationRole} exists.
    *
    * @param token The token to validate
    * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
@@ -56,8 +64,8 @@ public class JwtService {
   public boolean validateToken(final String token) {
     try {
       List<String> roleNames = getRoles(token);
-      Roles[] roles = Roles.values();
-      for (Roles role : roles) {
+      AuthorizationRole[] roles = AuthorizationRole.values();
+      for (AuthorizationRole role : roles) {
         if (roleNames.contains(role.getRoleName())) {
           return true;
         }
@@ -95,6 +103,7 @@ public class JwtService {
 
   private byte[] getSecret() {
     try {
+      String secret = verificationApplicationConfig.getJwt().getSecret();
       return secret.getBytes("UTF-8");
     } catch (UnsupportedEncodingException ex) {
       //log.warn(ex.getMessage(), ex);
@@ -103,19 +112,4 @@ public class JwtService {
     return new byte[0];
   }
 
-  public enum Roles {
-    AUTH_C19_HOTLINE("c19hotline"),
-    AUTH_C19_HEALTHAUTHORITY("c19healthauthority");
-
-    private final String roleName;
-
-    Roles(final String role) {
-      this.roleName = role;
-    }
-
-    public String getRoleName() {
-      return this.roleName;
-    }
-
-  }
 }

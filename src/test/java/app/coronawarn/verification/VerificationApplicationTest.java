@@ -18,6 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package app.coronawarn.verification;
 
 import app.coronawarn.verification.model.HashedGuid;
@@ -35,13 +36,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -50,9 +48,6 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,7 +63,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
@@ -138,9 +132,9 @@ public class VerificationApplicationTest {
     doReturn(TEST_LAB_POSITIVE_RESULT).when(labServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-    .contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-    .andExpect(status().isCreated());
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+      .andExpect(status().isCreated());
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
@@ -164,9 +158,9 @@ public class VerificationApplicationTest {
     log.info("process callGenerateTanByUnknownToken()");
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-    .contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-    .andExpect(status().isBadRequest());
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+      .andExpect(status().isBadRequest());
   }
 
   /**
@@ -196,9 +190,9 @@ public class VerificationApplicationTest {
     doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-    .contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-    .andExpect(status().isBadRequest());
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+      .andExpect(status().isBadRequest());
   }
 
   /**
@@ -235,9 +229,9 @@ public class VerificationApplicationTest {
     doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-    .contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-    .andExpect(status().isCreated());
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+      .andExpect(status().isCreated());
   }
 
   /**
@@ -255,9 +249,9 @@ public class VerificationApplicationTest {
     doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-    .contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-    .andExpect(status().isBadRequest());
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+      .andExpect(status().isBadRequest());
   }
 
   /**
@@ -268,9 +262,9 @@ public class VerificationApplicationTest {
   @Test
   public void callGenerateTeleTAN() throws Exception {
     log.info("process callGenerateTeleTAN()");
-    String jwtString = getJwtTestData(JwtService.Roles.AUTH_C19_HEALTHAUTHORITY);
+    String jwtString = getJwtTestData(AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
-    .andExpect(status().isCreated());
+      .andExpect(status().isCreated());
   }
 
   /**
@@ -377,9 +371,9 @@ public class VerificationApplicationTest {
     given(this.tanService.getEntityByTan(TEST_TELE_TAN)).willReturn(Optional.empty());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-    .contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(request)))
-    .andExpect(status().isBadRequest());
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(request)))
+      .andExpect(status().isBadRequest());
   }
 
   /**
@@ -394,9 +388,9 @@ public class VerificationApplicationTest {
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_INVALID_GUI_HASH, RegistrationTokenKeyType.GUID);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-    .contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(request)))
-    .andExpect(status().isBadRequest());
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(request)))
+      .andExpect(status().isBadRequest());
   }
 
   /**
@@ -411,9 +405,9 @@ public class VerificationApplicationTest {
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-    .contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(request)))
-    .andExpect(status().isBadRequest());
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(request)))
+      .andExpect(status().isBadRequest());
   }
 
   /**
@@ -435,9 +429,9 @@ public class VerificationApplicationTest {
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_TELE_TAN, RegistrationTokenKeyType.TELETAN);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-    .contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(request)))
-    .andExpect(status().isBadRequest());
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(request)))
+      .andExpect(status().isBadRequest());
   }
 
   /**
@@ -454,9 +448,9 @@ public class VerificationApplicationTest {
     given(this.labServerService.result(new HashedGuid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-    .andExpect(status().isOk())
-    .andExpect(jsonPath("$.testResult").value(TEST_LAB_POSITIVE_RESULT.getTestResult()));
+      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.testResult").value(TEST_LAB_POSITIVE_RESULT.getTestResult()));
   }
 
   /**
@@ -472,9 +466,9 @@ public class VerificationApplicationTest {
     appSessionrepository.deleteAll();
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/testresult")
-    .contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-    .andExpect(status().isBadRequest());
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
+      .andExpect(status().isBadRequest());
   }
 
   /**
@@ -491,9 +485,9 @@ public class VerificationApplicationTest {
     assertFalse("Is TAN redeemed?", this.tanService.getEntityByTan(TEST_TAN).get().isRedeemed());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify")
-    .contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(new Tan(TEST_TAN))))
-    .andExpect(status().isOk());
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(new Tan(TEST_TAN))))
+      .andExpect(status().isOk());
   }
 
   /**
@@ -507,9 +501,9 @@ public class VerificationApplicationTest {
 
     // without mock tanService.getEntityByTan so this method will return empty entity
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify")
-    .contentType(MediaType.APPLICATION_JSON)
-    .content(getAsJsonFormat(new Tan(TEST_TAN))))
-    .andExpect(status().isNotFound());
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(new Tan(TEST_TAN))))
+      .andExpect(status().isNotFound());
   }
 
   /**
@@ -579,40 +573,40 @@ public class VerificationApplicationTest {
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON)
-	.content(getAsJsonFormat(new Tan(TEST_TAN))))
-    .andExpect(status().isNotFound());
+      .content(getAsJsonFormat(new Tan(TEST_TAN))))
+      .andExpect(status().isNotFound());
   }
 
-  private String getJwtTestData(JwtService.Roles... role) throws UnsupportedEncodingException {
+  private String getJwtTestData(AuthorizationRole... roles) throws UnsupportedEncodingException {
     final Map<String, List<String>> realm_accessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
-    for (JwtService.Roles r : role) {
-      roleNames.add(r.getRoleName());
+    for (AuthorizationRole role : roles) {
+      roleNames.add(role.getRoleName());
     }
 
     realm_accessMap.put("roles", roleNames);
 
     return Jwts.builder()
-    .setExpiration(Date.from(Instant.now().plusSeconds(3000)))
-    .setIssuedAt(Date.from(Instant.now()))
-    .setId("baeaa733-521e-4d2e-8abe-95bb440a9f5f")
-    .setIssuer("http://localhost:8080/auth/realms/cwa")
-    .setAudience("account")
-    .setSubject("72b3b494-a0f4-49f5-b235-1e9f93c86e58")
-    .claim("auth_time", "1590742669")
-    .claim("iss", "http://localhost:8080/auth/realms/cwa")
-    .claim("aud", "account")
-    .claim("typ", "Bearer")
-    .claim("azp", "verification-portal")
-    .claim("session_state", "41cc4d83-e394-4d08-b887-28d8c5372d4a")
-    .claim("acr", "0")
-    .claim("realm_access", realm_accessMap)
-    .claim("resource_access", new HashMap())
-    .claim("scope", "openid profile email")
-    .claim("email_verified", false)
-    .claim("preferred_username", "test")
-    .signWith(SignatureAlgorithm.HS256, secret.getBytes("UTF-8"))
-    .compact();
+      .setExpiration(Date.from(Instant.now().plusSeconds(3000)))
+      .setIssuedAt(Date.from(Instant.now()))
+      .setId("baeaa733-521e-4d2e-8abe-95bb440a9f5f")
+      .setIssuer("http://localhost:8080/auth/realms/cwa")
+      .setAudience("account")
+      .setSubject("72b3b494-a0f4-49f5-b235-1e9f93c86e58")
+      .claim("auth_time", "1590742669")
+      .claim("iss", "http://localhost:8080/auth/realms/cwa")
+      .claim("aud", "account")
+      .claim("typ", "Bearer")
+      .claim("azp", "verification-portal")
+      .claim("session_state", "41cc4d83-e394-4d08-b887-28d8c5372d4a")
+      .claim("acr", "0")
+      .claim("realm_access", realm_accessMap)
+      .claim("resource_access", new HashMap())
+      .claim("scope", "openid profile email")
+      .claim("email_verified", false)
+      .claim("preferred_username", "test")
+      .signWith(SignatureAlgorithm.HS256, secret.getBytes("UTF-8"))
+      .compact();
   }
 
   private void prepareAppSessionTestData() {

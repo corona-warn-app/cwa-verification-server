@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
  * This class represents the transaction number.
  */
 @Schema(
-  description = "The the transaction number model."
+  description = "The transaction number model."
 )
 @Data
 @NoArgsConstructor

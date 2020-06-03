@@ -26,6 +26,7 @@ import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
+import app.coronawarn.verification.model.AuthorizationToken;
 import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.LabTestResult;
 import app.coronawarn.verification.model.RegistrationToken;
@@ -48,7 +49,6 @@ import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -290,20 +290,14 @@ public class VerificationController {
   @PostMapping(value = TELE_TAN_ROUTE,
       produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public ResponseEntity<TeleTan> createTeleTan(@RequestHeader(REQ_HEADER_X_AUTH_TOKEN) String authorization) {
-    if (isAuthorized(authorization)) {
+  public ResponseEntity<TeleTan> createTeleTan(
+    @RequestHeader(REQ_HEADER_X_AUTH_TOKEN) @Valid AuthorizationToken authorization) {
+    if (jwtService.isAuthorized(authorization.getToken())) {
       String teleTan = tanService.generateVerificationTeleTan();
       log.info("The teleTAN is generated.");
       return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));
     }
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    throw new VerificationServerException(HttpStatus.UNAUTHORIZED, "JWT is invalid.");
   }
 
-  private boolean isAuthorized(String authorization) {
-    if (null != authorization && authorization.startsWith(JwtService.TOKEN_PREFIX)) {
-      String requestToken = authorization.substring(JwtService.TOKEN_PREFIX.length());
-      return jwtService.validateToken(requestToken);
-    }
-    return false;
-  }
 }

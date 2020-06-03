@@ -25,7 +25,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 /**
- * This class represents an Exception of the VerificationServer.
+ * This class represents the Verification Server Exception.
  */
 @Getter
 public class VerificationServerException extends RuntimeException {

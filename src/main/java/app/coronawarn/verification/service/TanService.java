@@ -245,7 +245,7 @@ public class TanService {
    * @return Optional VerificationTan
    */
   public Optional<VerificationTan> getEntityByTan(String tan) {
-    log.info("TanService start getEntityByTan.");
+    log.info("Start getEntityByTan.");
     return tanRepository.findByTanHash(hashingService.hash(tan));
   }
 

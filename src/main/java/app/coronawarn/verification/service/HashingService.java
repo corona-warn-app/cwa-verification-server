@@ -28,7 +28,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * This class represents the hashing service.
+ * This class represents the hashing service for providing and check a hash string.
  */
 @Slf4j
 @Component

@@ -21,8 +21,6 @@
 
 package app.coronawarn.verification;
 
-import app.coronawarn.verification.model.HashedGuid;
-import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.*;
@@ -48,6 +46,7 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
+
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,7 +57,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -196,7 +194,8 @@ public class VerificationApplicationTest {
   }
 
   /**
-   * Test generateTAN with an registration token where the tancounter maximum is reached.
+   * Test generateTAN with an registration token where the tancounter maximum is
+   * reached.
    *
    * @throws Exception if the test cannot be performed.
    */
@@ -215,7 +214,8 @@ public class VerificationApplicationTest {
   }
 
   /**
-   * Test generateTAN with an registration token connected to an appsession based on a tele Tan.
+   * Test generateTAN with an registration token connected to an appsession
+   * based on a tele Tan.
    *
    * @throws Exception if the test cannot be performed.
    */
@@ -262,8 +262,9 @@ public class VerificationApplicationTest {
   @Test
   public void callGenerateTeleTAN() throws Exception {
     log.info("process callGenerateTeleTAN()");
-    String jwtString = getJwtTestData(AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
+    String jwtString = getJwtTestData(3000, JwtService.Roles.AUTH_C19_HEALTHAUTHORITY);
+    mockMvc
+      .perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
       .andExpect(status().isCreated());
   }
 
@@ -394,7 +395,8 @@ public class VerificationApplicationTest {
   }
 
   /**
-   * Test get registration token for a guid, but the guid already has a registration token.
+   * Test get registration token for a guid, but the guid already has a
+   * registration token.
    *
    * @throws Exception if the test cannot be performed.
    */
@@ -411,7 +413,8 @@ public class VerificationApplicationTest {
   }
 
   /**
-   * Test get registration token for a teletan, but the teletan already has a registration token.
+   * Test get registration token for a teletan, but the teletan already has a
+   * registration token.
    *
    * @throws Exception if the test cannot be performed.
    */
@@ -577,7 +580,7 @@ public class VerificationApplicationTest {
       .andExpect(status().isNotFound());
   }
 
-  private String getJwtTestData(AuthorizationRole... roles) throws UnsupportedEncodingException {
+  private String getJwtTestData(final long expirationSecondsToAdd, JwtService.Roles... role) throws UnsupportedEncodingException {
     final Map<String, List<String>> realm_accessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
     for (AuthorizationRole role : roles) {
@@ -587,7 +590,7 @@ public class VerificationApplicationTest {
     realm_accessMap.put("roles", roleNames);
 
     return Jwts.builder()
-      .setExpiration(Date.from(Instant.now().plusSeconds(3000)))
+      .setExpiration(Date.from(Instant.now().plusSeconds(expirationSecondsToAdd)))
       .setIssuedAt(Date.from(Instant.now()))
       .setId("baeaa733-521e-4d2e-8abe-95bb440a9f5f")
       .setIssuer("http://localhost:8080/auth/realms/cwa")

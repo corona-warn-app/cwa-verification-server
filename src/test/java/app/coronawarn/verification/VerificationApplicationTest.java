@@ -34,19 +34,17 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
-
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,10 +55,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
@@ -262,7 +261,7 @@ public class VerificationApplicationTest {
   @Test
   public void callGenerateTeleTAN() throws Exception {
     log.info("process callGenerateTeleTAN()");
-    String jwtString = getJwtTestData(3000, JwtService.Roles.AUTH_C19_HEALTHAUTHORITY);
+    String jwtString = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     mockMvc
       .perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
       .andExpect(status().isCreated());
@@ -580,7 +579,7 @@ public class VerificationApplicationTest {
       .andExpect(status().isNotFound());
   }
 
-  private String getJwtTestData(final long expirationSecondsToAdd, JwtService.Roles... role) throws UnsupportedEncodingException {
+  private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException {
     final Map<String, List<String>> realm_accessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
     for (AuthorizationRole role : roles) {

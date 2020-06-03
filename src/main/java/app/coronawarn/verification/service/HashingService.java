@@ -38,13 +38,13 @@ public class HashingService {
   private static final Pattern PATTERN = Pattern.compile(GUID_HASH_PATTERN);
 
   /**
-   * Returns the hash of the supplied string.
+   * Calculates the SHA-256 digest and returns the value as a hex string.
    *
    * @param toHash that will be Hashed
    * @return the hash of the supplied string
    */
   public String hash(String toHash) {
-    log.info("Hash has been called.");
+    log.info("Hash process has been called.");
     return DigestUtils.sha256Hex(toHash);
   }
 

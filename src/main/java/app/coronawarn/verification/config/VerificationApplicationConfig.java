@@ -26,8 +26,8 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * This class is used to read in values from configuration file application.yml.
- * It is loaded via the @EnableConfigurationProperties annotation from SpringBootApplication main class.
+ * This class is used to read in values from configuration file application.yml, which is loaded via the
+ * '@EnableConfigurationProperties' annotation from SpringBootApplication main class.
  */
 @Getter
 @Setter
@@ -39,9 +39,7 @@ public class VerificationApplicationConfig {
   private EntitiesCfg entities;
 
   /**
-   * Configure the TeleValidCfg with build property values.
-   *
-   * @return the configured paramters
+   * Configure the TeleCfg with build property values and return the configured parameters.
    */
   public static class TeleCfg {
     @Getter
@@ -49,9 +47,7 @@ public class VerificationApplicationConfig {
     private TeleValidCfg valid;
 
     /**
-     * Configure the TeleValidCfg with build property values.
-     *
-     * @return the configured paramters
+     * Configure the TeleValidCfg with build property values and return the configured parameters.
      */
     public static class TeleValidCfg {
       @Getter
@@ -61,9 +57,7 @@ public class VerificationApplicationConfig {
   }
 
   /**
-   * Configure the ValidCfg with build property values.
-   *
-   * @return the configured paramters
+   * Configure the ValidCfg with build property values and return the configured parameters.
    */
   public static class ValidCfg {
     @Getter
@@ -72,9 +66,7 @@ public class VerificationApplicationConfig {
   }
 
   /**
-   * Configure the TanCfg with build property values.
-   *
-   * @return the configured paramters
+   * Configure the TanCfg with build property values and return the configured parameters.
    */
   public static class TanCfg {
     @Getter
@@ -86,9 +78,7 @@ public class VerificationApplicationConfig {
   }
 
   /**
-   * Configure the AppSessionCfg with build property values.
-   *
-   * @return the configured paramters
+   * Configure the AppSessionCfg with build property values and return the configured parameters.
    */
   public static class AppSessionCfg {
     @Getter
@@ -97,9 +87,7 @@ public class VerificationApplicationConfig {
   }
 
   /**
-   * Configure the CleanupCfg with build property values.
-   *
-   * @return the configured paramters
+   * Configure the EntitiesCfg with build property values and return the configured parameters.
    */
   public static class EntitiesCfg {
     @Getter
@@ -108,9 +96,7 @@ public class VerificationApplicationConfig {
   }
 
   /**
-   * Configure the CleanupCfg with build property values.
-   *
-   * @return the configured paramters
+   * Configure the CleanupCfg with build property values and return the configured parameters.
    */
   public static class CleanupCfg {
     @Getter

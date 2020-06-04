@@ -157,13 +157,11 @@ public class TanService {
    * @return a new teleTAN
    */
   public String generateTeleTan() {
-    return IntStream.range(0, TELE_TAN_LENGTH)
-      .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
-      .collect(Collector.of(
-        StringBuilder::new,
-        StringBuilder::append,
-        StringBuilder::append,
-        StringBuilder::toString));
+    return Holder.NUMBER_GENERATOR
+        .ints(TELE_TAN_LENGTH, 0, TELE_TAN_ALLOWED_CHARS.length())
+        .map(TELE_TAN_ALLOWED_CHARS::codePointAt)
+        .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+        .toString();
   }
 
   /**

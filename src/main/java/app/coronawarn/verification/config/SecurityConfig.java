@@ -48,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     http.authorizeRequests()
       .mvcMatchers("/api/**").permitAll()
       .mvcMatchers("/version/**").permitAll()
-      .mvcMatchers("/management/*").permitAll()
+      .mvcMatchers("/actuator/**").permitAll()
       .anyRequest().denyAll()
       .and().csrf().disable();
   }

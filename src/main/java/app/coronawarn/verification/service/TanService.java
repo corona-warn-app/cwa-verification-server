@@ -113,10 +113,10 @@ public class TanService {
     boolean verified = false;
     if (syntaxTeleTanVerification(teleTan)) {
       Optional<VerificationTan> teleTanEntity = getEntityByTan(teleTan);
-      if (teleTanEntity.isPresent() && !teleTanEntity.get().isRedeemed()) {
+      if (teleTanEntity.isPresent() && teleTanEntity.get().canBeRedeemed(LocalDateTime.now())) {
         verified = true;
       } else {
-        log.warn("The teleTAN is unknown or already redeemed.");
+        log.warn("The teleTAN is unknown, expired or already redeemed.");
       }
     } else {
       log.warn("The teleTAN is not valid to the syntax constraints.");
@@ -158,12 +158,12 @@ public class TanService {
    */
   public String generateTeleTan() {
     return IntStream.range(0, TELE_TAN_LENGTH)
-        .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
-        .collect(Collector.of(
-            StringBuilder::new,
-            StringBuilder::append,
-            StringBuilder::append,
-            StringBuilder::toString));
+      .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
+      .collect(Collector.of(
+        StringBuilder::new,
+        StringBuilder::append,
+        StringBuilder::append,
+        StringBuilder::toString));
   }
 
   /**

@@ -121,6 +121,6 @@ public class VerificationApplicationConfig {
   public static class JwtCfg {
     @Getter
     @Setter
-    private String secret;
+    private String server;
   }
 }

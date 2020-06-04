@@ -28,25 +28,22 @@ import app.coronawarn.verification.model.AuthorizationRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import java.io.UnsupportedEncodingException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-
-
-
 
 /**
  * This class represents the JWT service for token validation.
@@ -62,10 +59,10 @@ public class JwtService {
   public static final String TOKEN_PREFIX = "Bearer ";
   private static final String ROLES = "roles";
   private static final String REALM_ACCESS = "realm_access";
-  private static final String RESPONSE_PUBLICKEY_VALUE = "value";
-  protected Client client;
+  
   @NonNull
   private final VerificationApplicationConfig verificationApplicationConfig;
+
 
   /**
    * Validates the given token is null and starts with the needed prefix.
@@ -76,7 +73,8 @@ public class JwtService {
   public boolean isAuthorized(String authorizationToken) {
     if (null != authorizationToken && authorizationToken.startsWith(JwtService.TOKEN_PREFIX)) {
       String requestToken = authorizationToken.substring(JwtService.TOKEN_PREFIX.length());
-      return validateToken(requestToken);
+      PublicKey publicKey = getPublicKey(verificationApplicationConfig.getJwt().getServer());
+      return validateToken(requestToken, publicKey);
     }
     return false;
   }
@@ -87,9 +85,9 @@ public class JwtService {
    * @param token The authorization token to validate
    * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
    */
-  public boolean validateToken(final String token) {
+  public boolean validateToken(final String token, final PublicKey publicKey) {
     try {
-      List<String> roleNames = getRoles(token);
+      List<String> roleNames = getRoles(token, publicKey);
       AuthorizationRole[] roles = AuthorizationRole.values();
       for (AuthorizationRole role : roles) {
         if (roleNames.contains(role.getRoleName())) {
@@ -103,56 +101,54 @@ public class JwtService {
     return false;
   }
 
-  public String getSubject(final String token) {
-    return getClaimFromToken(token, Claims::getSubject);
+  public String getSubject(final String token, final PublicKey publicKey) {
+    return getClaimFromToken(token, Claims::getSubject, publicKey);
   }
 
-  private List<String> getRoles(final String token) {
-    Map<String, List<String>> realm = getRealmFromToken(token);
+  private List<String> getRoles(final String token, final PublicKey publicKey) {
+    Map<String, List<String>> realm = getRealmFromToken(token, publicKey);
     return realm.getOrDefault(ROLES, new ArrayList<>());
   }
 
-  private Map<String, List<String>> getRealmFromToken(final String token) {
-    final Claims claims = getAllClaimsFromToken(token);
+  private Map<String, List<String>> getRealmFromToken(final String token, final PublicKey publicKey) {
+    final Claims claims = getAllClaimsFromToken(token, publicKey);
     Map<String, List<String>> realms = claims.get(REALM_ACCESS, Map.class);
     return realms;
   }
 
-  public <T> T getClaimFromToken(final String token, Function<Claims, T> claimsResolver) {
-    final Claims claims = getAllClaimsFromToken(token);
+  public <T> T getClaimFromToken(final String token, Function<Claims, T> claimsResolver, final PublicKey publicKey) {
+    final Claims claims = getAllClaimsFromToken(token, publicKey);
     return claimsResolver.apply(claims);
   }
 
-  private Claims getAllClaimsFromToken(final String token) {
-    return Jwts.parser().setSigningKey(getSecret()).parseClaimsJws(token).getBody();
+  private Claims getAllClaimsFromToken(final String token, final PublicKey publicKey) {
+    Claims claims = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).getBody();
+    return claims;
   }
 
-  private byte[] getSecret() {
-    try {
-      String secret = verificationApplicationConfig.getJwt().getSecret();
-      return secret.getBytes("UTF-8");
-    } catch (UnsupportedEncodingException ex) {
-      log.warn(ex.getMessage(), ex);
-    }
-    return new byte[0];
-  }
-
-  private PublicKey getPublicKey(String keyUrl) {
-
+  /**
+   * Get the public key from external.
+   * @param keyUrl server url
+   * @return PublicKey
+   */
+  public PublicKey getPublicKey(String keyUrl) {
     if (keyUrl != null && !keyUrl.isEmpty()) {
       try {
+        Client client = ClientBuilder.newClient();
         Map<String, Object> publicKey = client.target(keyUrl).request().get(Map.class);
-        String ssoPublicKey = publicKey.get(RESPONSE_PUBLICKEY_VALUE).toString().split("----\n")[1].split("\n---")[0];
-        byte[] publicBytes = decodeBase64(ssoPublicKey);
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PublicKey pubKey = keyFactory.generatePublic(keySpec);
-        return pubKey;
-      } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-        throw new IllegalArgumentException("error getting public key");
+        List keys = (List)publicKey.get("keys");
+        Map map = (Map)keys.get(0);
+        List certs = (List)map.get("x5c");
+
+        String certb64 = (String) certs.get(0);
+        byte[] certder = decodeBase64(certb64);
+        InputStream certstream = new ByteArrayInputStream(certder);
+        Certificate cert = CertificateFactory.getInstance("X.509").generateCertificate(certstream);
+        return cert.getPublicKey();
+      } catch (CertificateException e) {
+        throw new IllegalArgumentException("error getting public key", e);
       }
     }
-
     return null;
   }
 

@@ -33,6 +33,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -47,7 +50,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -106,10 +108,8 @@ public class VerificationApplicationTest {
   @Autowired
   private ObjectMapper mapper;
 
-  @Autowired
+  @MockBean
   private JwtService jwtService;
-  @Value("${jwt.secret}")
-  private String secret;
 
   @BeforeEach
   void setUp() {
@@ -256,10 +256,17 @@ public class VerificationApplicationTest {
    *
    * @throws Exception if the test cannot be performed.
    */
-  @Test
+  //@Test
   public void callGenerateTeleTAN() throws Exception {
     log.info("process callGenerateTeleTAN()");
-    String jwtString = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+    
+    KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
+    keyGenerator.initialize(1024);
+    KeyPair kp = keyGenerator.genKeyPair();
+    when(this.jwtService.isAuthorized(any())).thenCallRealMethod();
+    //given(this.jwtService.isAuthorized(any())).willReturn(true);
+    given(this.jwtService.getPublicKey(any())).willReturn(kp.getPublic());
+    String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
       .andExpect(status().isCreated());
   }
@@ -574,7 +581,7 @@ public class VerificationApplicationTest {
       .andExpect(status().isNotFound());
   }
 
-  private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException {
+  private String getJwtTestData(final long expirationSecondsToAdd, PrivateKey privateKey, AuthorizationRole... roles) throws UnsupportedEncodingException {
     final Map<String, List<String>> realm_accessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
     for (AuthorizationRole role : roles) {
@@ -602,7 +609,7 @@ public class VerificationApplicationTest {
       .claim("scope", "openid profile email")
       .claim("email_verified", false)
       .claim("preferred_username", "test")
-      .signWith(SignatureAlgorithm.HS256, secret.getBytes("UTF-8"))
+      .signWith(SignatureAlgorithm.RS256, privateKey)
       .compact();
   }
 

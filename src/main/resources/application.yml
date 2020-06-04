@@ -20,7 +20,7 @@ feign:
         read-timeout: 5000
         logger-level: basic
 jwt:
-  secret: covid19
+  server: http://localhost:8080/auth/realms/cwa/protocol/openid-connect/certs
 springdoc:
   api-docs:
     path: /api/docs

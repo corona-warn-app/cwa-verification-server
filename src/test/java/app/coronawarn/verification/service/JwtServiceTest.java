@@ -26,6 +26,11 @@ import app.coronawarn.verification.model.AuthorizationRole;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +53,18 @@ public class JwtServiceTest {
 
   @Autowired
   private JwtService jwTService;
+  PublicKey publicKey;
+  PrivateKey privateKey;
+  
+  @Before
+  public void setUp() throws NoSuchAlgorithmException {
+    KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
+    keyGenerator.initialize(1024);
+    KeyPair kp = keyGenerator.genKeyPair();
+    publicKey = (PublicKey) kp.getPublic();
+    privateKey = (PrivateKey) kp.getPrivate();    
+  }  
+  
 
   /**
    * Test of validateToken method, of class JwtService.
@@ -54,19 +72,18 @@ public class JwtServiceTest {
    * @throws java.io.UnsupportedEncodingException
    */
   @Test
-  public void testValidateToken() throws UnsupportedEncodingException {
+  public void testValidateToken() throws UnsupportedEncodingException, NoSuchAlgorithmException  {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    Assert.assertTrue(jwTService.validateToken(jwToken));
+    Assert.assertTrue(jwTService.validateToken(jwToken, publicKey));
   }
 
-  private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException {
+  private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException, NoSuchAlgorithmException {
     final Map<String, List<String>> realm_accessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
     for (AuthorizationRole role : roles) {
       roleNames.add(role.getRoleName());
     }
-
-    String secret = "covid19";
+    
     realm_accessMap.put("roles", roleNames);
 
     return Jwts.builder()
@@ -88,7 +105,7 @@ public class JwtServiceTest {
       .claim("scope", "openid profile email")
       .claim("email_verified", false)
       .claim("preferred_username", "test")
-      .signWith(SignatureAlgorithm.HS256, secret.getBytes("UTF-8"))
+      .signWith(SignatureAlgorithm.RS256, privateKey)
       .compact();
   }
 }

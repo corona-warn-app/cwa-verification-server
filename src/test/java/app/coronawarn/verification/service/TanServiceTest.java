@@ -26,6 +26,11 @@ import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,12 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
@@ -61,6 +60,7 @@ public class TanServiceTest {
   private static final String TELE_TAN_REGEX = "^[2-9A-HJ-KMNP-Z]{7}$";
   private static final String TAN_REGEX = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$";
   private static final TanSourceOfTrust TEST_TELE_TAN_SOURCE_OF_TRUST = TanSourceOfTrust.TELETAN;
+  private static final TanSourceOfTrust TEST_TAN_SOURCE_OF_TRUST = TanSourceOfTrust.CONNECTED_LAB;
   private static final Pattern TELE_TAN_PATTERN = Pattern.compile(TELE_TAN_REGEX);
   private static final Pattern TAN_PATTERN = Pattern.compile(TAN_REGEX);
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSS");
@@ -165,7 +165,7 @@ public class TanServiceTest {
 
   @Test
   public void generateValidTan() {
-    String tan = tanService.generateValidTan();
+    String tan = tanService.generateVerificationTan(TEST_TAN_SOURCE_OF_TRUST);
     assertTrue(syntaxTanVerification(tan));
     assertFalse(tan.isEmpty());
   }

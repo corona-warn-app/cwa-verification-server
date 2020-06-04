@@ -129,11 +129,11 @@ public class TanService {
    *
    * @return a Valid TAN String
    */
-  public String generateValidTan() {
+  private String generateValidTan() {
     boolean validTan = false;
     String newTan = "";
     while (!validTan) {
-      newTan = generateTanFromUuid();
+      newTan = UUID.randomUUID().toString();
       validTan = checkTanNotExist(newTan);
     }
     return newTan;
@@ -174,11 +174,6 @@ public class TanService {
    */
   public boolean isTeleTanValid(String teleTan) {
     return syntaxTeleTanVerification(teleTan);
-  }
-
-  private String generateTanFromUuid() {
-    // A UUID is a 128 bit value
-    return UUID.randomUUID().toString();
   }
 
   /**

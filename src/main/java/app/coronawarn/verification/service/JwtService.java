@@ -75,7 +75,7 @@ public class JwtService {
    * @param token The authorization token to validate
    * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
    */
-  public boolean validateToken(final String token) {
+  final boolean validateToken(final String token) {
     try {
       List<String> roleNames = getRoles(token);
       AuthorizationRole[] roles = AuthorizationRole.values();

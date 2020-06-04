@@ -23,7 +23,6 @@ package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.VerificationApplication;
 import app.coronawarn.verification.model.AuthorizationRole;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.UnsupportedEncodingException;
@@ -33,7 +32,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Assert;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,14 +50,26 @@ public class JwtServiceTest {
   private JwtService jwTService;
 
   /**
-   * Test of validateToken method, of class JwtService.
+   * Test to validate an valid Token, with the {@link JwtService#validateToken(java.lang.String)} method.
    *
    * @throws java.io.UnsupportedEncodingException
    */
   @Test
-  public void testValidateToken() throws UnsupportedEncodingException {
-    String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    Assert.assertTrue(jwTService.validateToken(jwToken));
+  public void testValidToken() throws UnsupportedEncodingException {
+    String jwToken = getJwtTestData(120, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+    assertTrue(jwTService.validateToken(jwToken));
+  }
+
+  @Test
+  /**
+   * Test to validate an expired Token, with the {@link JwtService#validateToken(java.lang.String)} method.
+   *
+   * @throws java.io.UnsupportedEncodingException
+   */
+
+  public void testExpiredToken() throws UnsupportedEncodingException {
+    String jwToken = getJwtTestData(0, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+    assertFalse(jwTService.validateToken(jwToken));
   }
 
   private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException {

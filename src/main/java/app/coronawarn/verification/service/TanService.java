@@ -113,15 +113,10 @@ public class TanService {
     boolean verified = false;
     if (syntaxTeleTanVerification(teleTan)) {
       Optional<VerificationTan> teleTanEntity = getEntityByTan(teleTan);
-      if (teleTanEntity.isPresent() && !teleTanEntity.get().isRedeemed()) {
-        if (teleTanEntity.get().getValidUntil().isBefore(LocalDateTime.now())) {
-          log.warn("The teleTAN is already expired.");
-          return verified;
-        } else {
-          verified = true;
-        }
+      if (teleTanEntity.isPresent() && teleTanEntity.get().canBeRedeemed(LocalDateTime.now())) {
+        verified = true;
       } else {
-        log.warn("The teleTAN is unknown or already redeemed.");
+        log.warn("The teleTAN is unknown, expired or already redeemed.");
       }
     } else {
       log.warn("The teleTAN is not valid to the syntax constraints.");

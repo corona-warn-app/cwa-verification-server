@@ -64,7 +64,8 @@ public class TanServiceTest {
   private static final Pattern TELE_TAN_PATTERN = Pattern.compile(TELE_TAN_REGEX);
   private static final Pattern TAN_PATTERN = Pattern.compile(TAN_REGEX);
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSS");
-  private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
+  private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(14);
+  private static final LocalDateTime TELE_TAN_VALID_UNTIL_IN_HOURS = LocalDateTime.now().plusHours(1);
 
   @Autowired
   private TanService tanService;
@@ -148,7 +149,7 @@ public class TanServiceTest {
     tan.setRedeemed(false);
     tan.setTanHash(TEST_TELE_TAN_HASH);
     tan.setValidFrom(start);
-    tan.setValidUntil(LocalDateTime.parse((TAN_VALID_UNTIL_IN_DAYS.format(FORMATTER))));
+    tan.setValidUntil(LocalDateTime.parse((TELE_TAN_VALID_UNTIL_IN_HOURS.format(FORMATTER))));
     tan.setType(TanType.TELETAN.name());
     tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
     tanService.saveTan(tan);
@@ -196,6 +197,17 @@ public class TanServiceTest {
   @Test
   public void verifyUnknownTeleTan() {
     String teleTan = tanService.generateTeleTan();
+    assertFalse(tanService.verifyTeleTan(teleTan));
+  }
+
+  @Test
+  public void verifyExpiredTeleTan() {
+    String teleTan = tanService.generateVerificationTeleTan();
+    VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).get();
+    LocalDateTime validFrom = LocalDateTime.now().minusHours(1).minusMinutes(1);
+    teleTanFromDB.setValidFrom(validFrom);
+    teleTanFromDB.setValidUntil(validFrom.plusHours(1));
+    tanService.saveTan(teleTanFromDB);
     assertFalse(tanService.verifyTeleTan(teleTan));
   }
 

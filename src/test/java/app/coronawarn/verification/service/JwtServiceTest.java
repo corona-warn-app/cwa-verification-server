@@ -55,15 +55,9 @@ public class JwtServiceTest {
    * @throws java.io.UnsupportedEncodingException
    */
   @Test
-  public void testValidToken() throws UnsupportedEncodingException {
-    String jwToken = getJwtTestData(120, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+  public void testValidateToken() throws UnsupportedEncodingException {
+    String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertTrue(jwTService.validateToken(jwToken));
-  }
-
-  @Test
-  public void testExpiredToken() throws UnsupportedEncodingException {
-    String jwToken = getJwtTestData(0, AuthorizationRole.AUTH_C19_HOTLINE);
-    Assert.assertFalse(jwTService.validateToken(jwToken));
   }
 
   private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException {

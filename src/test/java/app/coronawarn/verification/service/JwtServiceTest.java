@@ -32,8 +32,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,13 +60,13 @@ public class JwtServiceTest {
     assertTrue(jwTService.validateToken(jwToken));
   }
 
-  @Test
+  
   /**
    * Test to validate an expired Token, with the {@link JwtService#validateToken(java.lang.String)} method.
    *
    * @throws java.io.UnsupportedEncodingException
    */
-
+  @Test
   public void testExpiredToken() throws UnsupportedEncodingException {
     String jwToken = getJwtTestData(0, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     assertFalse(jwTService.validateToken(jwToken));

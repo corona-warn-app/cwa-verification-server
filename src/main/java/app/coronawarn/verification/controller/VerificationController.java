@@ -209,7 +209,7 @@ public class VerificationController {
   @Operation(
     summary = "COVID-19 test result for given RegistrationToken",
     description = "Gets the result of COVID-19 Test. "
-      + "If the RegistrationToken belongs to a TeleTan the result is always positve"
+      + "If the RegistrationToken belongs to a TeleTan the result is always positive"
   )
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Testresult retrieved")})

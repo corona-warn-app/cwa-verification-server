@@ -63,7 +63,7 @@ Whether you cloned or downloaded the 'zipped' sources you will either find the s
 In either case open a terminal pointing to the directory you put the sources in. The local build process is described afterwards depending on the way you choose.
 
 #### Maven based build
-This is the recommmended way for taking part in the development.  
+This is the recommended way for taking part in the development.  
 Please check, whether following prerequisites are installed on your machine:
 - [Open JDK 11](https://openjdk.java.net) or a similar JDK 11 compatible VM  
 - [Maven](https://maven.apache.org)

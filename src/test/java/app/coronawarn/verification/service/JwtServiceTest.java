@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +69,7 @@ public class JwtServiceTest {
   
 
   /**
-   * Test of validateToken method, of class JwtService.
+   * Test to validate an valid Token, with the {@link JwtService#validateToken(java.lang.String)} method.
    *
    * @throws java.io.UnsupportedEncodingException
    */
@@ -75,6 +77,16 @@ public class JwtServiceTest {
   public void testValidateToken() throws UnsupportedEncodingException, NoSuchAlgorithmException  {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertTrue(jwTService.validateToken(jwToken, publicKey));
+  
+  /**
+   * Test to validate an expired Token, with the {@link JwtService#validateToken(java.lang.String)} method.
+   *
+   * @throws java.io.UnsupportedEncodingException
+   */
+  @Test
+  public void testExpiredToken() throws UnsupportedEncodingException {
+    String jwToken = getJwtTestData(0, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+    assertFalse(jwTService.validateToken(jwToken));
   }
 
   private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException, NoSuchAlgorithmException {

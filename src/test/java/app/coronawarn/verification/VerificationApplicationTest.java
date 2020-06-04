@@ -125,11 +125,12 @@ public class VerificationApplicationTest {
     log.info("Got {} verification entries from db repository.", count);
     assertEquals(1, count, "Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ");
 
-    List<VerificationAppSession> verficationList = appSessionrepository.findAll();
-    assertNotNull(verficationList);
-    assertEquals(TEST_GUI_HASH, verficationList.get(0).getHashedGuid());
-    assertEquals(AppSessionSourceOfTrust.HASHED_GUID, verficationList.get(0).getSourceOfTrust());
-    assertEquals(TEST_REG_TOK_HASH, verficationList.get(0).getRegistrationTokenHash());
+
+    List<VerificationAppSession> verificationList = appSessionrepository.findAll();
+    assertNotNull(verificationList);
+    assertEquals(TEST_GUI_HASH, verificationList.get(0).getHashedGuid());
+    assertEquals(AppSessionSourceOfTrust.HASHED_GUID, verificationList.get(0).getSourceOfTrust());
+    assertEquals(TEST_REG_TOK_HASH, verificationList.get(0).getRegistrationTokenHash());
 
   }
 
@@ -272,6 +273,7 @@ public class VerificationApplicationTest {
     log.info("Got {} verification entries from db repository.", count);
     assertEquals(1, count, "Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ");
 
+
     List<VerificationAppSession> verificationList = appSessionrepository.findAll();
     assertNotNull(verificationList);
     assertEquals(TEST_GUI_HASH, verificationList.get(0).getHashedGuid());
@@ -334,6 +336,7 @@ public class VerificationApplicationTest {
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
     assertEquals(1, count, "Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ");
+
 
     List<VerificationAppSession> verificationList = appSessionrepository.findAll();
     assertNotNull(verificationList);

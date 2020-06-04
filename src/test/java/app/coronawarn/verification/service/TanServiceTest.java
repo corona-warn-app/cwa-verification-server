@@ -26,6 +26,11 @@ import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,12 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -61,10 +60,12 @@ public class TanServiceTest {
   private static final String TELE_TAN_REGEX = "^[2-9A-HJ-KMNP-Z]{7}$";
   private static final String TAN_REGEX = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$";
   private static final TanSourceOfTrust TEST_TELE_TAN_SOURCE_OF_TRUST = TanSourceOfTrust.TELETAN;
+  private static final TanSourceOfTrust TEST_TAN_SOURCE_OF_TRUST = TanSourceOfTrust.CONNECTED_LAB;
   private static final Pattern TELE_TAN_PATTERN = Pattern.compile(TELE_TAN_REGEX);
   private static final Pattern TAN_PATTERN = Pattern.compile(TAN_REGEX);
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSS");
-  private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
+  private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(14);
+  private static final LocalDateTime TELE_TAN_VALID_UNTIL_IN_HOURS = LocalDateTime.now().plusHours(1);
 
   @Autowired
   private TanService tanService;
@@ -148,7 +149,7 @@ public class TanServiceTest {
     tan.setRedeemed(false);
     tan.setTanHash(TEST_TELE_TAN_HASH);
     tan.setValidFrom(start);
-    tan.setValidUntil(LocalDateTime.parse((TAN_VALID_UNTIL_IN_DAYS.format(FORMATTER))));
+    tan.setValidUntil(LocalDateTime.parse((TELE_TAN_VALID_UNTIL_IN_HOURS.format(FORMATTER))));
     tan.setType(TanType.TELETAN.name());
     tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
     tanService.saveTan(tan);
@@ -164,7 +165,7 @@ public class TanServiceTest {
 
   @Test
   public void generateValidTan() {
-    String tan = tanService.generateValidTan();
+    String tan = tanService.generateVerificationTan(TEST_TAN_SOURCE_OF_TRUST);
     assertTrue(syntaxTanVerification(tan));
     assertFalse(tan.isEmpty());
   }
@@ -196,6 +197,17 @@ public class TanServiceTest {
   @Test
   public void verifyUnknownTeleTan() {
     String teleTan = tanService.generateTeleTan();
+    assertFalse(tanService.verifyTeleTan(teleTan));
+  }
+
+  @Test
+  public void verifyExpiredTeleTan() {
+    String teleTan = tanService.generateVerificationTeleTan();
+    VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).get();
+    LocalDateTime validFrom = LocalDateTime.now().minusHours(1).minusMinutes(1);
+    teleTanFromDB.setValidFrom(validFrom);
+    teleTanFromDB.setValidUntil(validFrom.plusHours(1));
+    tanService.saveTan(teleTanFromDB);
     assertFalse(tanService.verifyTeleTan(teleTan));
   }
 

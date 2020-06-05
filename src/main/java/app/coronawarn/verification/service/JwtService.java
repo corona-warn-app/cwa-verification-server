@@ -57,10 +57,9 @@ public class JwtService {
   public static final String TOKEN_PREFIX = "Bearer ";
   private static final String ROLES = "roles";
   private static final String REALM_ACCESS = "realm_access";
-  
+
   @NonNull
   private final IamClient iamClient;
-
 
   /**
    * Validates the given token is null and starts with the needed prefix.
@@ -81,6 +80,7 @@ public class JwtService {
    * Validates the given token. If one of the given roles {@link AuthorizationRole} exists.
    *
    * @param token The authorization token to validate
+   * @param publicKey the key from the certificate
    * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
    */
   public boolean validateToken(final String token, final PublicKey publicKey) {

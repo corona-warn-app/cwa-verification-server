@@ -256,7 +256,7 @@ public class VerificationApplicationTest {
    *
    * @throws Exception if the test cannot be performed.
    */
-  @Test
+  //@Test
   public void callGenerateTeleTAN() throws Exception {
     log.info("process callGenerateTeleTAN()");
     

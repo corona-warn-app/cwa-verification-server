@@ -256,19 +256,37 @@ public class VerificationApplicationTest {
    *
    * @throws Exception if the test cannot be performed.
    */
-  //@Test
+  @Test
   public void callGenerateTeleTAN() throws Exception {
     log.info("process callGenerateTeleTAN()");
-    
+
     KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
     keyGenerator.initialize(1024);
     KeyPair kp = keyGenerator.genKeyPair();
     when(this.jwtService.isAuthorized(any())).thenCallRealMethod();
-    //given(this.jwtService.isAuthorized(any())).willReturn(true);
     given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
     String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
       .andExpect(status().isCreated());
+  }
+
+  /**
+   * Test the generation of a tele Tan, when the jwt is not authorized.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGenerateTeleTanUnauthorized() throws Exception {
+    log.info("process callGenerateTeleTanUnauthorized()");
+
+    KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
+    keyGenerator.initialize(1024);
+    KeyPair kp = keyGenerator.genKeyPair();
+    given(this.jwtService.isAuthorized(any())).willReturn(false);
+    given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
+    String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
+      .andExpect(status().isUnauthorized());
   }
 
   /**

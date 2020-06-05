@@ -21,8 +21,6 @@
 
 package app.coronawarn.verification.service;
 
-import static org.apache.commons.codec.binary.Base64.decodeBase64;
-
 import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.model.AuthorizationRole;
 import io.jsonwebtoken.Claims;
@@ -45,6 +43,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import static org.apache.commons.codec.binary.Base64.decodeBase64;
+
 /**
  * This class represents the JWT service for token validation.
  */
@@ -59,10 +59,9 @@ public class JwtService {
   public static final String TOKEN_PREFIX = "Bearer ";
   private static final String ROLES = "roles";
   private static final String REALM_ACCESS = "realm_access";
-  
+
   @NonNull
   private final VerificationApplicationConfig verificationApplicationConfig;
-
 
   /**
    * Validates the given token is null and starts with the needed prefix.
@@ -83,6 +82,7 @@ public class JwtService {
    * Validates the given token. If one of the given roles {@link AuthorizationRole} exists.
    *
    * @param token The authorization token to validate
+   * @param publicKey the key from the certificate
    * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
    */
   public boolean validateToken(final String token, final PublicKey publicKey) {
@@ -128,6 +128,7 @@ public class JwtService {
 
   /**
    * Get the public key from external.
+   *
    * @param keyUrl server url
    * @return PublicKey
    */
@@ -136,9 +137,9 @@ public class JwtService {
       try {
         Client client = ClientBuilder.newClient();
         Map<String, Object> publicKey = client.target(keyUrl).request().get(Map.class);
-        List keys = (List)publicKey.get("keys");
-        Map map = (Map)keys.get(0);
-        List certs = (List)map.get("x5c");
+        List keys = (List) publicKey.get("keys");
+        Map map = (Map) keys.get(0);
+        List certs = (List) map.get("x5c");
 
         String certb64 = (String) certs.get(0);
         byte[] certder = decodeBase64(certb64);

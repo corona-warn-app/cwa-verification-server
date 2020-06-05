@@ -7,10 +7,11 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ResourceUtils;
 
-
+@Configuration
 public class TestResultServerClientConfiguration {
 
   @Autowired

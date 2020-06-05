@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
  * This class represents the Labor Server service feign client.
  */
 @FeignClient(
-  name = "testResultServer",
+  name = "labServerService",
   url = "${cwa-testresult-server.url}",
   configuration = TestResultServerClientConfiguration.class)
 public interface TestResultServerClient {

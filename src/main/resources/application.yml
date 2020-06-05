@@ -59,10 +59,15 @@ tan:
     days: 14
 appsession:
   tancountermax: 2
-uri:
-  endpoint:
-    labserver: http://localhost:8088
 entities:
   cleanup:
     days: 21
     rate: 3600000
+
+cwa-testresult-server:
+  url: http://localhost:8088
+  path:
+    result: /api/v1/app/result
+  ssl:
+    one-way-authentication-enabled: false
+    two-way-authentication-enabled: false

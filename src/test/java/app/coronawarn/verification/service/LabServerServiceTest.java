@@ -23,7 +23,7 @@ package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.VerificationApplication;
 import app.coronawarn.verification.model.HashedGuid;
-import app.coronawarn.verification.client.LabServerClient;
+import app.coronawarn.verification.client.TestResultServerClient;
 import app.coronawarn.verification.model.TestResult;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class LabServerServiceTest {
 
   @Before
   public void setUp() {
-    labServerService = new LabServerService(new LabServerClientMock());
+    labServerService = new LabServerService(new TestResultServerClientMock());
   }
 
   /**
@@ -68,7 +68,7 @@ public class LabServerServiceTest {
     assertThat(testResult).isEqualTo(TEST_LAB_REDEEMED_RESULT);
   }  
 
-  public static class LabServerClientMock implements LabServerClient {
+  public static class TestResultServerClientMock implements TestResultServerClient {
     @Override
     public TestResult result(HashedGuid guid) {
       if(guid.getId().equals(TEST_GUI_HASH_1)){

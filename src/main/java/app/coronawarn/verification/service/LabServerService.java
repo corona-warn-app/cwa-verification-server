@@ -21,7 +21,7 @@
 
 package app.coronawarn.verification.service;
 
-import app.coronawarn.verification.client.LabServerClient;
+import app.coronawarn.verification.client.TestResultServerClient;
 import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.TestResult;
 import lombok.NonNull;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 public class LabServerService {
 
   @NonNull
-  private final LabServerClient labServerClient;
+  private final TestResultServerClient testResultServerClient;
 
   /**
    * This method gives an TestResult for a guid.
@@ -46,6 +46,6 @@ public class LabServerService {
    * @return Testresult for GUID
    */
   public TestResult result(HashedGuid guid) {
-    return labServerClient.result(guid);
+    return testResultServerClient.result(guid);
   }
 }

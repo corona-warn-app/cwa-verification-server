@@ -26,81 +26,67 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * This class is used to read in values from configuration file application.yml, which is loaded via the
- * '@EnableConfigurationProperties' annotation from SpringBootApplication main class.
+ * This class and its nested subclasses are used to read in values from configuration file application.yml,
+ * which is loaded via the '@EnableConfigurationProperties' annotation from SpringBootApplication main class.
  */
 @Getter
 @Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
 
-  private TanCfg tan;
-  private AppSessionCfg appsession;
-  private EntitiesCfg entities;
+  private TanCfg tan = new TanCfg();
+  private AppSessionCfg appsession = new AppSessionCfg();
+  private EntitiesCfg entities = new EntitiesCfg();
 
-  /**
-   * Configure the TeleCfg with build property values and return the configured parameters.
-   */
   public static class TeleCfg {
     @Getter
     @Setter
-    private TeleValidCfg valid;
+    private TeleValidCfg valid = new TeleValidCfg();
 
-    /**
-     * Configure the TeleValidCfg with build property values and return the configured parameters.
-     */
     public static class TeleValidCfg {
+
+      // Number of hours that teleTAN remains valid
       @Getter
       @Setter
-      private int hours;
+      private int hours = 1;
     }
   }
 
-  /**
-   * Configure the ValidCfg with build property values and return the configured parameters.
-   */
   public static class ValidCfg {
+
+    // Number of days that TAN remains valid
     @Getter
     @Setter
-    int days;
+    int days = 14;
   }
 
-  /**
-   * Configure the TanCfg with build property values and return the configured parameters.
-   */
   public static class TanCfg {
     @Getter
     @Setter
-    private TeleCfg tele;
+    private TeleCfg tele = new TeleCfg();
+
     @Getter
     @Setter
-    private ValidCfg valid;
+    private ValidCfg valid = new ValidCfg();
   }
 
-  /**
-   * Configure the AppSessionCfg with build property values and return the configured parameters.
-   */
   public static class AppSessionCfg {
+
+    // Maximum number of tans in a session at one time
     @Getter
     @Setter
-    int tancountermax;
+    int tancountermax = 2;
   }
 
-  /**
-   * Configure the EntitiesCfg with build property values and return the configured parameters.
-   */
   public static class EntitiesCfg {
     @Getter
     @Setter
-    private CleanupCfg cleanup;
+    private CleanupCfg cleanup = new CleanupCfg();
   }
 
-  /**
-   * Configure the CleanupCfg with build property values and return the configured parameters.
-   */
   public static class CleanupCfg {
     @Getter
     @Setter
-    private Integer days;
+    private Integer days = 21;
   }
 }

@@ -38,7 +38,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     StrictHttpFirewall firewall = new StrictHttpFirewall();
     firewall.setAllowedHttpMethods(Arrays.asList(
       HttpMethod.GET.name(),
-      HttpMethod.POST.name()
+      HttpMethod.POST.name(),
+      HttpMethod.HEAD.name()
     ));
     return firewall;
   }

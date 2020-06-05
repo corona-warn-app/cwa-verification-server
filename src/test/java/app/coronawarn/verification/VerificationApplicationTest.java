@@ -256,7 +256,7 @@ public class VerificationApplicationTest {
    *
    * @throws Exception if the test cannot be performed.
    */
-  //@Test
+  @Test
   public void callGenerateTeleTAN() throws Exception {
     log.info("process callGenerateTeleTAN()");
     
@@ -265,7 +265,7 @@ public class VerificationApplicationTest {
     KeyPair kp = keyGenerator.genKeyPair();
     when(this.jwtService.isAuthorized(any())).thenCallRealMethod();
     //given(this.jwtService.isAuthorized(any())).willReturn(true);
-    given(this.jwtService.getPublicKey(any())).willReturn(kp.getPublic());
+    given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
     String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
       .andExpect(status().isCreated());

@@ -107,7 +107,7 @@ public class VerificationController {
   private VerificationApplicationConfig verificationApplicationConfig;
 
   @NonNull
-  private JwtService jwtService;
+  private final JwtService jwtService;
 
   /**
    * This method generates a registrationToken by a hashed guid or a teleTAN.

@@ -46,15 +46,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
 public class JwtServiceTest {
 
-  @Autowired
-  private JwtService jwTService;
   PublicKey publicKey;
   PrivateKey privateKey;
+  
+  @Autowired
+  private JwtService jwtService;  
   
   @Before
   public void setUp() throws NoSuchAlgorithmException {
@@ -70,22 +72,36 @@ public class JwtServiceTest {
    * Test to validate an valid Token, with the {@link JwtService#validateToken(java.lang.String)} method.
    *
    * @throws java.io.UnsupportedEncodingException
+   * @throws java.security.NoSuchAlgorithmException
    */
   @Test
   public void testValidateToken() throws UnsupportedEncodingException, NoSuchAlgorithmException  {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    Assert.assertTrue(jwTService.validateToken(jwToken, publicKey));
+    Assert.assertTrue(jwtService.validateToken(jwToken, publicKey));
   }
+  
+  /**
+   * Test to validate an valid Token, with the {@link JwtService#validateToken(java.lang.String)} method.
+   *
+   * @throws java.io.UnsupportedEncodingException
+   * @throws java.security.NoSuchAlgorithmException
+   */
+  // @Test
+  public void testAuthorizedToken() throws UnsupportedEncodingException, NoSuchAlgorithmException  {
+    String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+    Assert.assertTrue(jwtService.isAuthorized("Bearer " + jwToken));
+  }  
   
   /**
    * Test to validate an expired Token, with the {@link JwtService#validateToken(java.lang.String)} method.
    *
    * @throws java.io.UnsupportedEncodingException
+   * @throws java.security.NoSuchAlgorithmException
    */
   @Test
   public void testExpiredToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(0, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    Assert.assertFalse(jwTService.validateToken(jwToken, publicKey));
+    Assert.assertFalse(jwtService.validateToken(jwToken, publicKey));
   }
 
   private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException, NoSuchAlgorithmException {

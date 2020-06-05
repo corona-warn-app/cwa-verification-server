@@ -23,7 +23,7 @@ package app.coronawarn.verification.service;
 
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
 
-import app.coronawarn.verification.config.VerificationApplicationConfig;
+import app.coronawarn.verification.client.IamClient;
 import app.coronawarn.verification.model.AuthorizationRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -38,8 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +59,7 @@ public class JwtService {
   private static final String REALM_ACCESS = "realm_access";
   
   @NonNull
-  private final VerificationApplicationConfig verificationApplicationConfig;
+  private final IamClient iamClient;
 
 
   /**
@@ -72,9 +70,9 @@ public class JwtService {
    */
   public boolean isAuthorized(String authorizationToken) {
     if (null != authorizationToken && authorizationToken.startsWith(JwtService.TOKEN_PREFIX)) {
-      String requestToken = authorizationToken.substring(JwtService.TOKEN_PREFIX.length());
-      PublicKey publicKey = getPublicKey(verificationApplicationConfig.getJwt().getServer());
-      return validateToken(requestToken, publicKey);
+      String jwtToken = authorizationToken.substring(JwtService.TOKEN_PREFIX.length());
+      PublicKey publicKey = getPublicKey();
+      return validateToken(jwtToken, publicKey);
     }
     return false;
   }
@@ -128,28 +126,23 @@ public class JwtService {
 
   /**
    * Get the public key from external.
-   * @param keyUrl server url
+   *
    * @return PublicKey
    */
-  public PublicKey getPublicKey(String keyUrl) {
-    if (keyUrl != null && !keyUrl.isEmpty()) {
-      try {
-        Client client = ClientBuilder.newClient();
-        Map<String, Object> publicKey = client.target(keyUrl).request().get(Map.class);
-        List keys = (List)publicKey.get("keys");
-        Map map = (Map)keys.get(0);
-        List certs = (List)map.get("x5c");
-
-        String certb64 = (String) certs.get(0);
-        byte[] certder = decodeBase64(certb64);
-        InputStream certstream = new ByteArrayInputStream(certder);
-        Certificate cert = CertificateFactory.getInstance("X.509").generateCertificate(certstream);
-        return cert.getPublicKey();
-      } catch (CertificateException e) {
-        throw new IllegalArgumentException("error getting public key", e);
-      }
+  public PublicKey getPublicKey() {
+    try {
+      Map<String, Object> certs = iamClient.certs();
+      List keys = (List) certs.get("keys");
+      Map map = (Map) keys.get(0);
+      List x5cList = (List) map.get("x5c");
+      String certb64 = (String) x5cList.get(0);
+      byte[] certder = decodeBase64(certb64);
+      InputStream certstream = new ByteArrayInputStream(certder);
+      Certificate cert = CertificateFactory.getInstance("X.509").generateCertificate(certstream);
+      return cert.getPublicKey();
+    } catch (CertificateException e) {
+      log.info("Error getting public key.");
+      return null;
     }
-    return null;
   }
-
 }

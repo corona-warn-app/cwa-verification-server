@@ -207,7 +207,7 @@ API Endpoint:
 
 1.	Verify registrationToken, if registrationToken is invalid, exit with error HTTP 400
 2.	Verifiy whether the entity AppSession exists for the Registration token
-	1.	If yes, check if TANcounter >= 2
+	1.	If yes, check if TANcounter >= 1
 		1.	If yes, return error HTTP 400
 	1.	If no, return error HTTP 400
 3.	If AppSession.sourceOfTrust == “hashedGUID”
@@ -220,6 +220,7 @@ API Endpoint:
 5.	Persist TAN as entity TAN
 6.	Update entity AppSession, increment TANcounter
 7.	Return TAN string
+
 
 ###	Use Case Create teleTAN
 API Endpoint:

@@ -263,9 +263,12 @@ public class VerificationApplicationTest {
     KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
     keyGenerator.initialize(1024);
     KeyPair kp = keyGenerator.genKeyPair();
+    String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+
     when(this.jwtService.isAuthorized(any())).thenCallRealMethod();
     given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
-    String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+    when(this.jwtService.validateToken(jwtString, kp.getPublic())).thenCallRealMethod();
+
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
       .andExpect(status().isCreated());
   }

@@ -293,15 +293,16 @@ The entity TAN represents the authorization (sometimes referred as “proof”) 
 All data is deleted after 21 days.
 
 ##	Entity AppSession
-The entity AppSession is a hashed GUID which was used in processing to generate a TAN. The entity basically marks a GUID hash as “used”
+The entity AppSession is a hashed GUID which was used in processing to generate a TAN. The entity basically marks a GUID hash as “used”.
+
 |Name|	Not null|	Type|	Definition|
 | ------------- |:-------------:| -----:| -----:|
-|GUIDHash|	Y|	String[64]|	The hashed GUID.|
-|teleTANHash|	Y|	String[64]|	The hashed teleTAN.|
+|GUIDHash||	String[64]|	The hashed GUID.|
+|teleTANHash||	String[64]|	The hashed teleTAN.|
 |RegistrationTokenHash|	Y|	String[64]|	Hash of the Registration Token.|
 |TANcounter|	Y|Int|	Contains the number of TANs generated in the session|
 |sourceOfTrust|	Y|	String [“hashedGUID”, “teleTAN”]|Defines the type of the Session|
-|createdON|	Y|	Date	||
+|createdON|	Y|	Date	|Date of creation|
 
 ###	Data Deletion
 All data is deleted after 14 days.

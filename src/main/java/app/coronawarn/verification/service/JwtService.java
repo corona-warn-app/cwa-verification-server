@@ -21,6 +21,8 @@
 
 package app.coronawarn.verification.service;
 
+import static org.apache.commons.codec.binary.Base64.decodeBase64;
+
 import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.model.AuthorizationRole;
 import io.jsonwebtoken.Claims;
@@ -42,8 +44,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import static org.apache.commons.codec.binary.Base64.decodeBase64;
 
 /**
  * This class represents the JWT service for token validation.

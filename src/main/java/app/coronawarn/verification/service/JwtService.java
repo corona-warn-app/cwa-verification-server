@@ -21,20 +21,20 @@
 
 package app.coronawarn.verification.service;
 
-import static org.apache.commons.codec.binary.Base64.decodeBase64;
-
 import app.coronawarn.verification.client.IamClient;
 import app.coronawarn.verification.model.AuthorizationRole;
+import app.coronawarn.verification.model.Certs;
+import app.coronawarn.verification.model.Key;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * This class represents the JWT service for token validation.
+ * This class represents the JWT service for token authorization and validation.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -62,40 +62,46 @@ public class JwtService {
   private final IamClient iamClient;
 
   /**
-   * Validates the given token is null and starts with the needed prefix.
+   * Validates the given token is given, the token starts with the needed prefix, 
+   * the signing key is not null and the token is valid.
    *
    * @param authorizationToken The authorization token to validate
-   * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
+   * @return <code>true</code>, if the token is valid, otherwise
+   * <code>false</code>
    */
   public boolean isAuthorized(String authorizationToken) {
     if (null != authorizationToken && authorizationToken.startsWith(JwtService.TOKEN_PREFIX)) {
       String jwtToken = authorizationToken.substring(JwtService.TOKEN_PREFIX.length());
-      PublicKey publicKey = getPublicKey();
-      return validateToken(jwtToken, publicKey);
+      return validateToken(jwtToken, getPublicKey());
     }
     return false;
   }
 
   /**
-   * Validates the given token. If one of the given roles {@link AuthorizationRole} exists.
+   * Validates the given token. If one of the given roles
+   * {@link AuthorizationRole} exists and verified by a public key
    *
    * @param token The authorization token to validate
-   * @param publicKey the key from the certificate
-   * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
+   * @param publicKey the key from the IAM server
+   * @return <code>true</code>, if the token is valid, otherwise
+   * <code>false</code>
    */
   public boolean validateToken(final String token, final PublicKey publicKey) {
-    try {
-      List<String> roleNames = getRoles(token, publicKey);
-      AuthorizationRole[] roles = AuthorizationRole.values();
-      for (AuthorizationRole role : roles) {
-        if (roleNames.contains(role.getRoleName())) {
-          return true;
+    if (null != publicKey) {
+      try {
+        List<String> roleNames = getRoles(token, publicKey);
+        AuthorizationRole[] roles = AuthorizationRole.values();
+        for (AuthorizationRole role : roles) {
+          if (roleNames.contains(role.getRoleName())) {
+            return true;
+          }
         }
+      } catch (JwtException ex) {
+        log.warn("Token is not valid: {}.", ex.getMessage());
+        return false;
       }
-    } catch (JwtException ex) {
-      log.warn("Token is not valid.");
-      return false;
     }
+    log.warn("No public key for Token validation found.");
     return false;
   }
 
@@ -125,24 +131,27 @@ public class JwtService {
   }
 
   /**
-   * Get the public key from external.
+   * Get the public key from IAM client.
    *
-   * @return PublicKey
+   * @return the calculated Public key from PEM
    */
   public PublicKey getPublicKey() {
-    try {
-      Map<String, Object> certs = iamClient.certs();
-      List keys = (List) certs.get("keys");
-      Map map = (Map) keys.get(0);
-      List x5cList = (List) map.get("x5c");
-      String certb64 = (String) x5cList.get(0);
-      byte[] certder = decodeBase64(certb64);
-      InputStream certstream = new ByteArrayInputStream(certder);
-      Certificate cert = CertificateFactory.getInstance("X.509").generateCertificate(certstream);
-      return cert.getPublicKey();
-    } catch (CertificateException e) {
-      log.info("Error getting public key.");
-      return null;
+    Certs certs = iamClient.certs();
+    PublicKey pubKey = null;
+    for (Key key : certs.getKeys()) {
+      if (key.isCertValid()) {
+        String certb64 = key.getX5c().get(0);
+        try {
+          KeyFactory kf = KeyFactory.getInstance("RSA");
+          X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getMimeDecoder().decode(certb64));
+          return kf.generatePublic(keySpecX509);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+          log.warn("Error getting public key: {}.", ex.getMessage());
+        }
+      } else {
+        log.warn("Error getting public key - not the right use or alg key");
+      }
     }
+    return pubKey;
   }
 }

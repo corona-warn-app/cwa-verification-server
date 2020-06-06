@@ -19,24 +19,20 @@
  * under the License.
  */
 
-package app.coronawarn.verification.client;
+package app.coronawarn.verification.model;
 
-import app.coronawarn.verification.model.Certs;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * This class represents the IAM feign client.
- */
-@FeignClient(name = "IamService", url = "${jwt.server}")
-public interface IamClient {
-  /**
-   * This method gets the cert information from the IAM Server.
-   * @return Testresult from server
-   */
-  @GetMapping(value = "/auth/realms/cwa/protocol/openid-connect/certs",
-    consumes = MediaType.APPLICATION_JSON_VALUE
-  )
-   Certs certs();
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Certs {
+  
+  private List<Key> keys = null;
+  private Map<String, Object> additionalProperties = new HashMap<>();
 }

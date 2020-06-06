@@ -30,14 +30,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 /**
  * This class represents the Labor Server service feign client.
  */
-@FeignClient(name = "labServerService", url = "${cwa-testresult-server.url}")
+@FeignClient(
+  name = "labServerService",
+  url = "${cwa-testresult-server.url}",
+  configuration = TestResultServerClientConfiguration.class)
 public interface TestResultServerClient {
   /**
    * This method gets a testResult from the LabServer.
    * @param guid for Testresult
    * @return Testresult from server
    */
-  @PostMapping(value = "${cwa-testresult-server.path}",
+  @PostMapping(value = "${cwa-testresult-server.path.result}",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE
   )

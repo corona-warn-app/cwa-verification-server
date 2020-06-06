@@ -39,7 +39,7 @@ public interface TestResultServerClient {
    * @param guid for Testresult
    * @return Testresult from server
    */
-  @PostMapping(value = "${cwa-testresult-server.path}",
+  @PostMapping(value = "${cwa-testresult-server.path.result}",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE
   )

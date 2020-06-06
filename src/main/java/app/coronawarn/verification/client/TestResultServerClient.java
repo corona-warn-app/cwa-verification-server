@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.PostMapping;
  */
 @FeignClient(
   name = "labServerService",
-  url = "${cwa-testresult-server.url}")
+  url = "${cwa-testresult-server.url}", configuration = TestResultServerClientConfiguration.class)
 public interface TestResultServerClient {
   /**
    * This method gets a testResult from the LabServer.

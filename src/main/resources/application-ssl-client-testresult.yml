@@ -1,0 +1,9 @@
+---
+client:
+  ssl:
+    key-password: ${SSL_KEYSTORE_PASSWORD}
+    key-store: ${SSL_KEYSTORE_PATH}
+    key-store-password: ${SSL_KEYSTORE_PASSWORD}
+    testresult:
+      trust-store: ${SSL_CLIENT_TRUSTSTORE_PATH}
+      trust-store-password: ${SSL_TRUSTSTORE_PASSWORD}

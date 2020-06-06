@@ -10,7 +10,7 @@ spring:
 cwa-testresult-server:
   ssl:
     one-way-authentication-enabled: false
-    two-way-authentication-enabled: true
+    two-way-authentication-enabled: ${SSL_TWO_WAY_AUTH_ENABLED}
     key-password: ${SSL_KEYSTORE_PASSWORD}
     key-store: ${SSL_KEYSTORE_PATH}
     key-store-password: ${SSL_KEYSTORE_PASSWORD}

@@ -60,7 +60,7 @@ tan:
   valid:
     days: 14
 appsession:
-  tancountermax: 2
+  tancountermax: 1
 entities:
   cleanup:
     days: 21
@@ -73,3 +73,6 @@ cwa-testresult-server:
   ssl:
     one-way-authentication-enabled: false
     two-way-authentication-enabled: false
+
+server:
+  port: 8082

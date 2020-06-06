@@ -71,6 +71,3 @@ cwa-testresult-server:
   ssl:
     one-way-authentication-enabled: false
     two-way-authentication-enabled: false
-
-server:
-  port: 8082

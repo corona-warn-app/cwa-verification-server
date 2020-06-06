@@ -21,6 +21,7 @@
 
 package app.coronawarn.verification;
 
+import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.domain.VerificationAppSession;
@@ -95,6 +96,9 @@ public class VerificationApplicationTest {
   private VerificationAppSessionRepository appSessionrepository;
   @Autowired
   private ObjectMapper mapper;
+  
+  @Autowired
+  private VerificationApplicationConfig verificationApplicationConfig;
 
   @BeforeEach
   void setUp() {
@@ -187,7 +191,8 @@ public class VerificationApplicationTest {
     log.info("process callGenerateTanWithTanCounterMaximum()");
     appSessionrepository.deleteAll();
     VerificationAppSession appSessionTestData = getAppSessionTestData();
-    appSessionTestData.setTanCounter(2);
+    int tancountermax = verificationApplicationConfig.getAppsession().getTancountermax();
+    appSessionTestData.setTanCounter(tancountermax);
     appSessionrepository.save(appSessionTestData);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")

@@ -58,7 +58,7 @@ tan:
   valid:
     days: 14
 appsession:
-  tancountermax: 2
+  tancountermax: 1
 entities:
   cleanup:
     days: 21

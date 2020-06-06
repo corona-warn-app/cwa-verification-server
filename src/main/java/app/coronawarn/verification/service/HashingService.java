@@ -28,7 +28,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * This class represents the hashing service for providing and check a hash string.
+ * This class represents the hashing service for providing and check a hash
+ * string.
  */
 @Slf4j
 @Component
@@ -46,6 +47,17 @@ public class HashingService {
   public String hash(String toHash) {
     log.info("Hash process has been called.");
     return DigestUtils.sha256Hex(toHash);
+  }
+
+  /**
+   * Calculates the SHA-256 digest and returns an check digit.
+   *
+   * @param toHash that will be Hashed
+   * @return the check digit
+   */
+  public String getCheckDigit(String toHash) {
+    log.info("check digit process has been called.");
+    return DigestUtils.sha256Hex(toHash).substring(0, 1).toUpperCase().replace("0", "G").replace("1", "H");
   }
 
   /**

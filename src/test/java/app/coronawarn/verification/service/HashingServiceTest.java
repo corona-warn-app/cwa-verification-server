@@ -42,18 +42,17 @@ public class HashingServiceTest {
 
   @Test
   public void testValidSha256Hash() {
-    String hash = "523463041ef9ffa2950d8450feb34c88bc8692c40c9cf3c99dcdf75e270229e2";
-    boolean result = hashingService.isHashValid(hash);
-
-    assertTrue(result);
+    assertTrue(hashingService.isHashValid("523463041ef9ffa2950d8450feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
+    assertTrue(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000"));
+    assertTrue(hashingService.isHashValid("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"));
   }
 
   @Test
   public void testInvalidSha256Hash() {
-    String hash = "523463041ef9ffa2950d8z50feb34c88bc8692c40c9cf3c99dcdf75e270229e2";
-    boolean result = hashingService.isHashValid(hash);
-
-    assertFalse(result);
+    assertFalse(hashingService.isHashValid("x23463041ef9ffa2950d8z50feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
+    assertFalse(hashingService.isHashValid("523463041ef9ffa2950d8z50feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
+    assertFalse(hashingService.isHashValid("0"));
+    assertFalse(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000f"));
   }
 
 

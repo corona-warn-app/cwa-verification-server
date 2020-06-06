@@ -6,3 +6,23 @@ spring:
     password: ${POSTGRESQL_PASSWORD}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+cwa-testresult-server:
+  ssl:
+    one-way-authentication-enabled: false
+    two-way-authentication-enabled: ${SSL_TWO_WAY_AUTH_ENABLED}
+    key-password: ${SSL_KEYSTORE_PASSWORD}
+    key-store: ${SSL_KEYSTORE_PATH}
+    key-store-password: ${SSL_KEYSTORE_PASSWORD}
+    key-store-provider: SUN
+    key-store-type: JKS
+    trust-store: ${SSL_CLIENT_TRUSTSTORE_PATH}
+    trust-store-password: ${SSL_TRUSTSTORE_PASSWORD}
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: full

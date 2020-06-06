@@ -21,49 +21,57 @@
 
 package app.coronawarn.verification.service;
 
+import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationTan;
+import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.IntStream;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.utility.RandomString;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
 
 /**
  * This class represents the TanService service.
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class TanService {
 
-  private static final Integer TELE_TAN_LENGTH = 7;
-  private static final String TELE_TAN_PATTERN = "[2-9A-HJ-KM-N-P-Za-km-n-p-z]{7}";
-  private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
+  // TANs are UUIDs
+  private static final String UUID_PATTERN = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$";
+  private static final String TAN_TAN_PATTERN = UUID_PATTERN;
+  private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
 
-  @Value("${tan.valid.days}")
-  private Integer tanValidInDays;
-  @Value("${tan.tele.valid.hours}")
-  private Integer teleTanValidInHours;
+  // Tele-TANs are a shorter, easier to communicate form of TAN
+  private static final int TELE_TAN_LENGTH = 7;
+  // Exclude characters which can be confusing in some fonts like 0-O or i-I-l.
+  private static final String TELE_TAN_ALLOWED_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+  private static final String TELE_TAN_PATTERN = "^[" + TELE_TAN_ALLOWED_CHARS + "]{" + TELE_TAN_LENGTH + "}$";
+  private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
 
   /**
    * The {@link VerificationTanRepository}.
    */
-  @Autowired
-  private VerificationTanRepository tanRepository;
-
+  @NonNull
+  private final VerificationTanRepository tanRepository;
   /**
    * The {@link HashingService}.
    */
-  @Autowired
-  private HashingService hashingService;
+  @NonNull
+  private final HashingService hashingService;
+
+  @NonNull
+  private final VerificationApplicationConfig verificationApplicationConfig;
 
   /**
    * Saves a {@link VerificationTan} into the database.
@@ -76,21 +84,19 @@ public class TanService {
   }
 
   /**
-   * Check TAN syntax constraints.
+   * Deletes a {@link VerificationTan} from the database.
    *
-   * @param tan the TAN
-   * @return TAN verification flag
+   * @param tan the tan which will be deleted
    */
-  // TODO syntax constraints
-  public boolean syntaxVerification(String tan) {
-    return true;
+  public void deleteTan(VerificationTan tan) {
+    tanRepository.delete(tan);
   }
 
   /**
-   * Check Tele-TAN syntax constraints.
+   * Check teleTAN syntax constraints.
    *
-   * @param teleTan the Tele TAN
-   * @return Tele TAN verification flag
+   * @param teleTan the teleTAN
+   * @return teleTAN verification flag
    */
   private boolean syntaxTeleTanVerification(String teleTan) {
     Matcher matcher = PATTERN.matcher(teleTan);
@@ -98,22 +104,22 @@ public class TanService {
   }
 
   /**
-   * Verifies the tele transaction number (Tele TAN).
+   * Verifies the tele transaction number (teleTAN).
    *
-   * @param teleTan the Tele TAN to verify
-   * @return verified is teletan is verified
+   * @param teleTan the teleTAN to verify
+   * @return is teleTAN verified
    */
   public boolean verifyTeleTan(String teleTan) {
     boolean verified = false;
     if (syntaxTeleTanVerification(teleTan)) {
       Optional<VerificationTan> teleTanEntity = getEntityByTan(teleTan);
-      if (teleTanEntity.isPresent() && !teleTanEntity.get().isRedeemed()) {
+      if (teleTanEntity.isPresent() && teleTanEntity.get().canBeRedeemed(LocalDateTime.now())) {
         verified = true;
       } else {
-        log.warn("The Tele TAN is unknown or already redeemed.");
+        log.warn("The teleTAN is unknown, expired or already redeemed.");
       }
     } else {
-      log.warn("The Tele TAN is not valid to the syntax constraints.");
+      log.warn("The teleTAN is not valid to the syntax constraints.");
     }
     return verified;
   }
@@ -123,14 +129,51 @@ public class TanService {
    *
    * @return a Valid TAN String
    */
-  public String generateValidTan() {
+  private String generateValidTan() {
     boolean validTan = false;
     String newTan = "";
     while (!validTan) {
-      newTan = generateTanFromUuid();
-      validTan = hashTanAndCheckAvailability(newTan);
+      newTan = UUID.randomUUID().toString();
+      validTan = checkTanNotExist(newTan);
     }
     return newTan;
+  }
+
+  /**
+   * This method generates a {@link VerificationTan} - entity and saves it.
+   *
+   * @param tan the TAN
+   * @param tanType the TAN type
+   * @return the persisted TAN
+   */
+  private VerificationTan persistTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
+    VerificationTan newTan = generateVerificationTan(tan, tanType, sourceOfTrust);
+    return tanRepository.save(newTan);
+  }
+
+  /**
+   * Returns the a new valid teleTAN String.
+   *
+   * @return a new teleTAN
+   */
+  public String generateTeleTan() {
+    return IntStream.range(0, TELE_TAN_LENGTH)
+      .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
+      .collect(Collector.of(
+        StringBuilder::new,
+        StringBuilder::append,
+        StringBuilder::append,
+        StringBuilder::toString));
+  }
+
+  /**
+   * Returns the if a teleTAN matches the Pattern requirements.
+   *
+   * @param teleTan the teleTAN to check
+   * @return The validity of the teleTAN
+   */
+  public boolean isTeleTanValid(String teleTan) {
+    return syntaxTeleTanVerification(teleTan);
   }
 
   /**
@@ -139,77 +182,39 @@ public class TanService {
    * @param tan the TAN
    * @return flag for existing TAN
    */
-  public boolean checkTanAlreadyExist(String tan) {
-    return hashTanAndCheckAvailability(tan);
-  }
-
-  /**
-   * This method generates a {@link VerificationTan} - entity and saves it.
-   *
-   * @param tan     the TAN
-   * @param tanType the TAN type
-   * @return the persisted TAN
-   */
-  private VerificationTan persistTan(String tan, TanType tanType, String sourceOfTrust) {
-    VerificationTan newTan = generateVerificationTan(tan, tanType, sourceOfTrust);
-    return tanRepository.save(newTan);
-  }
-
-  /**
-   * Returns the a new valid TeleTan String.
-   *
-   * @return a new TeleTan
-   */
-  public String generateTeleTan() {
-    /*
-     * The generation of a TeleTan is a temporary solution and may be subject to later changes.
-     */
-    String generatedTeleTan = "";
-    boolean isTeleTanValid = false;
-
-    while (!isTeleTanValid) {
-      generatedTeleTan = RandomString.make(TELE_TAN_LENGTH);
-      isTeleTanValid = isTeleTanValid(generatedTeleTan);
-    }
-    return generatedTeleTan;
-  }
-
-  /**
-   * Returns the if a Tele Tan matches the Pattern requirements.
-   *
-   * @param teleTan the Tele TAN to check
-   * @return The validity of the Tele TAN
-   */
-  public boolean isTeleTanValid(String teleTan) {
-    return syntaxTeleTanVerification(teleTan);
-  }
-
-  private String generateTanFromUuid() {
-    // A UUID is a 128 bit value
-    return UUID.randomUUID().toString();
-  }
-
-  private boolean hashTanAndCheckAvailability(String tan) {
+  public boolean checkTanNotExist(String tan) {
     String tanHash = hashingService.hash(tan);
     return !tanRepository.existsByTanHash(tanHash);
+  }
+
+  /**
+   * Returns a generated valid teleTAN and persists it.
+   *
+   * @return a valid teleTAN
+   */
+  public String generateVerificationTeleTan() {
+    String teleTan = generateTeleTan();
+    persistTan(teleTan, TanType.TELETAN, TanSourceOfTrust.TELETAN);
+    return teleTan;
   }
 
   /**
    * This Method generates a valid TAN and persists it. Returns the generated TAN.
    *
    * @param sourceOfTrust sets the source of Trust for the Tan
-   * @return Tan a valid tan with given source of Trust
+   * @return a valid tan with given source of Trust
    */
-  public String generateVerificationTan(String sourceOfTrust) {
+  public String generateVerificationTan(TanSourceOfTrust sourceOfTrust) {
     String tan = generateValidTan();
     persistTan(tan, TanType.TAN, sourceOfTrust);
     return tan;
   }
 
-  private VerificationTan generateVerificationTan(String tan, TanType tanType, String sourceOfTrust) {
+  protected VerificationTan generateVerificationTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
     LocalDateTime from = LocalDateTime.now();
     LocalDateTime until;
-
+    int tanValidInDays = verificationApplicationConfig.getTan().getValid().getDays();
+    int teleTanValidInHours = verificationApplicationConfig.getTan().getTele().getValid().getHours();
     if (tanType == TanType.TELETAN) {
       until = from.plusHours(teleTanValidInHours);
     } else {
@@ -229,16 +234,22 @@ public class TanService {
   }
 
   /**
-   * Get existing VerificationTan by TAN from
-   * {@link VerificationTanRepository}.
+   * Get existing VerificationTan by TAN from {@link VerificationTanRepository}.
    *
    * @param tan the TAN
    * @return Optional VerificationTan
    */
   public Optional<VerificationTan> getEntityByTan(String tan) {
-    log.info("TanService start getEntityByTan.");
-    VerificationTan tanEntity = new VerificationTan();
-    tanEntity.setTanHash(hashingService.hash(tan));
-    return tanRepository.findOne(Example.of(tanEntity, ExampleMatcher.matching()));
+    log.info("Start getEntityByTan.");
+    return tanRepository.findByTanHash(hashingService.hash(tan));
+  }
+
+  /*
+   * The random number generator used by this class to create random
+   * based UUIDs. In a holder class to defer initialization until needed.
+   */
+  private static class Holder {
+
+    static final SecureRandom NUMBER_GENERATOR = new SecureRandom();
   }
 }

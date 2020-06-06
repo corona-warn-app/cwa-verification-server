@@ -28,24 +28,23 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * This class represents the hashing service.
+ * This class represents the hashing service for providing and check a hash string.
  */
 @Slf4j
 @Component
 public class HashingService {
 
-  private static final String GUID_HASH_PATTERN = "[0-9A-Fa-f]{64}";
-  private static final Pattern pattern = Pattern.compile(GUID_HASH_PATTERN);
-
+  private static final String GUID_HASH_PATTERN = "^[0-9A-Fa-f]{64}$";
+  private static final Pattern PATTERN = Pattern.compile(GUID_HASH_PATTERN);
 
   /**
-   * Returns the hash of the supplied string.
+   * Calculates the SHA-256 digest and returns the value as a hex string.
    *
    * @param toHash that will be Hashed
    * @return the hash of the supplied string
    */
   public String hash(String toHash) {
-    log.info("HashingService - hash has been called.");
+    log.info("Hash process has been called.");
     return DigestUtils.sha256Hex(toHash);
   }
 
@@ -56,7 +55,7 @@ public class HashingService {
    * @return Boolean if the String Matches the Pattern
    */
   public boolean isHashValid(String toValidate) {
-    Matcher matcher = pattern.matcher(toValidate);
+    Matcher matcher = PATTERN.matcher(toValidate);
     return matcher.find();
   }
 }

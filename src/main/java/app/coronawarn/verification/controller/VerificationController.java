@@ -38,7 +38,6 @@ import app.coronawarn.verification.model.TeleTan;
 import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.JwtService;
-import app.coronawarn.verification.service.LabServerService;
 import app.coronawarn.verification.service.TanService;
 import app.coronawarn.verification.service.TestResultServerService;
 import io.swagger.v3.oas.annotations.Operation;

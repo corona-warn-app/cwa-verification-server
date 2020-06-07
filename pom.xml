@@ -32,16 +32,18 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <!-- dependencies -->
     <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
+    <spring-security.version>5.2.3.RELEASE</spring-security.version>
     <spring.cloud.version>Hoxton.SR4</spring.cloud.version>
     <lombok.version>1.18.12</lombok.version>
     <liquibase.version>3.9.0</liquibase.version>
     <springdoc.version>1.3.9</springdoc.version>
+    <jsonwebtoken.version>0.9.1</jsonwebtoken.version>
+    <openfeign.version>11.0</openfeign.version>
     <!-- plugins -->
     <plugin.checkstyle.version>3.1.1</plugin.checkstyle.version>
     <plugin.sonar.version>3.6.1.1688</plugin.sonar.version>
     <plugin.jacoco.version>0.8.5</plugin.jacoco.version>
     <guava.version>29.0-jre</guava.version>
-    
     <sonar.coverage.exclusions>
       **/VerificationApplication.java,
       **/model/*,
@@ -130,7 +132,12 @@
     <dependency>
       <groupId>io.github.openfeign</groupId>
       <artifactId>feign-httpclient</artifactId>
-      <version>11.0</version>
+      <version>${openfeign.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt</artifactId>
+      <version>${jsonwebtoken.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.cloud</groupId>
@@ -180,6 +187,12 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <version>${spring-security.version}</version>
+      <type>jar</type>
     </dependency>
   </dependencies>
 

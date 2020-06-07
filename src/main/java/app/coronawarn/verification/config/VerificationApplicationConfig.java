@@ -33,16 +33,25 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
-
+  
   private TanCfg tan = new TanCfg();
   private AppSessionCfg appsession = new AppSessionCfg();
   private EntitiesCfg entities = new EntitiesCfg();
+  private JwtCfg jwt = new JwtCfg();
 
+  /**
+   * Configure the TeleCfg with build property values and return the configured
+   * parameters.
+   */
   public static class TeleCfg {
     @Getter
     @Setter
     private TeleValidCfg valid = new TeleValidCfg();
 
+    /**
+     * Configure the TeleValidCfg with build property values and return the
+     * configured parameters.
+     */
     public static class TeleValidCfg {
 
       // Number of hours that teleTAN remains valid
@@ -52,6 +61,10 @@ public class VerificationApplicationConfig {
     }
   }
 
+  /**
+   * Configure the ValidCfg with build property values and return the configured
+   * parameters.
+   */
   public static class ValidCfg {
 
     // Number of days that TAN remains valid
@@ -60,6 +73,10 @@ public class VerificationApplicationConfig {
     int days = 14;
   }
 
+  /**
+   * Configure the TanCfg with build property values and return the configured
+   * parameters.
+   */
   public static class TanCfg {
     @Getter
     @Setter
@@ -70,6 +87,10 @@ public class VerificationApplicationConfig {
     private ValidCfg valid = new ValidCfg();
   }
 
+  /**
+   * Configure the AppSessionCfg with build property values and return the
+   * configured parameters.
+   */
   public static class AppSessionCfg {
 
     // Maximum number of tans in a session at one time
@@ -78,15 +99,33 @@ public class VerificationApplicationConfig {
     int tancountermax = 2;
   }
 
+  /**
+   * Configure the EntitiesCfg with build property values and return the
+   * configured parameters.
+   */
   public static class EntitiesCfg {
     @Getter
     @Setter
     private CleanupCfg cleanup = new CleanupCfg();
   }
 
+  /**
+   * Configure the CleanupCfg with build property values and return the
+   * configured parameters.
+   */
   public static class CleanupCfg {
     @Getter
     @Setter
     private Integer days = 21;
+  }
+
+  /**
+   * Configure the JwtCfg with build property values and return the configured
+   * parameters.
+   */
+  public static class JwtCfg {
+    @Getter
+    @Setter
+    private String server;
   }
 }

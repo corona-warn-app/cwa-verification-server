@@ -278,7 +278,8 @@ public class VerificationApplicationTest {
     KeyPair kp = keyGenerator.genKeyPair();
     String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
 
-    when(this.jwtService.isAuthorized(any())).thenCallRealMethod();
+    //when(this.jwtService.isAuthorized(any())).thenCallRealMethod();
+    given(this.jwtService.isAuthorized(any())).willReturn(Boolean.TRUE);
     given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
     when(this.jwtService.validateToken(jwtString, kp.getPublic())).thenCallRealMethod();
 

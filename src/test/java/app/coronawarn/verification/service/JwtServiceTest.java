@@ -22,6 +22,7 @@ package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.VerificationApplication;
 import app.coronawarn.verification.client.IamClient;
+import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.model.AuthorizationRole;
 import app.coronawarn.verification.model.Certs;
 import app.coronawarn.verification.model.Key;
@@ -118,7 +119,7 @@ public class JwtServiceTest
   public void testAuthorizedToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     IamClientMock clientMock = createIamClientMock();
-    jwtService = new JwtService(clientMock);
+    jwtService = new JwtService(clientMock, new VerificationApplicationConfig());
     Assert.assertTrue(jwtService.isAuthorized(TOKEN_PREFIX + jwToken));
   }
 

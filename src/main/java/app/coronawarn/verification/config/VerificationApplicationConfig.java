@@ -126,6 +126,9 @@ public class VerificationApplicationConfig {
   public static class JwtCfg {
     @Getter
     @Setter
-    private String server;
+    private String server = "http://localhost:8080";
+    @Getter
+    @Setter
+    private Boolean enabled = false;    
   }
 }

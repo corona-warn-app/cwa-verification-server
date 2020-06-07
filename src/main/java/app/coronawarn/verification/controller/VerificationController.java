@@ -26,6 +26,7 @@ import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
+import app.coronawarn.verification.model.AuthorizationToken;
 import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.LabTestResult;
 import app.coronawarn.verification.model.RegistrationToken;
@@ -36,6 +37,7 @@ import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TeleTan;
 import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.service.AppSessionService;
+import app.coronawarn.verification.service.JwtService;
 import app.coronawarn.verification.service.TanService;
 import app.coronawarn.verification.service.TestResultServerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +55,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -86,6 +89,10 @@ public class VerificationController {
    * The route to the teleTAN generation endpoint.
    */
   public static final String TELE_TAN_ROUTE = "/tan/teletan";
+  /**
+   * The http request header 'X-Auth-Token'.
+   */
+  private static final String REQ_HEADER_X_AUTH_TOKEN = "X-Auth-Token";
 
   @NonNull
   private final AppSessionService appSessionService;
@@ -98,6 +105,9 @@ public class VerificationController {
 
   @NonNull
   private final VerificationApplicationConfig verificationApplicationConfig;
+
+  @NonNull
+  private final JwtService jwtService;
 
   /**
    * This method generates a registrationToken by a hashed guid or a teleTAN.
@@ -268,7 +278,8 @@ public class VerificationController {
   /**
    * This method generates a valid teleTAN.
    *
-   * @return a created teleTAN
+   * @param authorization auth
+   * @return a created teletan
    */
   @Operation(
     summary = "Request generation of a teleTAN",
@@ -279,9 +290,14 @@ public class VerificationController {
   @PostMapping(value = TELE_TAN_ROUTE,
     produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public ResponseEntity<TeleTan> createTeleTan() {
-    String teleTan = tanService.generateVerificationTeleTan();
-    log.info("The teleTAN is generated.");
-    return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));
+  public ResponseEntity<TeleTan> createTeleTan(
+    @RequestHeader(REQ_HEADER_X_AUTH_TOKEN) @Valid AuthorizationToken authorization) {
+    if (jwtService.isAuthorized(authorization.getToken())) {
+      String teleTan = tanService.generateVerificationTeleTan();
+      log.info("The teleTAN is generated.");
+      return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));
+    }
+    throw new VerificationServerException(HttpStatus.UNAUTHORIZED, "JWT is invalid.");
   }
+
 }

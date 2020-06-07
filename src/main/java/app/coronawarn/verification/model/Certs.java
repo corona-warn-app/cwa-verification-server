@@ -21,24 +21,18 @@
 
 package app.coronawarn.verification.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * This class represents the registration Token.
- */
-@Schema(
-  description = "The registration token model."
-)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegistrationToken {
-  @NotNull
-  @Pattern(regexp = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$")
-  private String registrationToken;
+public class Certs {
+  
+  private List<Key> keys = null;
+  private Map<String, Object> additionalProperties = new HashMap<>();
 }

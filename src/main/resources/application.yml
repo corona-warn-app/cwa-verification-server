@@ -72,6 +72,3 @@ cwa-testresult-server:
     key-store-password: none
     trust-store: none
     trust-store-password: none
-
-server:
-  port: 8082

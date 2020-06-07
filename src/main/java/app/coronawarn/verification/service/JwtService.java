@@ -22,6 +22,7 @@
 package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.client.IamClient;
+import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.model.AuthorizationRole;
 import app.coronawarn.verification.model.Certs;
 import app.coronawarn.verification.model.Key;
@@ -60,6 +61,9 @@ public class JwtService {
 
   @NonNull
   private final IamClient iamClient;
+  
+  @NonNull
+  private final VerificationApplicationConfig verificationApplicationConfig;  
 
   /**
    * Validates the given token is given, the token starts with the needed prefix, 
@@ -70,6 +74,10 @@ public class JwtService {
    * <code>false</code>
    */
   public boolean isAuthorized(String authorizationToken) {
+    // check if the JWT is enabled
+    if (!verificationApplicationConfig.getJwt().getEnabled()) {
+      return true;
+    }
     if (null != authorizationToken && authorizationToken.startsWith(JwtService.TOKEN_PREFIX)) {
       String jwtToken = authorizationToken.substring(JwtService.TOKEN_PREFIX.length());
       return validateToken(jwtToken, getPublicKey());

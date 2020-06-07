@@ -53,6 +53,9 @@ public class VerificationApplicationConfig {
      * configured parameters.
      */
     public static class TeleValidCfg {
+      @Getter
+      @Setter
+      private int length = 1;
 
       // Number of hours that teleTAN remains valid
       @Getter

@@ -57,6 +57,7 @@ management:
 tan:
   tele:
     valid:
+      length: 9
       hours: 1
   valid:
     days: 14

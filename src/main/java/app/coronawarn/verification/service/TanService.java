@@ -37,6 +37,7 @@ import java.util.stream.IntStream;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,7 +54,8 @@ public class TanService {
   private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
 
   // Tele-TANs are a shorter, easier to communicate form of TAN
-  private static final int TELE_TAN_LENGTH = 9;
+  @Value("${tan.tele.valid.length}")
+  private static int TELE_TAN_LENGTH = 9;
   private static final int CHECK_DIGIT_LENGTH = 1;
   
   // Exclude characters which can be confusing in some fonts like 0-O or i-I-l.
@@ -62,6 +64,9 @@ public class TanService {
   private static final int TELE_TAN_TOTAL_LENGTH = TELE_TAN_LENGTH + CHECK_DIGIT_LENGTH;
   private static final String TELE_TAN_PATTERN = "^[" + TELE_TAN_ALLOWED_CHARS + "]{" + TELE_TAN_TOTAL_LENGTH + "}$";
   private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
+
+  @NonNull
+  private final VerificationApplicationConfig verificationApplicationConfig;
 
   /**
    * The {@link VerificationTanRepository}.
@@ -73,9 +78,6 @@ public class TanService {
    */
   @NonNull
   private final HashingService hashingService;
-
-  @NonNull
-  private final VerificationApplicationConfig verificationApplicationConfig;
 
   /**
    * Saves a {@link VerificationTan} into the database.
@@ -247,6 +249,11 @@ public class TanService {
   public Optional<VerificationTan> getEntityByTan(String tan) {
     log.info("Start getEntityByTan.");
     return tanRepository.findByTanHash(hashingService.hash(tan));
+  }
+
+  @Value("${tan.tele.valid.length}")
+  private void setTeleTanLength(String length) {
+    TanService.TELE_TAN_LENGTH = Integer.valueOf(length);
   }
 
   /*

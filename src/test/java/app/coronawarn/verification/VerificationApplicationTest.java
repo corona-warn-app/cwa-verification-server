@@ -71,10 +71,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -110,13 +113,13 @@ public class VerificationApplicationTest {
   private MockMvc mockMvc;
   @MockBean
   private TestResultServerService testResultServerService;
-  @MockBean
+  @SpyBean
   private TanService tanService;
   @Autowired
   private VerificationAppSessionRepository appSessionrepository;
   @Autowired
   private ObjectMapper mapper;
-  
+
   @Autowired
   private VerificationApplicationConfig verificationApplicationConfig;
 
@@ -140,10 +143,7 @@ public class VerificationApplicationTest {
     prepareAppSessionTestData();
     doReturn(TEST_LAB_POSITIVE_RESULT).when(testResultServerService).result(any());
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-      .andExpect(status().isCreated());
+    mockMvcPostAndVerify(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK)), "/tan", status().isCreated());
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
@@ -166,10 +166,7 @@ public class VerificationApplicationTest {
   public void callGenerateTanByUnknownToken() throws Exception {
     log.info("process callGenerateTanByUnknownToken()");
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK)), "/tan", status().isBadRequest());
   }
 
   /**
@@ -181,10 +178,7 @@ public class VerificationApplicationTest {
   public void callGenerateTanByInvalidToken() throws Exception {
     log.info("process callGenerateTanByInvalidToken()");
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new RegistrationToken(TEST_INVALID_REG_TOK))))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(new RegistrationToken(TEST_INVALID_REG_TOK)), "/tan", status().isBadRequest());
   }
 
   /**
@@ -198,10 +192,7 @@ public class VerificationApplicationTest {
     prepareAppSessionTestData();
     doReturn(TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK)), "/tan", status().isBadRequest());
   }
 
   /**
@@ -218,10 +209,7 @@ public class VerificationApplicationTest {
     appSessionTestData.setTanCounter(tancountermax);
     appSessionrepository.save(appSessionTestData);
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK)), "/tan", status().isBadRequest());
   }
 
   /**
@@ -238,10 +226,7 @@ public class VerificationApplicationTest {
     appSessionrepository.save(appSessionTestData);
     doReturn(TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-      .andExpect(status().isCreated());
+    mockMvcPostAndVerify(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK)), "/tan", status().isCreated());
   }
 
   /**
@@ -258,10 +243,7 @@ public class VerificationApplicationTest {
     appSessionrepository.save(appSessionTestData);
     doReturn(TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK)), "/tan", status().isBadRequest());
   }
 
   /**
@@ -316,10 +298,7 @@ public class VerificationApplicationTest {
     log.info("process callGetRegistrationTokenByGuid() ");
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(request)))
-      .andExpect(status().isCreated())
+    mockMvcPostAndVerify(getAsJsonFormat(request), "/registrationToken", status().isCreated())
       .andExpect(jsonPath("$.registrationToken").exists());
 
     long count = appSessionrepository.count();
@@ -333,6 +312,42 @@ public class VerificationApplicationTest {
     assertNotNull(verificationList.get(0).getRegistrationTokenHash());
   }
 
+  @Test
+  public void verifyRegistrationTokenAndTanGenerationBehaviorForGuid() throws Exception {
+    log.info("process verifyRegistrationTokenAndTanGenerationBehaviorForGuid() ");
+
+    appSessionrepository.deleteAll();
+    doReturn(TEST_LAB_POSITIVE_RESULT).when(testResultServerService).result(any());
+    RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
+
+    String registrationToken =
+      mockMvcPostAndVerify(getAsJsonFormat(request), "/registrationToken", status().isCreated())
+        .andExpect(jsonPath("$.registrationToken").exists())
+        .andReturn()
+        .getResponse().getContentAsString();
+
+    log.info("attempt to re-create registrationToken with existing GUID");
+    mockMvcPostAndVerify(getAsJsonFormat(request), "/registrationToken", status().isBadRequest());
+
+    log.info("Create TAN with registrationToken");
+    String generatedTan = mockMvcPostAndVerify(registrationToken, "/tan", status().isCreated())
+      .andExpect(jsonPath("$.tan").exists())
+      .andReturn()
+      .getResponse().getContentAsString();
+
+    log.info("attempt to re-create TAN");
+    mockMvcPostAndVerify(registrationToken, "/tan", status().isBadRequest());
+
+    log.info("attempt to re-create registrationToken with existing GUID");
+    mockMvcPostAndVerify(getAsJsonFormat(request), "/registrationToken", status().isBadRequest());
+
+    log.info("Verify generated tan");
+    mockMvcPostAndVerify(generatedTan, "/tan/verify", status().isOk());
+
+    log.info("Verify tan is redeemed");
+    mockMvcPostAndVerify(generatedTan, "/tan/verify", status().isNotFound());
+  }
+
   /**
    * Test get registration token by a keytype which is null.
    *
@@ -343,10 +358,7 @@ public class VerificationApplicationTest {
     log.info("process callGetRegistrationTokenWithNullKeyType() ");
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, null);
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(request)))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(request), "/registrationToken", status().isBadRequest());
   }
 
   /**
@@ -359,10 +371,7 @@ public class VerificationApplicationTest {
     log.info("process callGetRegistrationTokenWithNullKey() ");
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(null, RegistrationTokenKeyType.GUID);
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(request)))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(request), "/registrationToken", status().isBadRequest());
   }
 
   /**
@@ -378,11 +387,9 @@ public class VerificationApplicationTest {
     given(this.tanService.verifyTeleTan(TEST_TELE_TAN)).willReturn(true);
     given(this.tanService.isTeleTanValid(TEST_TELE_TAN)).willReturn(true);
     given(this.tanService.getEntityByTan(TEST_TELE_TAN)).willReturn(Optional.of(getTeleTanTestData()));
-
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(request)))
-      .andExpect(status().isCreated())
+    mockMvcPostAndVerify(getAsJsonFormat(request),
+      "/registrationToken",
+      status().isCreated())
       .andExpect(jsonPath("$.registrationToken").exists());
 
     long count = appSessionrepository.count();
@@ -409,10 +416,7 @@ public class VerificationApplicationTest {
     when(this.tanService.verifyTeleTan(TEST_TELE_TAN)).thenCallRealMethod();
     given(this.tanService.getEntityByTan(TEST_TELE_TAN)).willReturn(Optional.empty());
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(request)))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(request), "/registrationToken", status().isBadRequest());
   }
 
   /**
@@ -426,10 +430,7 @@ public class VerificationApplicationTest {
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_INVALID_GUI_HASH, RegistrationTokenKeyType.GUID);
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(request)))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(request), "/registrationToken", status().isBadRequest());
   }
 
   /**
@@ -443,10 +444,7 @@ public class VerificationApplicationTest {
     prepareAppSessionTestData();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(request)))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(request), "/registrationToken", status().isBadRequest());
   }
 
   /**
@@ -467,10 +465,7 @@ public class VerificationApplicationTest {
 
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_TELE_TAN, RegistrationTokenKeyType.TELETAN);
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(request)))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(request), "/registrationToken", status().isBadRequest());
   }
 
   /**
@@ -485,10 +480,10 @@ public class VerificationApplicationTest {
     prepareAppSessionTestData();
 
     given(this.testResultServerService.result(new HashedGuid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
-
-    mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-      .andExpect(status().isOk())
+    mockMvcPostAndVerify(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK)),
+      "/testresult",
+      status().isOk()
+    )
       .andExpect(jsonPath("$.testResult").value(TEST_LAB_POSITIVE_RESULT.getTestResult()));
   }
 
@@ -504,10 +499,7 @@ public class VerificationApplicationTest {
     //clean the repo
     appSessionrepository.deleteAll();
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/testresult")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK)), "/testresult", status().isBadRequest());
   }
 
   /**
@@ -523,10 +515,7 @@ public class VerificationApplicationTest {
 
     assertFalse("Is TAN redeemed?", this.tanService.getEntityByTan(TEST_TAN).get().isRedeemed());
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new Tan(TEST_TAN))))
-      .andExpect(status().isOk());
+    mockMvcPostAndVerify(getAsJsonFormat(new Tan(TEST_TAN)), "/tan/verify", status().isOk());
   }
 
   /**
@@ -539,10 +528,7 @@ public class VerificationApplicationTest {
     log.info("process callVerifyTANByVerificationTANIsEmpty()");
 
     // without mock tanService.getEntityByTan so this method will return empty entity
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new Tan(TEST_TAN))))
-      .andExpect(status().isNotFound());
+    mockMvcPostAndVerify(getAsJsonFormat(new Tan(TEST_TAN)), "/tan/verify", status().isNotFound());
   }
 
   /**
@@ -554,9 +540,7 @@ public class VerificationApplicationTest {
   public void callVerifyTANByTanWithInvalidSyntax() throws Exception {
     log.info("process callVerifyTANByTanWithInvalidSyntax()");
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new Tan(TEST_INVALID_TAN))))
-      .andExpect(status().isBadRequest());
+    mockMvcPostAndVerify(getAsJsonFormat(new Tan(TEST_INVALID_TAN)), "/tan/verify", status().isBadRequest());
   }
 
   /**
@@ -573,9 +557,7 @@ public class VerificationApplicationTest {
     cvtan.setValidFrom(LocalDateTime.now().plusDays(2));
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new Tan(TEST_TAN))))
-      .andExpect(status().isNotFound());
+    mockMvcPostAndVerify(getAsJsonFormat(new Tan(TEST_TAN)), "/tan/verify", status().isNotFound());
   }
 
   /**
@@ -592,9 +574,7 @@ public class VerificationApplicationTest {
     cvtan.setValidUntil(LocalDateTime.now().minusDays(2));
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new Tan(TEST_TAN))))
-      .andExpect(status().isNotFound());
+    mockMvcPostAndVerify(getAsJsonFormat(new Tan(TEST_TAN)), "/tan/verify", status().isNotFound());
   }
 
   /**
@@ -611,9 +591,14 @@ public class VerificationApplicationTest {
     cvtan.setRedeemed(true);
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON)
-      .content(getAsJsonFormat(new Tan(TEST_TAN))))
-      .andExpect(status().isNotFound());
+    mockMvcPostAndVerify(getAsJsonFormat(new Tan(TEST_TAN)), "/tan/verify", status().isNotFound());
+  }
+
+  private ResultActions mockMvcPostAndVerify(String content, String apiPath, ResultMatcher responseCode) throws Exception {
+    return mockMvc.perform(post(PREFIX_API_VERSION + apiPath)
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(content))
+      .andExpect(responseCode);
   }
 
   private String getJwtTestData(final long expirationSecondsToAdd, PrivateKey privateKey, AuthorizationRole... roles) throws UnsupportedEncodingException {

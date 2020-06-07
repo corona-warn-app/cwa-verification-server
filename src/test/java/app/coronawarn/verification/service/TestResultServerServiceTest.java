@@ -37,17 +37,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
-public class LabServerServiceTest {
+public class TestResultServerServiceTest {
 
   public static final String TEST_GUI_HASH_1 = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
   public static final String TEST_GUI_HASH_2 = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13c";
   public static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2);
   public static final TestResult TEST_LAB_REDEEMED_RESULT = new TestResult(4);
-  private LabServerService labServerService;
+  private TestResultServerService testResultServerService;
 
   @Before
   public void setUp() {
-    labServerService = new LabServerService(new TestResultServerClientMock());
+    testResultServerService = new TestResultServerService(new TestResultServerClientMock());
   }
 
   /**
@@ -55,7 +55,7 @@ public class LabServerServiceTest {
    */
   @Test
   public void resultPositiveTest() {
-    TestResult testResult = labServerService.result(new HashedGuid(TEST_GUI_HASH_1));
+    TestResult testResult = testResultServerService.result(new HashedGuid(TEST_GUI_HASH_1));
     assertThat(testResult).isEqualTo(TEST_LAB_POSITIVE_RESULT);
   }
   
@@ -64,7 +64,7 @@ public class LabServerServiceTest {
    */
   @Test
   public void resultRedeemedTest() {
-    TestResult testResult = labServerService.result(new HashedGuid(TEST_GUI_HASH_2));
+    TestResult testResult = testResultServerService.result(new HashedGuid(TEST_GUI_HASH_2));
     assertThat(testResult).isEqualTo(TEST_LAB_REDEEMED_RESULT);
   }  
 

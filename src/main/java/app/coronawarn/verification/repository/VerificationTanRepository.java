@@ -33,6 +33,7 @@ public interface VerificationTanRepository extends JpaRepository<VerificationTan
 
   /**
    * This method looks in the Database for an if a VerificationTan exists for the tan hash.
+   *
    * @param tanHash hash to search for
    * @return Boolean if there is an Entity for the tanHash
    */
@@ -40,6 +41,7 @@ public interface VerificationTanRepository extends JpaRepository<VerificationTan
 
   /**
    * This method looks in the Database for an if a VerificationTan exists for the tan hash.
+   *
    * @param tanHash hash to search for
    * @return Optional VerificationTan
    */
@@ -47,6 +49,7 @@ public interface VerificationTanRepository extends JpaRepository<VerificationTan
 
   /**
    * This method purges Entities from the database that are older than before value.
+   *
    * @param before LocalDateTime to delete older entities
    */
   void deleteByCreatedAtBefore(LocalDateTime before);

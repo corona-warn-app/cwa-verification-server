@@ -176,9 +176,10 @@ public class AppSessionService {
     appSession.setTeleTanHash(hashingService.hash(teleTan));
     return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
   }
-  
+
   /**
    * Verifies the hashed guid.
+   *
    * @param hashedGuid the hashed Guid
    * @return flag for verification
    */

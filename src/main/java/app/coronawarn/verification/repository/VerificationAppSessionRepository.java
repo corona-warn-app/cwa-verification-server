@@ -33,6 +33,7 @@ public interface VerificationAppSessionRepository extends JpaRepository<Verifica
 
   /**
    * This method looks in the Database for an Appsession with the given registrationTokenHash.
+   *
    * @param registrationTokenHash hash to search for
    * @return Optional VerificationAppSession the optional Appsession
    */
@@ -40,6 +41,7 @@ public interface VerificationAppSessionRepository extends JpaRepository<Verifica
 
   /**
    * This method looks in the Database for Appsessions that are older than the before value and deletes them.
+   *
    * @param before the Date to delete by
    */
   void deleteByCreatedAtBefore(LocalDateTime before);

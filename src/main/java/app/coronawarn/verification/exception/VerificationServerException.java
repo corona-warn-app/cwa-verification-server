@@ -4,9 +4,9 @@
  * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG, SAP AG and all other contributors /
- * copyright owners license this file to you under the Apache 
- * License, Version 2.0 (the "License"); you may not use this 
- * file except in compliance with the License. 
+ * copyright owners license this file to you under the Apache
+ * License, Version 2.0 (the "License"); you may not use this
+ * file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -34,8 +34,9 @@ public class VerificationServerException extends RuntimeException {
 
   /**
    * The Constructor for the Exception class.
+   *
    * @param httpStatus the state of the server
-   * @param message the message
+   * @param message    the message
    */
   public VerificationServerException(HttpStatus httpStatus, String message) {
     super(message);

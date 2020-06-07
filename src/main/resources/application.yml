@@ -18,7 +18,7 @@ feign:
       default:
         connect-timeout: 5000
         read-timeout: 5000
-        logger-level: basic
+        logger-level: full
 springdoc:
   api-docs:
     path: /api/docs
@@ -66,8 +66,9 @@ entities:
 
 cwa-testresult-server:
   url: http://localhost:8088
-  path:
-    result: /api/v1/app/result
   ssl:
-    one-way-authentication-enabled: false
-    two-way-authentication-enabled: false
+    enabled: false
+    key-store: none
+    key-store-password: none
+    trust-store: none
+    trust-store-password: none

@@ -49,6 +49,17 @@ public class HashingService {
   }
 
   /**
+   * Calculates the SHA-256 digest and returns an check digit.
+   *
+   * @param toHash that will be Hashed
+   * @return the check digit
+   */
+  public String getCheckDigit(String toHash) {
+    log.info("get check digit process has been called.");
+    return DigestUtils.sha256Hex(toHash).substring(0, 1).toUpperCase().replace("0", "G").replace("1", "H");
+  }
+
+  /**
    * Returns true if the String is resembles a SHA256 Pattern.
    *
    * @param toValidate String that will be checked to match the pattern of a SHA256 Hash

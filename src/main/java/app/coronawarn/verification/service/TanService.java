@@ -53,10 +53,14 @@ public class TanService {
   private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
 
   // Tele-TANs are a shorter, easier to communicate form of TAN
-  private static final int TELE_TAN_LENGTH = 7;
+  private static final int TELE_TAN_LENGTH = 9;
+  private static final int CHECK_DIGIT_LENGTH = 1;
+  
   // Exclude characters which can be confusing in some fonts like 0-O or i-I-l.
   private static final String TELE_TAN_ALLOWED_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
-  private static final String TELE_TAN_PATTERN = "^[" + TELE_TAN_ALLOWED_CHARS + "]{" + TELE_TAN_LENGTH + "}$";
+  // Note the total length of teleTAN, is made up of the teletan length and the check digit
+  private static final int TELE_TAN_TOTAL_LENGTH = TELE_TAN_LENGTH + CHECK_DIGIT_LENGTH;
+  private static final String TELE_TAN_PATTERN = "^[" + TELE_TAN_ALLOWED_CHARS + "]{" + TELE_TAN_TOTAL_LENGTH + "}$";
   private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
 
   /**
@@ -157,13 +161,14 @@ public class TanService {
    * @return a new teleTAN
    */
   public String generateTeleTan() {
-    return IntStream.range(0, TELE_TAN_LENGTH)
+    String teletan = IntStream.range(0, TELE_TAN_LENGTH)
       .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
       .collect(Collector.of(
         StringBuilder::new,
         StringBuilder::append,
         StringBuilder::append,
         StringBuilder::toString));
+    return teletan + hashingService.getCheckDigit(teletan);
   }
 
   /**

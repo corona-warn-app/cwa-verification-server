@@ -41,6 +41,7 @@ public class VerificationApplication {
 
   /**
    * The main Method.
+   *
    * @param args the args for the main method
    */
   public static void main(String[] args) {

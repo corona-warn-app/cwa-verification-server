@@ -2,6 +2,8 @@ package app.coronawarn.verification.client;
 
 import feign.Client;
 
-public interface FeignClientProvider {
+public interface TestResultServerClientProvider {
+
   Client createFeignClient();
+
 }

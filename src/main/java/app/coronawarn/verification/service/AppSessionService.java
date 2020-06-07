@@ -32,8 +32,6 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -158,9 +156,7 @@ public class AppSessionService {
    */
   public boolean checkRegistrationTokenAlreadyExistsForGuid(String hashedGuid) {
     log.info("Start checkRegistrationTokenAlreadyExistsForGuid.");
-    VerificationAppSession appSession = new VerificationAppSession();
-    appSession.setHashedGuid(hashedGuid);
-    return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
+    return appSessionRepository.findByHashedGuid(hashedGuid).isPresent();
   }
 
   /**
@@ -172,9 +168,7 @@ public class AppSessionService {
    */
   public boolean checkRegistrationTokenAlreadyExistForTeleTan(String teleTan) {
     log.info("Start checkTeleTanAlreadyExistForTeleTan.");
-    VerificationAppSession appSession = new VerificationAppSession();
-    appSession.setTeleTanHash(hashingService.hash(teleTan));
-    return appSessionRepository.exists(Example.of(appSession, ExampleMatcher.matchingAll()));
+    return appSessionRepository.findByTeleTanHash(hashingService.hash(teleTan)).isPresent();
   }
 
   /**

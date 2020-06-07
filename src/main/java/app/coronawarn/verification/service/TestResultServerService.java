@@ -19,32 +19,34 @@
  * under the License.
  */
 
-package app.coronawarn.verification.client;
+package app.coronawarn.verification.service;
 
+import app.coronawarn.verification.client.TestResultServerClient;
 import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.TestResult;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
- * This class represents the Labor Server service feign client.
+ * This class represents the lab server service.
  */
-@FeignClient(
-  name = "testResultServerClient",
-  url = "${cwa-testresult-server.url}",
-  configuration = TestResultServerClientConfig.class)
-public interface TestResultServerClient {
+@Slf4j
+@RequiredArgsConstructor
+@Component
+public class TestResultServerService {
+
+  @NonNull
+  private final TestResultServerClient testResultServerClient;
 
   /**
-   * This method gets a testResult from the LabServer.
+   * This method gives an TestResult for a guid.
    *
-   * @param guid for TestResult
-   * @return TestResult from server
+   * @param guid hashed GUID
+   * @return Testresult for GUID
    */
-  @PostMapping(value = "/api/v1/app/result",
-    consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
-  )
-  TestResult result(HashedGuid guid);
+  public TestResult result(HashedGuid guid) {
+    return testResultServerClient.result(guid);
+  }
 }

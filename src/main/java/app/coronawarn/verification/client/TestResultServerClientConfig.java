@@ -19,33 +19,22 @@
  * under the License.
  */
 
-package app.coronawarn.verification.service;
+package app.coronawarn.verification.client;
 
-import app.coronawarn.verification.client.TestResultServerClient;
-import app.coronawarn.verification.model.HashedGuid;
-import app.coronawarn.verification.model.TestResult;
-import lombok.NonNull;
+import feign.Client;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-/**
- * This class represents the lab server service.
- */
-@Slf4j
+@Configuration
 @RequiredArgsConstructor
-@Component
-public class LabServerService {
+public class TestResultServerClientConfig {
 
-  @NonNull
-  private final TestResultServerClient testResultServerClient;
+  private final TestResultServerClientProvider testResultServerClientProvider;
 
-  /**
-   * This method gives an TestResult for a guid.
-   * @param guid hashed GUID
-   * @return Testresult for GUID
-   */
-  public TestResult result(HashedGuid guid) {
-    return testResultServerClient.result(guid);
+  @Bean
+  public Client feignClient() {
+    return testResultServerClientProvider.createFeignClient();
   }
+
 }

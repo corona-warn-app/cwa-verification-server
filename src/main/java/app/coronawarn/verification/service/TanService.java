@@ -146,7 +146,7 @@ public class TanService {
   /**
    * This method generates a {@link VerificationTan} - entity and saves it.
    *
-   * @param tan the TAN
+   * @param tan     the TAN
    * @param tanType the TAN type
    * @return the persisted TAN
    */

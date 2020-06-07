@@ -28,7 +28,7 @@ import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.*;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
-import app.coronawarn.verification.service.LabServerService;
+import app.coronawarn.verification.service.TestResultServerService;
 import app.coronawarn.verification.service.TanService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -89,7 +89,7 @@ public class VerificationApplicationTest {
   @Autowired
   private MockMvc mockMvc;
   @MockBean
-  private LabServerService labServerService;
+  private TestResultServerService testResultServerService;
   @MockBean
   private TanService tanService;
   @Autowired
@@ -115,7 +115,7 @@ public class VerificationApplicationTest {
     log.info("process callGenerateTan()");
 
     prepareAppSessionTestData();
-    doReturn(TEST_LAB_POSITIVE_RESULT).when(labServerService).result(any());
+    doReturn(TEST_LAB_POSITIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
@@ -173,7 +173,7 @@ public class VerificationApplicationTest {
   public void callGenerateTanWithNegativeCovidResult() throws Exception {
     log.info("process callGenerateTanWithNegativeCovidResult()");
     prepareAppSessionTestData();
-    doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
+    doReturn(TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
@@ -213,7 +213,7 @@ public class VerificationApplicationTest {
     VerificationAppSession appSessionTestData = getAppSessionTestData();
     appSessionTestData.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
     appSessionrepository.save(appSessionTestData);
-    doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
+    doReturn(TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
@@ -233,7 +233,7 @@ public class VerificationApplicationTest {
     VerificationAppSession appSessionTestData = getAppSessionTestData();
     appSessionTestData.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
     appSessionrepository.save(appSessionTestData);
-    doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
+    doReturn(TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
@@ -433,7 +433,7 @@ public class VerificationApplicationTest {
 
     prepareAppSessionTestData();
 
-    given(this.labServerService.result(new HashedGuid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
+    given(this.testResultServerService.result(new HashedGuid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))

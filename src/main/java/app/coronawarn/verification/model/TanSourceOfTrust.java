@@ -23,6 +23,7 @@ package app.coronawarn.verification.model;
 
 /**
  * This class represents the possible sources of trust for a TAN entity.
+ *
  * @see <a href="https://github.com/corona-warn-app/cwa-verification-server/blob/master/docs/architecture-overview.md#entity-tan">Entity TAN - sourceOfTrust</a>
  */
 public enum TanSourceOfTrust {

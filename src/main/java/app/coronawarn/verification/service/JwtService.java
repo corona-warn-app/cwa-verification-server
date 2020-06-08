@@ -122,10 +122,10 @@ public class JwtService {
     return realm.getOrDefault(ROLES, new ArrayList<>());
   }
 
+  @SuppressWarnings("unchecked")
   private Map<String, List<String>> getRealmFromToken(final String token, final PublicKey publicKey) {
     final Claims claims = getAllClaimsFromToken(token, publicKey);
-    Map<String, List<String>> realms = claims.get(REALM_ACCESS, Map.class);
-    return realms;
+    return claims.get(REALM_ACCESS, Map.class);
   }
 
   public <T> T getClaimFromToken(final String token, Function<Claims, T> claimsResolver, final PublicKey publicKey) {
@@ -134,8 +134,7 @@ public class JwtService {
   }
 
   private Claims getAllClaimsFromToken(final String token, final PublicKey publicKey) {
-    Claims claims = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).getBody();
-    return claims;
+    return Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).getBody();
   }
 
   /**
@@ -145,7 +144,6 @@ public class JwtService {
    */
   public PublicKey getPublicKey() {
     Certs certs = iamClient.certs();
-    PublicKey pubKey = null;
     for (Key key : certs.getKeys()) {
       if (key.isCertValid()) {
         String certb64 = key.getX5c().get(0);
@@ -160,6 +158,6 @@ public class JwtService {
         log.warn("Error getting public key - not the right use or alg key");
       }
     }
-    return pubKey;
+    return null;
   }
 }

@@ -35,49 +35,50 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
  * This class represents the TanService service.
  */
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class TanService {
 
-  // TANs are UUIDs
-  private static final String UUID_PATTERN = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$";
-  private static final String TAN_TAN_PATTERN = UUID_PATTERN;
-  private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
-
-  // Tele-TANs are a shorter, easier to communicate form of TAN
-  @Value("${tan.tele.valid.length}")
-  private static int TELE_TAN_LENGTH = 9;
-  private static final int CHECK_DIGIT_LENGTH = 1;
-  
-  // Exclude characters which can be confusing in some fonts like 0-O or i-I-l.
-  private static final String TELE_TAN_ALLOWED_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
-  // Note the total length of teleTAN, is made up of the teletan length and the check digit
-  private static final int TELE_TAN_TOTAL_LENGTH = TELE_TAN_LENGTH + CHECK_DIGIT_LENGTH;
-  private static final String TELE_TAN_PATTERN = "^[" + TELE_TAN_ALLOWED_CHARS + "]{" + TELE_TAN_TOTAL_LENGTH + "}$";
-  private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
-
-  @NonNull
   private final VerificationApplicationConfig verificationApplicationConfig;
 
   /**
    * The {@link VerificationTanRepository}.
    */
-  @NonNull
   private final VerificationTanRepository tanRepository;
   /**
    * The {@link HashingService}.
    */
-  @NonNull
   private final HashingService hashingService;
+
+  private final Pattern teleTanPattern;
+
+  /**
+   * Constructor for the TanService that also builds the pattern for tele tan verification.
+   *
+   * @param verificationApplicationConfig the {@link VerificationApplicationConfig} with needed tan configurations
+   * @param tanRepository the {@link VerificationTanRepository} where tans are queried and inserted
+   * @param hashingService the {@link HashingService} implementation
+   */
+  public TanService(
+    @NonNull VerificationApplicationConfig verificationApplicationConfig,
+    @NonNull VerificationTanRepository tanRepository,
+    @NonNull HashingService hashingService
+  ) {
+    this.verificationApplicationConfig = verificationApplicationConfig;
+    this.tanRepository = tanRepository;
+    this.hashingService = hashingService;
+    this.teleTanPattern = Pattern.compile("^["
+      + verificationApplicationConfig.getTan().getTele().getValid().getChars()
+      + "]{"
+      + (verificationApplicationConfig.getTan().getTele().getValid().getLength() + 1)
+      + "}$");
+  }
 
   /**
    * Saves a {@link VerificationTan} into the database.
@@ -105,7 +106,7 @@ public class TanService {
    * @return teleTAN verification flag
    */
   private boolean syntaxTeleTanVerification(String teleTan) {
-    Matcher matcher = PATTERN.matcher(teleTan);
+    Matcher matcher = teleTanPattern.matcher(teleTan);
     return matcher.find();
   }
 
@@ -163,8 +164,10 @@ public class TanService {
    * @return a new teleTAN
    */
   public String generateTeleTan() {
-    String teletan = IntStream.range(0, TELE_TAN_LENGTH)
-      .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
+    final int length = verificationApplicationConfig.getTan().getTele().getValid().getLength();
+    final String chars = verificationApplicationConfig.getTan().getTele().getValid().getChars();
+    String teletan = IntStream.range(0, length)
+      .mapToObj(i -> chars.charAt(Holder.NUMBER_GENERATOR.nextInt(chars.length())))
       .collect(Collector.of(
         StringBuilder::new,
         StringBuilder::append,
@@ -249,11 +252,6 @@ public class TanService {
   public Optional<VerificationTan> getEntityByTan(String tan) {
     log.info("Start getEntityByTan.");
     return tanRepository.findByTanHash(hashingService.hash(tan));
-  }
-
-  @Value("${tan.tele.valid.length}")
-  private void setTeleTanLength(String length) {
-    TanService.TELE_TAN_LENGTH = Integer.valueOf(length);
   }
 
   /*

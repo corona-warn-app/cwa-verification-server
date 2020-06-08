@@ -33,105 +33,105 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
-  
-  private TanCfg tan = new TanCfg();
-  private AppSessionCfg appsession = new AppSessionCfg();
-  private EntitiesCfg entities = new EntitiesCfg();
-  private JwtCfg jwt = new JwtCfg();
+
+  private Tan tan = new Tan();
+  private AppSession appsession = new AppSession();
+  private Entities entities = new Entities();
+  private Jwt jwt = new Jwt();
 
   /**
-   * Configure the TeleCfg with build property values and return the configured
+   * Configure the Tan with build property values and return the configured
    * parameters.
    */
-  public static class TeleCfg {
-    @Getter
-    @Setter
-    private TeleValidCfg valid = new TeleValidCfg();
+  @Getter
+  @Setter
+  public static class Tan {
+
+    private Tele tele = new Tele();
+    private Valid valid = new Valid();
 
     /**
-     * Configure the TeleValidCfg with build property values and return the
-     * configured parameters.
+     * Configure the Tele with build property values and return the configured
+     * parameters.
      */
-    public static class TeleValidCfg {
-      @Getter
-      @Setter
-      private int length = 1;
+    @Getter
+    @Setter
+    public static class Tele {
 
-      // Number of hours that teleTAN remains valid
+      private Valid valid = new Valid();
+
+      /**
+       * Configure the TeleValid with build property values and return the
+       * configured parameters.
+       */
       @Getter
       @Setter
-      private int hours = 1;
+      public static class Valid {
+
+        private String chars = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+        private int length = 1;
+        // Number of hours that teleTAN remains valid
+        private int hours = 1;
+      }
+    }
+
+    /**
+     * Configure the Valid with build property values and return the configured
+     * parameters.
+     */
+    @Getter
+    @Setter
+    public static class Valid {
+
+      // Number of days that TAN remains valid
+      int days = 14;
     }
   }
 
   /**
-   * Configure the ValidCfg with build property values and return the configured
-   * parameters.
-   */
-  public static class ValidCfg {
-
-    // Number of days that TAN remains valid
-    @Getter
-    @Setter
-    int days = 14;
-  }
-
-  /**
-   * Configure the TanCfg with build property values and return the configured
-   * parameters.
-   */
-  public static class TanCfg {
-    @Getter
-    @Setter
-    private TeleCfg tele = new TeleCfg();
-
-    @Getter
-    @Setter
-    private ValidCfg valid = new ValidCfg();
-  }
-
-  /**
-   * Configure the AppSessionCfg with build property values and return the
+   * Configure the AppSession with build property values and return the
    * configured parameters.
    */
-  public static class AppSessionCfg {
+  @Getter
+  @Setter
+  public static class AppSession {
 
     // Maximum number of tans in a session at one time
-    @Getter
-    @Setter
     int tancountermax = 2;
   }
 
   /**
-   * Configure the EntitiesCfg with build property values and return the
+   * Configure the Entities with build property values and return the
    * configured parameters.
    */
-  public static class EntitiesCfg {
+  @Getter
+  @Setter
+  public static class Entities {
+
+    private Cleanup cleanup = new Cleanup();
+
+    /**
+     * Configure the Cleanup with build property values and return the
+     * configured parameters.
+     */
     @Getter
     @Setter
-    private CleanupCfg cleanup = new CleanupCfg();
+    public static class Cleanup {
+
+      private Integer days = 21;
+    }
+
   }
 
   /**
-   * Configure the CleanupCfg with build property values and return the
-   * configured parameters.
-   */
-  public static class CleanupCfg {
-    @Getter
-    @Setter
-    private Integer days = 21;
-  }
-
-  /**
-   * Configure the JwtCfg with build property values and return the configured
+   * Configure the Jwt with build property values and return the configured
    * parameters.
    */
-  public static class JwtCfg {
-    @Getter
-    @Setter
+  @Getter
+  @Setter
+  public static class Jwt {
+
     private String server = "http://localhost:8080";
-    @Getter
-    @Setter
-    private Boolean enabled = false;    
+    private Boolean enabled = false;
   }
 }

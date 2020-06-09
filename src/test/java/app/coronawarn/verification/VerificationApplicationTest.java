@@ -21,20 +21,51 @@
 
 package app.coronawarn.verification;
 
-import app.coronawarn.verification.model.HashedGuid;
-import app.coronawarn.verification.model.TestResult;
+import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
-import app.coronawarn.verification.model.*;
+import app.coronawarn.verification.model.AppSessionSourceOfTrust;
+import app.coronawarn.verification.model.AuthorizationRole;
+import app.coronawarn.verification.model.HashedGuid;
+import app.coronawarn.verification.model.RegistrationToken;
+import app.coronawarn.verification.model.RegistrationTokenKeyType;
+import app.coronawarn.verification.model.RegistrationTokenRequest;
+import app.coronawarn.verification.model.Tan;
+import app.coronawarn.verification.model.TanSourceOfTrust;
+import app.coronawarn.verification.model.TanType;
+import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
-import app.coronawarn.verification.service.LabServerService;
+import app.coronawarn.verification.service.JwtService;
 import app.coronawarn.verification.service.TanService;
+import app.coronawarn.verification.service.TestResultServerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import java.io.UnsupportedEncodingException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -44,16 +75,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -88,13 +109,19 @@ public class VerificationApplicationTest {
   @Autowired
   private MockMvc mockMvc;
   @MockBean
-  private LabServerService labServerService;
+  private TestResultServerService testResultServerService;
   @MockBean
   private TanService tanService;
   @Autowired
   private VerificationAppSessionRepository appSessionrepository;
   @Autowired
   private ObjectMapper mapper;
+  
+  @Autowired
+  private VerificationApplicationConfig verificationApplicationConfig;
+
+  @MockBean
+  private JwtService jwtService;
 
   @BeforeEach
   void setUp() {
@@ -111,7 +138,7 @@ public class VerificationApplicationTest {
     log.info("process callGenerateTan()");
 
     prepareAppSessionTestData();
-    doReturn(TEST_LAB_POSITIVE_RESULT).when(labServerService).result(any());
+    doReturn(TEST_LAB_POSITIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
@@ -169,7 +196,7 @@ public class VerificationApplicationTest {
   public void callGenerateTanWithNegativeCovidResult() throws Exception {
     log.info("process callGenerateTanWithNegativeCovidResult()");
     prepareAppSessionTestData();
-    doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
+    doReturn(TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
@@ -187,7 +214,8 @@ public class VerificationApplicationTest {
     log.info("process callGenerateTanWithTanCounterMaximum()");
     appSessionrepository.deleteAll();
     VerificationAppSession appSessionTestData = getAppSessionTestData();
-    appSessionTestData.setTanCounter(2);
+    int tancountermax = verificationApplicationConfig.getAppsession().getTancountermax();
+    appSessionTestData.setTanCounter(tancountermax);
     appSessionrepository.save(appSessionTestData);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
@@ -208,7 +236,7 @@ public class VerificationApplicationTest {
     VerificationAppSession appSessionTestData = getAppSessionTestData();
     appSessionTestData.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
     appSessionrepository.save(appSessionTestData);
-    doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
+    doReturn(TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
@@ -228,7 +256,7 @@ public class VerificationApplicationTest {
     VerificationAppSession appSessionTestData = getAppSessionTestData();
     appSessionTestData.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
     appSessionrepository.save(appSessionTestData);
-    doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
+    doReturn(TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
@@ -245,8 +273,37 @@ public class VerificationApplicationTest {
   public void callGenerateTeleTAN() throws Exception {
     log.info("process callGenerateTeleTAN()");
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan"))
+    KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
+    keyGenerator.initialize(1024);
+    KeyPair kp = keyGenerator.genKeyPair();
+    String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+
+    //when(this.jwtService.isAuthorized(any())).thenCallRealMethod();
+    given(this.jwtService.isAuthorized(any())).willReturn(Boolean.TRUE);
+    given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
+    when(this.jwtService.validateToken(jwtString, kp.getPublic())).thenCallRealMethod();
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
       .andExpect(status().isCreated());
+  }
+
+  /**
+   * Test the generation of a tele Tan, when the jwt is not authorized.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGenerateTeleTanUnauthorized() throws Exception {
+    log.info("process callGenerateTeleTanUnauthorized()");
+
+    KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
+    keyGenerator.initialize(1024);
+    KeyPair kp = keyGenerator.genKeyPair();
+    given(this.jwtService.isAuthorized(any())).willReturn(false);
+    given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
+    String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
+      .andExpect(status().isUnauthorized());
   }
 
   /**
@@ -349,7 +406,7 @@ public class VerificationApplicationTest {
     log.info("process callGetRegistrationTokenByUnknownTeleTan() ");
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_TELE_TAN, RegistrationTokenKeyType.TELETAN);
-    when(this.tanService.verifyTeleTan(TEST_TELE_TAN)).thenCallRealMethod();
+    given(this.tanService.verifyTeleTan(TEST_TELE_TAN)).willReturn(false);
     given(this.tanService.getEntityByTan(TEST_TELE_TAN)).willReturn(Optional.empty());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
@@ -376,7 +433,6 @@ public class VerificationApplicationTest {
   }
 
   /**
-   *
    * Test get registration token for a guid, but the guid already has a registration token.
    *
    * @throws Exception if the test cannot be performed.
@@ -428,7 +484,7 @@ public class VerificationApplicationTest {
 
     prepareAppSessionTestData();
 
-    given(this.labServerService.result(new HashedGuid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
+    given(this.testResultServerService.result(new HashedGuid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
@@ -558,6 +614,38 @@ public class VerificationApplicationTest {
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(new Tan(TEST_TAN))))
       .andExpect(status().isNotFound());
+  }
+
+  private String getJwtTestData(final long expirationSecondsToAdd, PrivateKey privateKey, AuthorizationRole... roles) throws UnsupportedEncodingException {
+    final Map<String, List<String>> realm_accessMap = new HashMap<>();
+    final List<String> roleNames = new ArrayList<>();
+    for (AuthorizationRole role : roles) {
+      roleNames.add(role.getRoleName());
+    }
+
+    realm_accessMap.put("roles", roleNames);
+
+    return Jwts.builder()
+      .setExpiration(Date.from(Instant.now().plusSeconds(expirationSecondsToAdd)))
+      .setIssuedAt(Date.from(Instant.now()))
+      .setId("baeaa733-521e-4d2e-8abe-95bb440a9f5f")
+      .setIssuer("http://localhost:8080/auth/realms/cwa")
+      .setAudience("account")
+      .setSubject("72b3b494-a0f4-49f5-b235-1e9f93c86e58")
+      .claim("auth_time", "1590742669")
+      .claim("iss", "http://localhost:8080/auth/realms/cwa")
+      .claim("aud", "account")
+      .claim("typ", "Bearer")
+      .claim("azp", "verification-portal")
+      .claim("session_state", "41cc4d83-e394-4d08-b887-28d8c5372d4a")
+      .claim("acr", "0")
+      .claim("realm_access", realm_accessMap)
+      .claim("resource_access", new HashMap())
+      .claim("scope", "openid profile email")
+      .claim("email_verified", false)
+      .claim("preferred_username", "test")
+      .signWith(SignatureAlgorithm.RS256, privateKey)
+      .compact();
   }
 
   private void prepareAppSessionTestData() {

@@ -35,7 +35,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -43,35 +42,43 @@ import org.springframework.stereotype.Component;
  * This class represents the TanService service.
  */
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class TanService {
 
-  // TANs are UUIDs
-  private static final String UUID_PATTERN = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$";
-  private static final String TAN_TAN_PATTERN = UUID_PATTERN;
-  private static final Pattern TAN_PATTERN = Pattern.compile(TAN_TAN_PATTERN);
-
-  // Tele-TANs are a shorter, easier to communicate form of TAN
-  private static final int TELE_TAN_LENGTH = 7;
-  // Exclude characters which can be confusing in some fonts like 0-O or i-I-l.
-  private static final String TELE_TAN_ALLOWED_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
-  private static final String TELE_TAN_PATTERN = "^[" + TELE_TAN_ALLOWED_CHARS + "]{" + TELE_TAN_LENGTH + "}$";
-  private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
+  private final VerificationApplicationConfig verificationApplicationConfig;
 
   /**
    * The {@link VerificationTanRepository}.
    */
-  @NonNull
   private final VerificationTanRepository tanRepository;
   /**
    * The {@link HashingService}.
    */
-  @NonNull
   private final HashingService hashingService;
 
-  @NonNull
-  private final VerificationApplicationConfig verificationApplicationConfig;
+  private final Pattern teleTanPattern;
+
+  /**
+   * Constructor for the TanService that also builds the pattern for tele tan verification.
+   *
+   * @param verificationApplicationConfig the {@link VerificationApplicationConfig} with needed tan configurations
+   * @param tanRepository the {@link VerificationTanRepository} where tans are queried and inserted
+   * @param hashingService the {@link HashingService} implementation
+   */
+  public TanService(
+    @NonNull VerificationApplicationConfig verificationApplicationConfig,
+    @NonNull VerificationTanRepository tanRepository,
+    @NonNull HashingService hashingService
+  ) {
+    this.verificationApplicationConfig = verificationApplicationConfig;
+    this.tanRepository = tanRepository;
+    this.hashingService = hashingService;
+    this.teleTanPattern = Pattern.compile("^["
+      + verificationApplicationConfig.getTan().getTele().getValid().getChars()
+      + "]{"
+      + (verificationApplicationConfig.getTan().getTele().getValid().getLength() + 1)
+      + "}$");
+  }
 
   /**
    * Saves a {@link VerificationTan} into the database.
@@ -99,7 +106,7 @@ public class TanService {
    * @return teleTAN verification flag
    */
   private boolean syntaxTeleTanVerification(String teleTan) {
-    Matcher matcher = PATTERN.matcher(teleTan);
+    Matcher matcher = teleTanPattern.matcher(teleTan);
     return matcher.find();
   }
 
@@ -142,7 +149,7 @@ public class TanService {
   /**
    * This method generates a {@link VerificationTan} - entity and saves it.
    *
-   * @param tan the TAN
+   * @param tan     the TAN
    * @param tanType the TAN type
    * @return the persisted TAN
    */
@@ -157,11 +164,13 @@ public class TanService {
    * @return a new teleTAN
    */
   public String generateTeleTan() {
+    final int length = verificationApplicationConfig.getTan().getTele().getValid().getLength();
+    final String chars = verificationApplicationConfig.getTan().getTele().getValid().getChars();
     return Holder.NUMBER_GENERATOR
-        .ints(TELE_TAN_LENGTH, 0, TELE_TAN_ALLOWED_CHARS.length())
-        .map(TELE_TAN_ALLOWED_CHARS::codePointAt)
+        .ints(length, 0, chars.length())
+        .map(chars::codePointAt)
         .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-        .toString();
+        .toString() + hashingService.getCheckDigit(teletan);
   }
 
   /**

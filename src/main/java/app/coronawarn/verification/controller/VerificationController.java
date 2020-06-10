@@ -234,7 +234,7 @@ public class VerificationController {
       appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
     if (appSession.isPresent()) {
       if ((appSession.get().getHashedGuid() == null) && (appSession.get().getTeleTanHash() != null)) {
-	log.info("The result will be returned.");
+        log.info("The result will be returned.");
         return ResponseEntity.ok(new TestResult(LabTestResult.POSITIVE.getTestResult()));
       }
       String hash = appSession.get().getHashedGuid();

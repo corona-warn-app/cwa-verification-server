@@ -98,6 +98,7 @@ public class AppSessionService {
           appSession.setHashedGuid(key);
           appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
           saveAppSession(appSession);
+          log.info("Returning the successfully created registration token.");
           return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(new RegistrationToken(registrationToken));
@@ -113,6 +114,7 @@ public class AppSessionService {
           appSession.setTeleTanHash(hashingService.hash(key));
           appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
           saveAppSession(appSession);
+          log.info("Returning the successfully created registration token.");
           return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(new RegistrationToken(registrationToken));

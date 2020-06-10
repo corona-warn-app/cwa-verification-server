@@ -197,9 +197,9 @@ public class VerificationController {
             throw new VerificationServerException(HttpStatus.BAD_REQUEST,
               "Unknown source of trust inside the appsession for the registration token");
         }
-        String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
         appSession.incrementTanCounter();
         appSessionService.saveAppSession(appSession);
+        String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
         log.info("Returning the successfully generated tan.");
         return ResponseEntity.status(HttpStatus.CREATED).body(new Tan(generatedTan));
       }

@@ -413,7 +413,7 @@ public class VerificationApplicationTest {
     log.info("process callGetRegistrationTokenByUnknownTeleTan() ");
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_TELE_TAN, RegistrationTokenKeyType.TELETAN);
-    when(this.tanService.verifyTeleTan(TEST_TELE_TAN)).thenCallRealMethod();
+    given(this.tanService.verifyTeleTan(TEST_TELE_TAN)).willReturn(false);
     given(this.tanService.getEntityByTan(TEST_TELE_TAN)).willReturn(Optional.empty());
 
     mockMvcPostAndVerify(getAsJsonFormat(request), "/registrationToken", status().isBadRequest());

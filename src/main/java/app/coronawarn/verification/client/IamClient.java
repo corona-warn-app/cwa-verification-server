@@ -21,16 +21,22 @@
 
 package app.coronawarn.verification.client;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import app.coronawarn.verification.model.Certs;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * This class represents the TestResult.
+ * This class represents the IAM feign client.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class TestResult {
-  private int testResult;
+@FeignClient(name = "IamService", url = "${jwt.server}")
+public interface IamClient {
+  /**
+   * This method gets the cert information from the IAM Server.
+   * @return Testresult from server
+   */
+  @GetMapping(value = "/auth/realms/cwa/protocol/openid-connect/certs",
+    consumes = MediaType.APPLICATION_JSON_VALUE
+  )
+   Certs certs();
 }

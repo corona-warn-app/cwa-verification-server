@@ -3,7 +3,7 @@
  *
  * (C) 2020, T-Systems International GmbH
  *
- * Deutsche Telekom AG and all other contributors /
+ * Deutsche Telekom AG, SAP AG and all other contributors /
  * copyright owners license this file to you under the Apache
  * License, Version 2.0 (the "License"); you may not use this
  * file except in compliance with the License.
@@ -19,28 +19,28 @@
  * under the License.
  */
 
-package app.coronawarn.verification.service;
+package app.coronawarn.verification.exception;
 
-import app.coronawarn.verification.client.HashedGuid;
-import app.coronawarn.verification.client.LabServerClient;
-import app.coronawarn.verification.client.TestResult;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 /**
- * This class represents the lab server service.
+ * This class represents the Verification Server Exception.
  */
-@Slf4j
-@RequiredArgsConstructor
-@Component
-public class LabServerService {
+@Getter
+public class VerificationServerException extends RuntimeException {
 
-  @NonNull
-  private final LabServerClient labServerClient;
+  private final HttpStatus httpStatus;
 
-  public TestResult result(HashedGuid guid) {
-    return labServerClient.result(guid);
+  /**
+   * The Constructor for the Exception class.
+   *
+   * @param httpStatus the state of the server
+   * @param message    the message
+   */
+  public VerificationServerException(HttpStatus httpStatus, String message) {
+    super(message);
+    this.httpStatus = httpStatus;
   }
+
 }

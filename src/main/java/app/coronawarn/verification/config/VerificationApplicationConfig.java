@@ -26,33 +26,112 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * This class is used to read in values from configuration file application.yml.
- * It is loaded via the @EnableConfigurationProperties annotation from SpringBootApplication main class. */
+ * This class and its nested subclasses are used to read in values from configuration file application.yml,
+ * which is loaded via the '@EnableConfigurationProperties' annotation from SpringBootApplication main class.
+ */
+@Getter
+@Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
 
-  public static class TeleCfg {
-    public static class TeleValidCfg {
-      @Getter @Setter private int hours;
+  private Tan tan = new Tan();
+  private AppSession appsession = new AppSession();
+  private Entities entities = new Entities();
+  private Jwt jwt = new Jwt();
+
+  /**
+   * Configure the Tan with build property values and return the configured
+   * parameters.
+   */
+  @Getter
+  @Setter
+  public static class Tan {
+
+    private Tele tele = new Tele();
+    private Valid valid = new Valid();
+
+    /**
+     * Configure the Tele with build property values and return the configured
+     * parameters.
+     */
+    @Getter
+    @Setter
+    public static class Tele {
+
+      private Valid valid = new Valid();
+
+      /**
+       * Configure the TeleValid with build property values and return the
+       * configured parameters.
+       */
+      @Getter
+      @Setter
+      public static class Valid {
+
+        private String chars = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+        private int length = 1;
+        // Number of hours that teleTAN remains valid
+        private int hours = 1;
+      }
     }
 
-    @Getter @Setter private TeleValidCfg valid;
+    /**
+     * Configure the Valid with build property values and return the configured
+     * parameters.
+     */
+    @Getter
+    @Setter
+    public static class Valid {
+
+      // Number of days that TAN remains valid
+      int days = 14;
+    }
   }
 
-  public static class ValidCfg {
-    @Getter @Setter int days;
+  /**
+   * Configure the AppSession with build property values and return the
+   * configured parameters.
+   */
+  @Getter
+  @Setter
+  public static class AppSession {
+
+    // Maximum number of tans in a session at one time
+    int tancountermax = 2;
   }
 
-  public static class TanCfg {
-    @Getter @Setter private TeleCfg tele;
-    @Getter @Setter private ValidCfg valid;
+  /**
+   * Configure the Entities with build property values and return the
+   * configured parameters.
+   */
+  @Getter
+  @Setter
+  public static class Entities {
+
+    private Cleanup cleanup = new Cleanup();
+
+    /**
+     * Configure the Cleanup with build property values and return the
+     * configured parameters.
+     */
+    @Getter
+    @Setter
+    public static class Cleanup {
+
+      private Integer days = 21;
+    }
+
   }
 
-  public static class AppSessionCfg {
-    @Getter @Setter int tancountermax;
-  }
-  
-  @Getter @Setter private TanCfg tan;
-  @Getter @Setter private AppSessionCfg appsession;
+  /**
+   * Configure the Jwt with build property values and return the configured
+   * parameters.
+   */
+  @Getter
+  @Setter
+  public static class Jwt {
 
+    private String server = "http://localhost:8080";
+    private Boolean enabled = false;
+  }
 }

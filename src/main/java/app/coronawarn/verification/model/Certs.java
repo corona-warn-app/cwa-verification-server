@@ -19,20 +19,20 @@
  * under the License.
  */
 
-package app.coronawarn.verification.client;
+package app.coronawarn.verification.model;
 
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * This class represents the Labor Server service client.
- */
-@FeignClient(name = "labServerService", url = "${uri.endpoint.labserver}")
-public interface LabServerClient {
-  @PostMapping(value = "/api/v1/app/result",
-    consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
-  )
-  TestResult result(HashedGuid guid);
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Certs {
+  
+  private List<Key> keys = null;
+  private Map<String, Object> additionalProperties = new HashMap<>();
 }

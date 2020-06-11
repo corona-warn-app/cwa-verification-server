@@ -89,11 +89,7 @@ public class VerificationController {
    * The route to the teleTAN generation endpoint.
    */
   public static final String TELE_TAN_ROUTE = "/tan/teletan";
-  /**
-   * The http request header 'X-Auth-Token'.
-   */
-  private static final String REQ_HEADER_X_AUTH_TOKEN = "X-Auth-Token";
-
+  
   @NonNull
   private final AppSessionService appSessionService;
 
@@ -291,7 +287,7 @@ public class VerificationController {
     produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<TeleTan> createTeleTan(
-    @RequestHeader(REQ_HEADER_X_AUTH_TOKEN) @Valid AuthorizationToken authorization) {
+    @RequestHeader(JwtService.HEADER_NAME_AUTHORIZATION) @Valid AuthorizationToken authorization) {
     if (jwtService.isAuthorized(authorization.getToken())) {
       String teleTan = tanService.generateVerificationTeleTan();
       log.info("The teleTAN is generated.");

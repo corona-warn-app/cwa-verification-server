@@ -283,7 +283,7 @@ public class VerificationApplicationTest {
     given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
     when(this.jwtService.validateToken(jwtString, kp.getPublic())).thenCallRealMethod();
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, JwtService.TOKEN_PREFIX + jwtString))
       .andExpect(status().isCreated());
   }
 
@@ -302,7 +302,7 @@ public class VerificationApplicationTest {
     given(this.jwtService.isAuthorized(any())).willReturn(false);
     given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
     String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, JwtService.TOKEN_PREFIX + jwtString))
       .andExpect(status().isUnauthorized());
   }
 

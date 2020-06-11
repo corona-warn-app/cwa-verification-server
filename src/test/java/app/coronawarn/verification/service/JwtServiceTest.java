@@ -20,7 +20,6 @@
  */
 package app.coronawarn.verification.service;
 
-import app.coronawarn.verification.VerificationApplication;
 import app.coronawarn.verification.client.IamClient;
 import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.model.AuthorizationRole;
@@ -31,21 +30,31 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
 import org.junit.Assert;
@@ -54,84 +63,81 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ContextConfiguration(classes = VerificationApplication.class)
-public class JwtServiceTest
-{
-  public static final String TOKEN_PREFIX = "Bearer ";
-  public static final String BEGIN_PEM = "-----BEGIN PUBLIC KEY-----";
-  public static final String END_PEM = "-----END PUBLIC KEY-----";
+public class JwtServiceTest {
+
   public static final String RSA = "RSA";
-  
+
   private PublicKey publicKey;
   private PrivateKey privateKey;
+  private String cert;
+  
+  static {
+    Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+  }
 
   @Autowired
   private JwtService jwtService;
 
   @Before
-  public void setUp() throws NoSuchAlgorithmException {
-    KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(RSA);
-    keyGenerator.initialize(1024);
-    KeyPair kp = keyGenerator.genKeyPair();
-    publicKey = kp.getPublic();
-    privateKey = kp.getPrivate();
+  public void setUp() throws Exception {
+    KeyPair pair = generateTestCertificate();
+    publicKey = pair.getPublic();
+    privateKey = pair.getPrivate();
   }
 
   /**
    * Test to validate an valid Token, with the
    * {@link JwtService#validateToken(java.lang.String)} method.
    *
-   * @throws java.io.UnsupportedEncodingException
-   * @throws java.security.NoSuchAlgorithmException
+   * @throws Exception if the test cannot be performed.
    */
   @Test
-  public void testValidateToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+  public void testValidateToken() throws Exception {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertTrue(jwtService.validateToken(jwToken, publicKey));
   }
-  
+
   /**
    * Test the negative case by not given public key, with the
    * {@link JwtService#validateToken(java.lang.String)} method.
    *
-   * @throws java.io.UnsupportedEncodingException
-   * @throws java.security.NoSuchAlgorithmException
+   * @throws Exception if the test cannot be performed.
    */
   @Test
-  public void testValidateTokenByPublicKeyIsNull() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+  public void testValidateTokenByPublicKeyIsNull() throws Exception {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertFalse(jwtService.validateToken(jwToken, null));
-  }  
+  }
 
   /**
    * Test is Token authorized, with the
    * {@link JwtService#isAuthorized(java.lang.String)} method.
    *
-   * @throws java.io.UnsupportedEncodingException
-   * @throws java.security.NoSuchAlgorithmException
+   * @throws Exception if the test cannot be performed.
    */
   @Test
-  public void testAuthorizedToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+  public void testAuthorizedToken() throws Exception {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     IamClientMock clientMock = createIamClientMock();
-    jwtService = new JwtService(clientMock, new VerificationApplicationConfig());
-    Assert.assertTrue(jwtService.isAuthorized(TOKEN_PREFIX + jwToken));
+    VerificationApplicationConfig config = new VerificationApplicationConfig();
+    config.getJwt().setEnabled(Boolean.TRUE);
+    jwtService = new JwtService(clientMock, config);
+    Assert.assertTrue(jwtService.isAuthorized(JwtService.TOKEN_PREFIX + jwToken));
   }
 
   /**
    * Test to validate an expired Token, with the
    * {@link JwtService#validateToken(java.lang.String)} method.
    *
-   * @throws java.io.UnsupportedEncodingException
-   * @throws java.security.NoSuchAlgorithmException
+   * @throws Exception if the test cannot be performed.
    */
   @Test
-  public void testExpiredToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+  public void testExpiredToken() throws Exception {
     String jwToken = getJwtTestData(0, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertFalse(jwtService.validateToken(jwToken, publicKey));
   }
@@ -166,21 +172,38 @@ public class JwtServiceTest
             .compact();
   }
   
-  private IamClientMock createIamClientMock() {
+  private KeyPair generateTestCertificate() throws Exception {
+    KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
+    KeyPair pair = kpGen.generateKeyPair();
+    LocalDateTime startDate = LocalDate.now().atStartOfDay();
+    X509v3CertificateBuilder builder = new X509v3CertificateBuilder(
+            new X500Name("CN=ca"),
+            new BigInteger("0"),
+            Date.from(startDate.atZone(ZoneId.systemDefault()).toInstant()),
+            Date.from(startDate.plusDays(3650).atZone(ZoneId.systemDefault()).toInstant()),
+            new X500Name("CN=ca"),
+            SubjectPublicKeyInfo.getInstance(pair.getPublic().getEncoded()));
+    JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA512WithRSAEncryption");
+    ContentSigner signer = csBuilder.build(pair.getPrivate());
+    X509CertificateHolder holder = builder.build(signer);
     StringWriter writer = new StringWriter();
     PemWriter pemWriter = new PemWriter(writer);
     try {
-      pemWriter.writeObject(new PemObject("PUBLIC KEY", publicKey.getEncoded()));
+      pemWriter.writeObject(new PemObject("CERTIFICATE", holder.toASN1Structure().getEncoded()));
       pemWriter.flush();
       pemWriter.close();
     } catch (IOException ex) {
-      Logger.getLogger(JwtServiceTest.class.getName()).log(Level.SEVERE, null, ex);
+      log.warn("Error writeObject: {}.", ex.getMessage());
     }
+    cert = writer.toString();
+    return pair;
+  }
+
+  private IamClientMock createIamClientMock() {
     IamClientMock clientMock = new IamClientMock();
-    String pem = writer.toString().replaceAll(System.lineSeparator(), "").replace(BEGIN_PEM, "").replace(END_PEM, "");
-    clientMock.setPem(pem);
+    clientMock.setPem(cert.replaceAll(System.lineSeparator(), "").replace(JwtService.BEGIN_CERT, "").replace(JwtService.END_CERT, ""));
     return clientMock;
-  }  
+  }
 
   public static class IamClientMock implements IamClient
   {

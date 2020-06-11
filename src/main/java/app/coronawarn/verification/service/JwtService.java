@@ -29,13 +29,13 @@ import app.coronawarn.verification.model.Key;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -53,21 +53,34 @@ import org.springframework.stereotype.Component;
 public class JwtService {
 
   /**
-   * The prefix for the json web token.
+   * The bearer prefix for the json web token.
    */
   public static final String TOKEN_PREFIX = "Bearer ";
+  /**
+   * The certificate begin prefix.
+   */
+  public static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
+  /**
+   * The certificate end suffix.
+   */
+  public static final String END_CERT = "-----END CERTIFICATE-----";
+  /**
+   * The http request header name for JWT 'Authorization'.
+   */
+  public static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+
   private static final String ROLES = "roles";
   private static final String REALM_ACCESS = "realm_access";
 
   @NonNull
   private final IamClient iamClient;
-  
+
   @NonNull
-  private final VerificationApplicationConfig verificationApplicationConfig;  
+  private final VerificationApplicationConfig verificationApplicationConfig;
 
   /**
-   * Validates the given token is given, the token starts with the needed prefix, 
-   * the signing key is not null and the token is valid.
+   * Validates the given token is given, the token starts with the needed
+   * prefix, the signing key is not null and the token is valid.
    *
    * @param authorizationToken The authorization token to validate
    * @return <code>true</code>, if the token is valid, otherwise
@@ -78,8 +91,8 @@ public class JwtService {
     if (!verificationApplicationConfig.getJwt().getEnabled()) {
       return true;
     }
-    if (null != authorizationToken && authorizationToken.startsWith(JwtService.TOKEN_PREFIX)) {
-      String jwtToken = authorizationToken.substring(JwtService.TOKEN_PREFIX.length());
+    if (null != authorizationToken && authorizationToken.startsWith(TOKEN_PREFIX)) {
+      String jwtToken = authorizationToken.substring(TOKEN_PREFIX.length());
       return validateToken(jwtToken, getPublicKey());
     }
     return false;
@@ -95,6 +108,7 @@ public class JwtService {
    * <code>false</code>
    */
   public boolean validateToken(final String token, final PublicKey publicKey) {
+    log.debug("process validateToken() by - token: {} PK: {}", token, publicKey);
     if (null != publicKey) {
       try {
         List<String> roleNames = getRoles(token, publicKey);
@@ -138,24 +152,29 @@ public class JwtService {
   }
 
   /**
-   * Get the public key from IAM client.
+   * Get the certificate from IAM client.
    *
-   * @return the calculated Public key from PEM
+   * @return the calculated Public key from the certificate
    */
   public PublicKey getPublicKey() {
     Certs certs = iamClient.certs();
+    log.debug("process getPublicKey() - cert info from IAM certs: {}", certs);
     for (Key key : certs.getKeys()) {
       if (key.isCertValid()) {
         String certb64 = key.getX5c().get(0);
+        String wrappedCert = BEGIN_CERT + System.lineSeparator() + certb64 + System.lineSeparator() + END_CERT;
         try {
-          KeyFactory kf = KeyFactory.getInstance("RSA");
-          X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getMimeDecoder().decode(certb64));
-          return kf.generatePublic(keySpecX509);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-          log.warn("Error getting public key: {}.", ex.getMessage());
+          byte[] certBytes = wrappedCert.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+          CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+          InputStream in = new ByteArrayInputStream(certBytes);
+          X509Certificate certificate = (X509Certificate) certFactory.generateCertificate(in);
+          return certificate.getPublicKey();
+        } catch (CertificateException ex) {
+          log.warn("Error generate certificate: {}.", ex.getMessage());
         }
       } else {
-        log.warn("Error getting public key - not the right use or alg key");
+        log.warn("Wrong use or alg key given! use: {} alg: {}", key.getUse(), key.getAlg());
+        log.warn("Keys use: {} and alg: {} are expected!", Key.SIG, Key.RS256);
       }
     }
     return null;

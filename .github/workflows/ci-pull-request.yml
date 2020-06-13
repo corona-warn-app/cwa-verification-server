@@ -1,8 +1,5 @@
-name: ci
+name: ci-pull-request
 on:
-  push:
-    branches:
-    - master
   pull_request:
     types:
     - opened
@@ -13,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - uses: actions/cache@v1
       env:
         cache-name: m2
@@ -23,9 +22,7 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 11
-    - run: |
-        mvn --batch-mode package
-    - uses: actions/upload-artifact@v1
-      with:
-        name: target
-        path: target
+    - name: mvn package
+      run: mvn --batch-mode package
+    - name: docker build
+      run: docker build .

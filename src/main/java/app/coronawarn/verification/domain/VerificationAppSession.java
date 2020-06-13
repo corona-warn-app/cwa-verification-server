@@ -21,10 +21,13 @@
 
 package app.coronawarn.verification.domain;
 
+import app.coronawarn.verification.model.AppSessionSourceOfTrust;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -71,11 +74,15 @@ public class VerificationAppSession implements Serializable {
   private String teleTanHash;
 
   @Column(name = "tan_counter")
-  private Integer tanCounter;
+  private int tanCounter;
 
   @Column(name = "sot")
-  private String sourceOfTrust;
+  @Enumerated(EnumType.STRING)
+  private AppSessionSourceOfTrust sourceOfTrust;
 
+  /**
+   * This method increments the tan counter.
+   */
   public void incrementTanCounter() {
     this.tanCounter++;
   }

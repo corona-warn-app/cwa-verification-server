@@ -27,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -91,5 +93,29 @@ public class VerificationExceptionHandler {
   public ResponseEntity<Void> handleVerificationServerExceptions(VerificationServerException exception) {
     log.warn("The verification server response preventation due to: {}", exception.getMessage());
     return ResponseEntity.status(exception.getHttpStatus()).build();
+  }
+
+  /**
+   * This method handles invalid HTTP methods.
+   *
+   * @param ex the thrown exception
+   * @param wr the WebRequest
+   */
+  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+  @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+  public void methodNotAllowedException(Exception ex, WebRequest wr) {
+    log.warn("Invalid http method {}", wr.getDescription(false), ex);
+  }
+
+  /**
+   * This method handles unsupported content types.
+   *
+   * @param ex the thrown exception
+   * @param wr the WebRequest
+   */
+  @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+  @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+  public void contentTypeNotAllowedException(Exception ex, WebRequest wr) {
+    log.warn("Unsupported content type {}", wr.getDescription(false), ex);
   }
 }

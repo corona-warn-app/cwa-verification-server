@@ -30,7 +30,9 @@ import lombok.NoArgsConstructor;
 /**
  * This class represents a registration token request parameter with a hashed guid or a teleTAN.
  */
-@Schema
+@Schema(
+  description = "The registration token request model."
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

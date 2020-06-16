@@ -25,15 +25,24 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 /**
- * The possible result states of the COVID-19 lab-test.
+ * The possible result results of the COVID-19 lab-test.
+ * Pending  = 0 : The test result does not exist yet
+ * Negative = 1 : No indication for COVID-19
+ * Positive = 2 : The test result indicates infection with COVID-19
+ * Invalid  = 3 : The test result is invalid due to unknown reason
+ * Redeemed = 4 : The test result is redeemed by time
  */
-@Schema
+
+@Schema(
+  description = "The lab test result model."
+)
 @Getter
 public enum LabTestResult {
   PENDING(0),
   NEGATIVE(1),
   POSITIVE(2),
-  INVALID(3);
+  INVALID(3),
+  REDEEMED(4);
 
   /**
    * The identifier for the test result from the lab-server.

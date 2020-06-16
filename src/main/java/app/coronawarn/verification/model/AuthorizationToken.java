@@ -3,10 +3,10 @@
  *
  * (C) 2020, T-Systems International GmbH
  *
- * Deutsche Telekom AG and all other contributors /
- * copyright owners license this file to you under the Apache
- * License, Version 2.0 (the "License"); you may not use this
- * file except in compliance with the License.
+ * Deutsche Telekom AG, SAP AG and all other contributors /
+ * copyright owners license this file to you under the Apache 
+ * License, Version 2.0 (the "License"); you may not use this 
+ * file except in compliance with the License. 
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -23,22 +23,22 @@ package app.coronawarn.verification.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * This class represents the registration Token.
+ * This class represents the authorization token (JWT), which is used for the
+ * creation of a teleTan.
  */
 @Schema(
-  description = "The registration token model."
+  description = "The jwt token header model."
 )
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegistrationToken {
+public class AuthorizationToken {
+
   @NotNull
-  @Pattern(regexp = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$")
-  private String registrationToken;
+  private String token;
 }

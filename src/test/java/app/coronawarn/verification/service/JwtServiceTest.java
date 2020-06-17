@@ -75,7 +75,7 @@ public class JwtServiceTest {
   private PublicKey publicKey;
   private PrivateKey privateKey;
   private String cert;
-  
+
   static {
     Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
   }
@@ -91,8 +91,7 @@ public class JwtServiceTest {
   }
 
   /**
-   * Test to validate an valid Token, with the
-   * {@link JwtService#validateToken(java.lang.String)} method.
+   * Test to validate an valid Token, with the {@link JwtService#validateToken(java.lang.String)} method.
    *
    * @throws Exception if the test cannot be performed.
    */
@@ -103,8 +102,7 @@ public class JwtServiceTest {
   }
 
   /**
-   * Test the negative case by not given public key, with the
-   * {@link JwtService#validateToken(java.lang.String)} method.
+   * Test the negative case by not given public key, with the {@link JwtService#validateToken(java.lang.String)} method.
    *
    * @throws Exception if the test cannot be performed.
    */
@@ -115,8 +113,7 @@ public class JwtServiceTest {
   }
 
   /**
-   * Test is Token authorized, with the
-   * {@link JwtService#isAuthorized(java.lang.String)} method.
+   * Test is Token authorized, with the {@link JwtService#isAuthorized(java.lang.String)} method.
    *
    * @throws Exception if the test cannot be performed.
    */
@@ -131,8 +128,7 @@ public class JwtServiceTest {
   }
 
   /**
-   * Test to validate an expired Token, with the
-   * {@link JwtService#validateToken(java.lang.String)} method.
+   * Test to validate an expired Token, with the {@link JwtService#validateToken(java.lang.String)} method.
    *
    * @throws Exception if the test cannot be performed.
    */
@@ -150,39 +146,39 @@ public class JwtServiceTest {
     }
     realm_accessMap.put("roles", roleNames);
     return Jwts.builder()
-            .setExpiration(Date.from(Instant.now().plusSeconds(expirationSecondsToAdd)))
-            .setIssuedAt(Date.from(Instant.now()))
-            .setId("baeaa733-521e-4d2e-8abe-95bb440a9f5f")
-            .setIssuer("http://localhost:8080/auth/realms/cwa")
-            .setAudience("account")
-            .setSubject("72b3b494-a0f4-49f5-b235-1e9f93c86e58")
-            .claim("auth_time", "1590742669")
-            .claim("iss", "http://localhost:8080/auth/realms/cwa")
-            .claim("aud", "account")
-            .claim("typ", "Bearer")
-            .claim("azp", "verification-portal")
-            .claim("session_state", "41cc4d83-e394-4d08-b887-28d8c5372d4a")
-            .claim("acr", "0")
-            .claim("realm_access", realm_accessMap)
-            .claim("resource_access", new HashMap<>())
-            .claim("scope", "openid profile email")
-            .claim("email_verified", false)
-            .claim("preferred_username", "test")
-            .signWith(SignatureAlgorithm.RS256, privateKey)
-            .compact();
+      .setExpiration(Date.from(Instant.now().plusSeconds(expirationSecondsToAdd)))
+      .setIssuedAt(Date.from(Instant.now()))
+      .setId("baeaa733-521e-4d2e-8abe-95bb440a9f5f")
+      .setIssuer("http://localhost:8080/auth/realms/cwa")
+      .setAudience("account")
+      .setSubject("72b3b494-a0f4-49f5-b235-1e9f93c86e58")
+      .claim("auth_time", "1590742669")
+      .claim("iss", "http://localhost:8080/auth/realms/cwa")
+      .claim("aud", "account")
+      .claim("typ", "Bearer")
+      .claim("azp", "verification-portal")
+      .claim("session_state", "41cc4d83-e394-4d08-b887-28d8c5372d4a")
+      .claim("acr", "0")
+      .claim("realm_access", realm_accessMap)
+      .claim("resource_access", new HashMap<>())
+      .claim("scope", "openid profile email")
+      .claim("email_verified", false)
+      .claim("preferred_username", "test")
+      .signWith(privateKey, SignatureAlgorithm.RS256)
+      .compact();
   }
-  
+
   private KeyPair generateTestCertificate() throws Exception {
     KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
     KeyPair pair = kpGen.generateKeyPair();
     LocalDateTime startDate = LocalDate.now().atStartOfDay();
     X509v3CertificateBuilder builder = new X509v3CertificateBuilder(
-            new X500Name("CN=ca"),
-            new BigInteger("0"),
-            Date.from(startDate.atZone(ZoneId.systemDefault()).toInstant()),
-            Date.from(startDate.plusDays(3650).atZone(ZoneId.systemDefault()).toInstant()),
-            new X500Name("CN=ca"),
-            SubjectPublicKeyInfo.getInstance(pair.getPublic().getEncoded()));
+      new X500Name("CN=ca"),
+      new BigInteger("0"),
+      Date.from(startDate.atZone(ZoneId.systemDefault()).toInstant()),
+      Date.from(startDate.plusDays(3650).atZone(ZoneId.systemDefault()).toInstant()),
+      new X500Name("CN=ca"),
+      SubjectPublicKeyInfo.getInstance(pair.getPublic().getEncoded()));
     JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA512WithRSAEncryption");
     ContentSigner signer = csBuilder.build(pair.getPrivate());
     X509CertificateHolder holder = builder.build(signer);
@@ -205,8 +201,7 @@ public class JwtServiceTest {
     return clientMock;
   }
 
-  public static class IamClientMock implements IamClient
-  {
+  public static class IamClientMock implements IamClient {
     @Setter
     String pem;
 

@@ -79,12 +79,11 @@ public class JwtService {
   private final VerificationApplicationConfig verificationApplicationConfig;
 
   /**
-   * Validates the given token is given, the token starts with the needed
-   * prefix, the signing key is not null and the token is valid.
+   * Validates the given token is given, the token starts with the needed prefix, the signing key is not null and the
+   * token is valid.
    *
    * @param authorizationToken The authorization token to validate
-   * @return <code>true</code>, if the token is valid, otherwise
-   * <code>false</code>
+   * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
    */
   public boolean isAuthorized(String authorizationToken) {
     // check if the JWT is enabled
@@ -99,13 +98,11 @@ public class JwtService {
   }
 
   /**
-   * Validates the given token. If one of the given roles
-   * {@link AuthorizationRole} exists and verified by a public key
+   * Validates the given token. If one of the given roles {@link AuthorizationRole} exists and verified by a public key
    *
    * @param token The authorization token to validate
    * @param publicKey the key from the IAM server
-   * @return <code>true</code>, if the token is valid, otherwise
-   * <code>false</code>
+   * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
    */
   public boolean validateToken(final String token, final PublicKey publicKey) {
     log.debug("process validateToken() by - token: {} PK: {}", token, publicKey);
@@ -148,7 +145,7 @@ public class JwtService {
   }
 
   private Claims getAllClaimsFromToken(final String token, final PublicKey publicKey) {
-    return Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).getBody();
+    return Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(token).getBody();
   }
 
   /**

@@ -116,7 +116,7 @@ public class VerificationApplicationTest {
   private VerificationAppSessionRepository appSessionrepository;
   @Autowired
   private ObjectMapper mapper;
-  
+
   @Autowired
   private VerificationApplicationConfig verificationApplicationConfig;
 
@@ -274,7 +274,7 @@ public class VerificationApplicationTest {
     log.info("process callGenerateTeleTAN()");
 
     KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
-    keyGenerator.initialize(1024);
+    keyGenerator.initialize(2048);
     KeyPair kp = keyGenerator.genKeyPair();
     String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
 
@@ -297,7 +297,7 @@ public class VerificationApplicationTest {
     log.info("process callGenerateTeleTanUnauthorized()");
 
     KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
-    keyGenerator.initialize(1024);
+    keyGenerator.initialize(2048);
     KeyPair kp = keyGenerator.genKeyPair();
     given(this.jwtService.isAuthorized(any())).willReturn(false);
     given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());

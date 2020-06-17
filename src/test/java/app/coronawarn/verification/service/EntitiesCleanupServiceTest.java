@@ -92,7 +92,7 @@ public class EntitiesCleanupServiceTest {
     Assertions.assertEquals(testCreationTime.withNano(5), findTan.get().getCreatedAt().withNano(5));
     // wait
     Single.fromCallable(() -> true).delay(1, TimeUnit.SECONDS).toBlocking().value();
-    // find and check repos clean up
+    // find and check both repos clean up
     findSession = appSessionRepository.findByRegistrationTokenHash(TEST_REG_TOK_HASH);
     Assertions.assertFalse(findSession.isPresent());
     findTan = tanRepository.findByTanHash(TEST_HASHED_TAN);

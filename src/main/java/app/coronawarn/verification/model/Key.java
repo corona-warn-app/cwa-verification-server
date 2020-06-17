@@ -21,24 +21,36 @@
 
 package app.coronawarn.verification.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * This class represents the registration Token.
- */
-@Schema(
-  description = "The registration token model."
-)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegistrationToken {
-  @NotNull
-  @Pattern(regexp = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$")
-  private String registrationToken;
+public class Key {
+  public static final String SIG = "sig";
+  public static final String RS256 = "RS256";
+  private String kid;
+  private String kty;
+  private String alg;
+  private String use;
+  private String nn;
+  private String ee;
+  private List<String> x5c = null;
+  private String x5t;
+  private String x5tS256;
+  private final Map<String, Object> additionalProperties = new HashMap<>();
+  
+  /**
+   * Check if the cert is valid for use.
+   * @return <code>true</code>, if the cert has the right use and alg keys, otherwise <code>false</code>
+   */  
+  
+  public boolean isCertValid() {
+    return getUse().equals(SIG) && getAlg().equals(RS256);
+  }
 }

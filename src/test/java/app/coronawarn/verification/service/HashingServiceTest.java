@@ -29,6 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -56,5 +57,18 @@ public class HashingServiceTest {
     assertFalse(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000f"));
   }
 
-
+  @Test
+  public void testGetCheckDigit() {
+    assertThat(hashingService.getCheckDigit("FE9A5MAK6").equals("C"));
+    assertThat(hashingService.getCheckDigit("WPHSATMHD").equals("4"));
+    assertThat(hashingService.getCheckDigit("9N4UTTACE").equals("6"));
+    assertThat(hashingService.getCheckDigit("S3HHJJYJD").equals("3"));
+    assertThat(hashingService.getCheckDigit("W3M75DUD7").equals("C"));
+    assertThat(hashingService.getCheckDigit("BBA3M8UVU").equals("C"));
+    assertThat(hashingService.getCheckDigit("MNSHDZAEJ").equals("2"));
+    assertThat(hashingService.getCheckDigit("WS732AR8Q").equals("B"));
+    // special cases
+    assertThat(hashingService.getCheckDigit("FE9A5MAK9").equals("H"));
+    assertThat(hashingService.getCheckDigit("FE9A5MAKW").equals("G"));
+  }
 }

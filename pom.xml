@@ -5,7 +5,7 @@
 
   <groupId>app.coronawarn.verification</groupId>
   <artifactId>cwa-verification-server</artifactId>
-  <version>0.5.2-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>cwa-verification-server</name>
@@ -32,17 +32,18 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <!-- dependencies -->
     <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
+    <spring-security.version>5.2.5.RELEASE</spring-security.version>
     <spring.cloud.version>Hoxton.SR4</spring.cloud.version>
     <lombok.version>1.18.12</lombok.version>
     <liquibase.version>3.9.0</liquibase.version>
     <springdoc.version>1.3.9</springdoc.version>
+    <jsonwebtoken.version>0.9.1</jsonwebtoken.version>
     <!-- plugins -->
     <plugin.checkstyle.version>3.1.1</plugin.checkstyle.version>
     <plugin.sonar.version>3.6.1.1688</plugin.sonar.version>
     <plugin.jacoco.version>0.8.5</plugin.jacoco.version>
     <plugin.surefire.version>2.22.2</plugin.surefire.version>
     <guava.version>29.0-jre</guava.version>
-    
     <sonar.coverage.exclusions>
       **/VerificationApplication.java,
       **/model/*,
@@ -120,6 +121,10 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-sleuth</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-openfeign</artifactId>
       <exclusions>
         <exclusion>
@@ -129,8 +134,13 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-sleuth</artifactId>
+      <groupId>io.github.openfeign</groupId>
+      <artifactId>feign-httpclient</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt</artifactId>
+      <version>${jsonwebtoken.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -186,6 +196,12 @@
           <artifactId>junit-vintage-engine</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <version>${spring-security.version}</version>
+      <type>jar</type>
     </dependency>
   </dependencies>
 

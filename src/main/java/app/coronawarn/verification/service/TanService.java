@@ -171,7 +171,7 @@ public class TanService {
       .map(chars::codePointAt)
       .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
       .toString();
-    return hashingService.getCheckDigit(teletan);
+    return teletan + hashingService.getCheckDigit(teletan);
   }
 
   /**

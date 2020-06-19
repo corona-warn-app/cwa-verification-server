@@ -171,13 +171,4 @@ public class AppSessionService {
     return appSessionRepository.findByTeleTanHash(hashingService.hash(teleTan)).isPresent();
   }
 
-  /**
-   * Verifies the hashed guid.
-   *
-   * @param hashedGuid the hashed Guid
-   * @return flag for verification
-   */
-  public boolean verifyHashedGuid(String hashedGuid) {
-    return hashingService.isHashValid(hashedGuid);
-  }
 }

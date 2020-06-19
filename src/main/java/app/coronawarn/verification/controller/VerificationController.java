@@ -127,25 +127,20 @@ public class VerificationController {
     produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<RegistrationToken> generateRegistrationToken(
-    @Valid @RequestBody RegistrationTokenRequest request) {
+    @RequestBody @Valid RegistrationTokenRequest request) {
     String key = request.getKey();
     RegistrationTokenKeyType keyType = request.getKeyType();
     switch (keyType) {
       case GUID:
-        if (appSessionService.verifyHashedGuid(key)) {
-          return appSessionService.generateRegistrationToken(key, keyType);
-        }
-        throw new VerificationServerException(HttpStatus.BAD_REQUEST, "The hashed guid has no valid pattern");
+        return appSessionService.generateRegistrationToken(key, keyType);
       case TELETAN:
-        if (tanService.verifyTeleTan(key)) {
-          ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
-          Optional<VerificationTan> optional = tanService.getEntityByTan(key);
-          if (optional.isPresent()) {
-            VerificationTan teleTan = optional.get();
-            teleTan.setRedeemed(true);
-            tanService.saveTan(teleTan);
-            return response;
-          }
+        ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
+        Optional<VerificationTan> optional = tanService.getEntityByTan(key);
+        if (optional.isPresent()) {
+          VerificationTan teleTan = optional.get();
+          teleTan.setRedeemed(true);
+          tanService.saveTan(teleTan);
+          return response;
         }
         throw new VerificationServerException(HttpStatus.BAD_REQUEST, "The teleTAN verification failed");
       default:

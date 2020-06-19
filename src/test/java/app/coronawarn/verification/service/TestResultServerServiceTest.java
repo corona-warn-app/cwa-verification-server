@@ -54,27 +54,27 @@ public class TestResultServerServiceTest {
    * Test result method by positive status.
    */
   @Test
-  public void resultPositiveTest() {
+  public void resultPositive() {
     TestResult testResult = testResultServerService.result(new HashedGuid(TEST_GUI_HASH_1));
     assertThat(testResult).isEqualTo(TEST_LAB_POSITIVE_RESULT);
   }
-  
+
   /**
    * Test result method by redeemed status.
    */
   @Test
-  public void resultRedeemedTest() {
+  public void resultRedeemed() {
     TestResult testResult = testResultServerService.result(new HashedGuid(TEST_GUI_HASH_2));
     assertThat(testResult).isEqualTo(TEST_LAB_REDEEMED_RESULT);
-  }  
+  }
 
   public static class TestResultServerClientMock implements TestResultServerClient {
     @Override
     public TestResult result(HashedGuid guid) {
-      if(guid.getId().equals(TEST_GUI_HASH_1)){
+      if (guid.getId().equals(TEST_GUI_HASH_1)) {
         return new TestResult(2);
       }
-      return new TestResult(4);     
+      return new TestResult(4);
     }
   }
 }

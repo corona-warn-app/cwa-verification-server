@@ -132,9 +132,9 @@ public class VerificationController {
     RegistrationTokenKeyType keyType = request.getKeyType();
     switch (keyType) {
       case GUID:
-        return appSessionService.generateRegistrationToken(key, keyType);
+        return appSessionService.generateRegistrationTokenByGuid(key);
       case TELETAN:
-        ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
+        ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(key);
         Optional<VerificationTan> optional = tanService.getEntityByTan(key);
         if (optional.isPresent()) {
           VerificationTan teleTan = optional.get();

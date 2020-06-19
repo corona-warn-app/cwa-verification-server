@@ -24,7 +24,6 @@ package app.coronawarn.verification.service;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
 import app.coronawarn.verification.model.RegistrationToken;
-import app.coronawarn.verification.model.RegistrationTokenKeyType;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;

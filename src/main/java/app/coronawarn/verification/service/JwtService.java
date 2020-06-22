@@ -150,6 +150,9 @@ public class JwtService {
 
   /**
    * Get the certificate from IAM client.
+   * As long as Keycloak can rotate it’s keys we decided to reload 
+   * the key on every validateToken call especially the method call 
+   * is fortunately limited in time and number too.
    *
    * @return the calculated Public key from the certificate
    */

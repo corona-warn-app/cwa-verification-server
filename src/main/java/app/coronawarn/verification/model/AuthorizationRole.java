@@ -37,7 +37,7 @@ public enum AuthorizationRole {
 
   private final String roleName;
 
-  private AuthorizationRole(final String role) {
+  AuthorizationRole(final String role) {
     this.roleName = role;
   }
 }

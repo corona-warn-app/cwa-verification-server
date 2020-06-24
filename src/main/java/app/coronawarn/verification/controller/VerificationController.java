@@ -127,25 +127,20 @@ public class VerificationController {
     produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<RegistrationToken> generateRegistrationToken(
-    @Valid @RequestBody RegistrationTokenRequest request) {
+    @RequestBody @Valid RegistrationTokenRequest request) {
     String key = request.getKey();
     RegistrationTokenKeyType keyType = request.getKeyType();
     switch (keyType) {
       case GUID:
-        if (appSessionService.verifyHashedGuid(key)) {
-          return appSessionService.generateRegistrationToken(key, keyType);
-        }
-        throw new VerificationServerException(HttpStatus.BAD_REQUEST, "The hashed guid has no valid pattern");
+        return appSessionService.generateRegistrationTokenByGuid(key);
       case TELETAN:
-        if (tanService.verifyTeleTan(key)) {
-          ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationToken(key, keyType);
-          Optional<VerificationTan> optional = tanService.getEntityByTan(key);
-          if (optional.isPresent()) {
-            VerificationTan teleTan = optional.get();
-            teleTan.setRedeemed(true);
-            tanService.saveTan(teleTan);
-            return response;
-          }
+        ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(key);
+        Optional<VerificationTan> optional = tanService.getEntityByTan(key);
+        if (optional.isPresent()) {
+          VerificationTan teleTan = optional.get();
+          teleTan.setRedeemed(true);
+          tanService.saveTan(teleTan);
+          return response;
         }
         throw new VerificationServerException(HttpStatus.BAD_REQUEST, "The teleTAN verification failed");
       default:
@@ -197,9 +192,10 @@ public class VerificationController {
             throw new VerificationServerException(HttpStatus.BAD_REQUEST,
               "Unknown source of trust inside the appsession for the registration token");
         }
-        String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
         appSession.incrementTanCounter();
         appSessionService.saveAppSession(appSession);
+        String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
+        log.info("Returning the successfully generated tan.");
         return ResponseEntity.status(HttpStatus.CREATED).body(new Tan(generatedTan));
       }
       throw new VerificationServerException(HttpStatus.BAD_REQUEST,
@@ -272,12 +268,13 @@ public class VerificationController {
       .filter(t -> t.canBeRedeemed(LocalDateTime.now()))
       .map(t -> {
         tanService.deleteTan(t);
+        log.info("The Tan is valid.");
         return t;
       })
       .map(t -> ResponseEntity.ok().build())
       .orElseGet(() -> {
         log.info("The Tan is invalid.");
-        throw new VerificationServerException(HttpStatus.NOT_FOUND, "No Tan found");
+        throw new VerificationServerException(HttpStatus.NOT_FOUND, "No Tan found or Tan is invalid");
       });
   }
 

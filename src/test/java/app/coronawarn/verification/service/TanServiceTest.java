@@ -98,7 +98,7 @@ public class TanServiceTest {
     tanService.saveTan(tan);
 
     Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
-    Assert.assertEquals(tan, tanFromDB.get());
+    Assert.assertEquals(tan, tanFromDB.orElse(null));
     tanService.deleteTan(tan);
     tanFromDB = tanService.getEntityByTan(TEST_TAN);
     assertFalse(tanFromDB.isPresent());
@@ -138,7 +138,7 @@ public class TanServiceTest {
     tanService.saveTan(tan);
 
     Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
-    Assert.assertEquals(tan, tanFromDB.get());
+    Assert.assertEquals(tan, tanFromDB.orElse(null));
   }
 
   @Test
@@ -189,8 +189,10 @@ public class TanServiceTest {
   @Test
   public void verifyAlreadyRedeemedTeleTan() {
     String teleTan = tanService.generateVerificationTeleTan();
-    VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).get();
-    teleTanFromDB.setRedeemed(true);
+    VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).orElse(null);
+    if (teleTanFromDB != null) {
+      teleTanFromDB.setRedeemed(true);
+    }
     tanService.saveTan(teleTanFromDB);
     assertFalse(tanService.verifyTeleTan(teleTan));
   }
@@ -204,10 +206,12 @@ public class TanServiceTest {
   @Test
   public void verifyExpiredTeleTan() {
     String teleTan = tanService.generateVerificationTeleTan();
-    VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).get();
+    VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).orElse(null);
     LocalDateTime validFrom = LocalDateTime.now().minusHours(1).minusMinutes(1);
-    teleTanFromDB.setValidFrom(validFrom);
-    teleTanFromDB.setValidUntil(validFrom.plusHours(1));
+    if (teleTanFromDB != null) {
+      teleTanFromDB.setValidFrom(validFrom);
+      teleTanFromDB.setValidUntil(validFrom.plusHours(1));
+    }
     tanService.saveTan(teleTanFromDB);
     assertFalse(tanService.verifyTeleTan(teleTan));
   }
@@ -230,7 +234,7 @@ public class TanServiceTest {
   /**
    * Check Tele-TAN syntax constraints.
    *
-   * @param teleTan the Tele TAN
+   * @param tan the Tele TAN
    * @return Tele TAN verification flag
    */
   private boolean syntaxTanVerification(String tan) {

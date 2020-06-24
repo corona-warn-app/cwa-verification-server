@@ -143,7 +143,7 @@ public class JwtServiceTest
       .claim("azp", "verification-portal")
       .claim("session_state", "41cc4d83-e394-4d08-b887-28d8c5372d4a")
       .claim("acr", "0")
-      .claim("realm_access", realm_accessMap)
+      .claim("realm_access", realmAccessMap)
       .claim("resource_access", new HashMap<>())
       .claim("scope", "openid profile email")
       .claim("email_verified", false)

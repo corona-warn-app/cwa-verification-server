@@ -47,13 +47,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+
 public class JwtServiceTest
 {
   public static final String TOKEN_PREFIX = "Bearer ";
   public static final String BEGIN_PEM = "-----BEGIN PUBLIC KEY-----";
   public static final String END_PEM = "-----END PUBLIC KEY-----";
   public static final String RSA = "RSA";
-  
+
   private PublicKey publicKey;
   private PrivateKey privateKey;
 
@@ -76,11 +77,11 @@ public class JwtServiceTest
    * @throws java.security.NoSuchAlgorithmException
    */
   @Test
-  public void testValidateToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+  public void validateToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertTrue(jwtService.validateToken(jwToken, publicKey));
   }
-  
+
   /**
    * Test the negative case by not given public key, with the
    * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
@@ -89,20 +90,19 @@ public class JwtServiceTest
    * @throws java.security.NoSuchAlgorithmException
    */
   @Test
-  public void testValidateTokenByPublicKeyIsNull() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+  public void validateTokenByPublicKeyIsNull() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertFalse(jwtService.validateToken(jwToken, null));
-  }  
+  }
 
   /**
-   * Test is Token authorized, with the
-   * {@link JwtService#isAuthorized(java.lang.String)} method.
+   * Test is Token authorized, with the {@link JwtService#isAuthorized(java.lang.String)} method.
    *
    * @throws java.io.UnsupportedEncodingException
    * @throws java.security.NoSuchAlgorithmException
    */
   @Test
-  public void testAuthorizedToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+  public void tokenIsAuthorized() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     IamClientMock clientMock = createIamClientMock();
     jwtService = new JwtService(clientMock, new VerificationApplicationConfig());
@@ -117,7 +117,7 @@ public class JwtServiceTest
    * @throws java.security.NoSuchAlgorithmException
    */
   @Test
-  public void testExpiredToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+  public void validateExpiredToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(0, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertFalse(jwtService.validateToken(jwToken, publicKey));
   }
@@ -130,28 +130,28 @@ public class JwtServiceTest
     }
     realmAccessMap.put("roles", roleNames);
     return Jwts.builder()
-            .setExpiration(Date.from(Instant.now().plusSeconds(expirationSecondsToAdd)))
-            .setIssuedAt(Date.from(Instant.now()))
-            .setId("baeaa733-521e-4d2e-8abe-95bb440a9f5f")
-            .setIssuer("http://localhost:8080/auth/realms/cwa")
-            .setAudience("account")
-            .setSubject("72b3b494-a0f4-49f5-b235-1e9f93c86e58")
-            .claim("auth_time", "1590742669")
-            .claim("iss", "http://localhost:8080/auth/realms/cwa")
-            .claim("aud", "account")
-            .claim("typ", "Bearer")
-            .claim("azp", "verification-portal")
-            .claim("session_state", "41cc4d83-e394-4d08-b887-28d8c5372d4a")
-            .claim("acr", "0")
-            .claim("realm_access", realmAccessMap)
-            .claim("resource_access", new HashMap<>())
-            .claim("scope", "openid profile email")
-            .claim("email_verified", false)
-            .claim("preferred_username", "test")
-            .signWith(SignatureAlgorithm.RS256, privateKey)
-            .compact();
+      .setExpiration(Date.from(Instant.now().plusSeconds(expirationSecondsToAdd)))
+      .setIssuedAt(Date.from(Instant.now()))
+      .setId("baeaa733-521e-4d2e-8abe-95bb440a9f5f")
+      .setIssuer("http://localhost:8080/auth/realms/cwa")
+      .setAudience("account")
+      .setSubject("72b3b494-a0f4-49f5-b235-1e9f93c86e58")
+      .claim("auth_time", "1590742669")
+      .claim("iss", "http://localhost:8080/auth/realms/cwa")
+      .claim("aud", "account")
+      .claim("typ", "Bearer")
+      .claim("azp", "verification-portal")
+      .claim("session_state", "41cc4d83-e394-4d08-b887-28d8c5372d4a")
+      .claim("acr", "0")
+      .claim("realm_access", realmAccessMap)
+      .claim("resource_access", new HashMap<>())
+      .claim("scope", "openid profile email")
+      .claim("email_verified", false)
+      .claim("preferred_username", "test")
+      .signWith(SignatureAlgorithm.RS256, privateKey)
+      .compact();
   }
-  
+
   private IamClientMock createIamClientMock() {
     StringWriter writer = new StringWriter();
     PemWriter pemWriter = new PemWriter(writer);
@@ -166,10 +166,9 @@ public class JwtServiceTest
     String pem = writer.toString().replaceAll(System.lineSeparator(), "").replace(BEGIN_PEM, "").replace(END_PEM, "");
     clientMock.setPem(pem);
     return clientMock;
-  }  
+  }
 
-  public static class IamClientMock implements IamClient
-  {
+  public static class IamClientMock implements IamClient {
     @Setter
     String pem;
 

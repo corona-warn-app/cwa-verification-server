@@ -228,15 +228,19 @@ public class VerificationController {
     Optional<VerificationAppSession> appSession =
       appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
     if (appSession.isPresent()) {
-      if ((appSession.get().getHashedGuid() == null) && (appSession.get().getTeleTanHash() != null)) {
-        log.info("The result will be returned.");
-        return ResponseEntity.ok(new TestResult(LabTestResult.POSITIVE.getTestResult()));
+      AppSessionSourceOfTrust sourceOfTrust = appSession.get().getSourceOfTrust();
+      switch (sourceOfTrust) {
+        case HASHED_GUID:
+          String hash = appSession.get().getHashedGuid();
+          log.info("Requested result for registration token with hashed Guid.");
+          TestResult testResult = testResultServerService.result(new HashedGuid(hash));
+          return ResponseEntity.ok(testResult);
+        case TELETAN:
+          return ResponseEntity.ok(new TestResult(LabTestResult.POSITIVE.getTestResult()));
+        default:
+          throw new VerificationServerException(HttpStatus.BAD_REQUEST,
+            "Unknown source of trust inside the appsession for the registration token");
       }
-      String hash = appSession.get().getHashedGuid();
-      log.info("Requested result for registration token with hashed Guid.");
-      TestResult testResult = testResultServerService.result(new HashedGuid(hash));
-      log.info("The result will be returned.");
-      return ResponseEntity.ok(testResult);
     }
     log.info("The registration token doesn't exists.");
     throw new VerificationServerException(HttpStatus.BAD_REQUEST,

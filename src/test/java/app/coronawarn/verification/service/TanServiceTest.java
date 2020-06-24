@@ -108,7 +108,7 @@ public class TanServiceTest {
    * Test saveTan.
    */
   @Test
-  public void saveTanTest() {
+  public void saveTan() {
     VerificationTan tan = new VerificationTan();
     tan.setCreatedAt(LocalDateTime.now());
     tan.setUpdatedAt(LocalDateTime.now());
@@ -118,12 +118,12 @@ public class TanServiceTest {
     tan.setValidUntil(TAN_VALID_UNTIL_IN_DAYS);
     tan.setType(TEST_TAN_TYPE);
     tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
-    VerificationTan retunedTan = tanService.saveTan(tan);
-    Assert.assertEquals(retunedTan, tan);
+    VerificationTan savedTan = tanService.saveTan(tan);
+    Assert.assertEquals(savedTan, tan);
   }
 
   @Test
-  public void getEntityByTanTest() {
+  public void getEntityByTan() {
     VerificationTan tan = new VerificationTan();
     LocalDateTime start = LocalDateTime.parse(LocalDateTime.now().format(FORMATTER));
     tan.setCreatedAt(start);

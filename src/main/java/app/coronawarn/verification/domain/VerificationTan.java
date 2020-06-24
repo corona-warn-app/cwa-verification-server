@@ -47,8 +47,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "tan")
 public class VerificationTan implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
+  static final long SERIAL_VERSION_UID = 1L;
+  
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")

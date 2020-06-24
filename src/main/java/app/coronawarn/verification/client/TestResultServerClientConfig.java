@@ -21,6 +21,7 @@
 
 package app.coronawarn.verification.client;
 
+import app.coronawarn.verification.exception.VerificationServerException;
 import feign.Client;
 import feign.httpclient.ApacheHttpClient;
 import java.io.IOException;
@@ -31,11 +32,11 @@ import lombok.RequiredArgsConstructor;
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.ResourceUtils;
 
 @Configuration
@@ -95,7 +96,7 @@ public class TestResultServerClientConfig {
       }
       return builder.build();
     } catch (IOException | GeneralSecurityException e) {
-      throw new RuntimeException(e);
+      throw new VerificationServerException(HttpStatus.INTERNAL_SERVER_ERROR, "The SSL context could not be loaded.");
     }
   }
 

@@ -22,7 +22,7 @@
           "verification-controller"
         ],
         "summary":"Get registration Token",
-        "description":"Get a registration token by providing a SHA-256 hasehd GUID or a TeleTAN",
+        "description":"Get a registration token by providing a SHA-256 hashed GUID or a TeleTAN",
         "operationId":"generateRegistrationToken",
         "requestBody":{
           "content":{

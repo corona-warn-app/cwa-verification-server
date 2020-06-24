@@ -19,14 +19,24 @@
  * under the License.
  */
 
-package app.coronawarn.verification.model;
+package app.coronawarn.verification.client;
+
+import app.coronawarn.verification.model.Certs;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * This class represents the possible sources of trust for a TAN entity.
- *
- * @see <a href="https://github.com/corona-warn-app/cwa-verification-server/blob/master/docs/architecture-overview.md#entity-tan">Entity TAN - sourceOfTrust</a>
+ * This class represents the IAM feign client.
  */
-public enum TanSourceOfTrust {
-  CONNECTED_LAB,
-  TELETAN
+@FeignClient(name = "IamService", url = "${jwt.server}")
+public interface IamClient {
+  /**
+   * This method gets the cert information from the IAM Server.
+   * @return Testresult from server
+   */
+  @GetMapping(value = "/auth/realms/cwa/protocol/openid-connect/certs",
+    consumes = MediaType.APPLICATION_JSON_VALUE
+  )
+   Certs certs();
 }

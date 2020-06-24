@@ -3,7 +3,7 @@
  *
  * (C) 2020, T-Systems International GmbH
  *
- * Deutsche Telekom AG and all other contributors /
+ * Deutsche Telekom AG, SAP AG and all other contributors /
  * copyright owners license this file to you under the Apache
  * License, Version 2.0 (the "License"); you may not use this
  * file except in compliance with the License.
@@ -19,14 +19,28 @@
  * under the License.
  */
 
-package app.coronawarn.verification.model;
+package app.coronawarn.verification.exception;
+
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 /**
- * This class represents the possible sources of trust for a TAN entity.
- *
- * @see <a href="https://github.com/corona-warn-app/cwa-verification-server/blob/master/docs/architecture-overview.md#entity-tan">Entity TAN - sourceOfTrust</a>
+ * This class represents the Verification Server Exception.
  */
-public enum TanSourceOfTrust {
-  CONNECTED_LAB,
-  TELETAN
+@Getter
+public class VerificationServerException extends RuntimeException {
+
+  private final HttpStatus httpStatus;
+
+  /**
+   * The Constructor for the Exception class.
+   *
+   * @param httpStatus the state of the server
+   * @param message    the message
+   */
+  public VerificationServerException(HttpStatus httpStatus, String message) {
+    super(message);
+    this.httpStatus = httpStatus;
+  }
+
 }

@@ -21,18 +21,22 @@
 
 package app.coronawarn.verification.model;
 
+import app.coronawarn.verification.validator.RegistrationTokenKeyConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * This class represents a registration token request.
+ * This class represents a registration token request parameter with a hashed guid or a teleTAN.
  */
-@Schema
+@Schema(
+  description = "The registration token request model."
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@RegistrationTokenKeyConstraint
 public class RegistrationTokenRequest {
 
   /**
@@ -41,7 +45,7 @@ public class RegistrationTokenRequest {
   private String key;
 
   /**
-   * The type of key, which can be "hashedGUID" or "teleTAN".
+   * The type of key, which can be "GUID" or "TELETAN".
    */
   private RegistrationTokenKeyType keyType;
 }

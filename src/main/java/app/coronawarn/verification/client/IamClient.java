@@ -21,25 +21,22 @@
 
 package app.coronawarn.verification.client;
 
-import app.coronawarn.verification.model.HashedGuid;
-import app.coronawarn.verification.model.TestResult;
+import app.coronawarn.verification.model.Certs;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * This class represents the Labor Server service client.
+ * This class represents the IAM feign client.
  */
-@FeignClient(name = "labServerService", url = "${uri.endpoint.labserver}")
-public interface LabServerClient {
+@FeignClient(name = "IamService", url = "${jwt.server}")
+public interface IamClient {
   /**
-   * This method gets a testResult from the LabServer.
-   * @param guid for Testresult
+   * This method gets the cert information from the IAM Server.
    * @return Testresult from server
    */
-  @PostMapping(value = "/api/v1/app/result",
-    consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
+  @GetMapping(value = "/auth/realms/cwa/protocol/openid-connect/certs",
+    consumes = MediaType.APPLICATION_JSON_VALUE
   )
-  TestResult result(HashedGuid guid);
+   Certs certs();
 }

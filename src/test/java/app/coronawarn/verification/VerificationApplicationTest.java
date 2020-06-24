@@ -21,20 +21,51 @@
 
 package app.coronawarn.verification;
 
-import app.coronawarn.verification.model.HashedGuid;
-import app.coronawarn.verification.model.TestResult;
+import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
-import app.coronawarn.verification.model.*;
+import app.coronawarn.verification.model.AppSessionSourceOfTrust;
+import app.coronawarn.verification.model.AuthorizationRole;
+import app.coronawarn.verification.model.HashedGuid;
+import app.coronawarn.verification.model.RegistrationToken;
+import app.coronawarn.verification.model.RegistrationTokenKeyType;
+import app.coronawarn.verification.model.RegistrationTokenRequest;
+import app.coronawarn.verification.model.Tan;
+import app.coronawarn.verification.model.TanSourceOfTrust;
+import app.coronawarn.verification.model.TanType;
+import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
-import app.coronawarn.verification.service.LabServerService;
+import app.coronawarn.verification.service.JwtService;
 import app.coronawarn.verification.service.TanService;
+import app.coronawarn.verification.service.TestResultServerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import java.io.UnsupportedEncodingException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -44,16 +75,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -84,17 +105,26 @@ public class VerificationApplicationTest {
   public static final String TEST_TAN_TYPE = "TAN";
   private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
   private static final String PREFIX_API_VERSION = "/version/v1";
+  private static final String REGISTRATION_TOKEN_URI = "/registrationToken";
 
   @Autowired
   private MockMvc mockMvc;
   @MockBean
-  private LabServerService labServerService;
+  private TestResultServerService testResultServerService;
   @MockBean
   private TanService tanService;
   @Autowired
   private VerificationAppSessionRepository appSessionrepository;
   @Autowired
   private ObjectMapper mapper;
+  
+  @Autowired
+  private VerificationApplicationConfig verificationApplicationConfig;
+
+  @MockBean
+  private JwtService jwtService;
+
+  private static final String TAN_VERIFICATION_URI = "/tan/verify";
 
   @BeforeEach
   void setUp() {
@@ -111,7 +141,7 @@ public class VerificationApplicationTest {
     log.info("process callGenerateTan()");
 
     prepareAppSessionTestData();
-    doReturn(TEST_LAB_POSITIVE_RESULT).when(labServerService).result(any());
+    doReturn(TEST_LAB_POSITIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
@@ -120,13 +150,13 @@ public class VerificationApplicationTest {
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
-    assertEquals("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", 1, count);
+    assertEquals("Verification Failed: Amount of verification entries is not 1 (Result=" + count + "). ", 1, count);
 
-    List<VerificationAppSession> verficationList = appSessionrepository.findAll();
-    assertNotNull(verficationList);
-    assertEquals(TEST_GUI_HASH, verficationList.get(0).getHashedGuid());
-    assertEquals(AppSessionSourceOfTrust.HASHED_GUID, verficationList.get(0).getSourceOfTrust());
-    assertEquals(TEST_REG_TOK_HASH, verficationList.get(0).getRegistrationTokenHash());
+    List<VerificationAppSession> verificationList = appSessionrepository.findAll();
+    assertNotNull(verificationList);
+    assertEquals(TEST_GUI_HASH, verificationList.get(0).getHashedGuid());
+    assertEquals(AppSessionSourceOfTrust.HASHED_GUID, verificationList.get(0).getSourceOfTrust());
+    assertEquals(TEST_REG_TOK_HASH, verificationList.get(0).getRegistrationTokenHash());
 
   }
 
@@ -169,7 +199,7 @@ public class VerificationApplicationTest {
   public void callGenerateTanWithNegativeCovidResult() throws Exception {
     log.info("process callGenerateTanWithNegativeCovidResult()");
     prepareAppSessionTestData();
-    doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
+    doReturn(TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
@@ -187,7 +217,8 @@ public class VerificationApplicationTest {
     log.info("process callGenerateTanWithTanCounterMaximum()");
     appSessionrepository.deleteAll();
     VerificationAppSession appSessionTestData = getAppSessionTestData();
-    appSessionTestData.setTanCounter(2);
+    int tancountermax = verificationApplicationConfig.getAppsession().getTancountermax();
+    appSessionTestData.setTanCounter(tancountermax);
     appSessionrepository.save(appSessionTestData);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
@@ -208,7 +239,7 @@ public class VerificationApplicationTest {
     VerificationAppSession appSessionTestData = getAppSessionTestData();
     appSessionTestData.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
     appSessionrepository.save(appSessionTestData);
-    doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
+    doReturn(TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
@@ -228,7 +259,7 @@ public class VerificationApplicationTest {
     VerificationAppSession appSessionTestData = getAppSessionTestData();
     appSessionTestData.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
     appSessionrepository.save(appSessionTestData);
-    doReturn(TEST_LAB_NEGATIVE_RESULT).when(labServerService).result(any());
+    doReturn(TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
@@ -245,8 +276,36 @@ public class VerificationApplicationTest {
   public void callGenerateTeleTAN() throws Exception {
     log.info("process callGenerateTeleTAN()");
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan"))
+    KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
+    keyGenerator.initialize(1024);
+    KeyPair kp = keyGenerator.genKeyPair();
+    String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+
+    given(this.jwtService.isAuthorized(any())).willReturn(Boolean.TRUE);
+    given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
+    when(this.jwtService.validateToken(jwtString, kp.getPublic())).thenCallRealMethod();
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
       .andExpect(status().isCreated());
+  }
+
+  /**
+   * Test the generation of a tele Tan, when the jwt is not authorized.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGenerateTeleTanUnauthorized() throws Exception {
+    log.info("process callGenerateTeleTanUnauthorized()");
+
+    KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
+    keyGenerator.initialize(1024);
+    KeyPair kp = keyGenerator.genKeyPair();
+    given(this.jwtService.isAuthorized(any())).willReturn(false);
+    given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
+    String jwtString = getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", "Bearer " + jwtString))
+      .andExpect(status().isUnauthorized());
   }
 
   /**
@@ -259,7 +318,7 @@ public class VerificationApplicationTest {
     log.info("process callGetRegistrationTokenByGuid() ");
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+    mockMvc.perform(post(PREFIX_API_VERSION + REGISTRATION_TOKEN_URI)
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(request)))
       .andExpect(status().isCreated())
@@ -267,7 +326,7 @@ public class VerificationApplicationTest {
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
-    assertEquals("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", 1, count);
+    assertEquals("Verification Failed: Amount of verification entries is not 1 (Result=" + count + "). ", 1, count);
 
     List<VerificationAppSession> verificationList = appSessionrepository.findAll();
     assertNotNull(verificationList);
@@ -286,7 +345,7 @@ public class VerificationApplicationTest {
     log.info("process callGetRegistrationTokenWithNullKeyType() ");
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, null);
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+    mockMvc.perform(post(PREFIX_API_VERSION + REGISTRATION_TOKEN_URI)
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(request)))
       .andExpect(status().isBadRequest());
@@ -302,7 +361,7 @@ public class VerificationApplicationTest {
     log.info("process callGetRegistrationTokenWithNullKey() ");
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(null, RegistrationTokenKeyType.GUID);
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+    mockMvc.perform(post(PREFIX_API_VERSION + REGISTRATION_TOKEN_URI)
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(request)))
       .andExpect(status().isBadRequest());
@@ -322,7 +381,7 @@ public class VerificationApplicationTest {
     given(this.tanService.isTeleTanValid(TEST_TELE_TAN)).willReturn(true);
     given(this.tanService.getEntityByTan(TEST_TELE_TAN)).willReturn(Optional.of(getTeleTanTestData()));
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+    mockMvc.perform(post(PREFIX_API_VERSION + REGISTRATION_TOKEN_URI)
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(request)))
       .andExpect(status().isCreated())
@@ -330,7 +389,7 @@ public class VerificationApplicationTest {
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
-    assertEquals("Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ", 1, count);
+    assertEquals("Verification Failed: Amount of verification entries is not 1 (Result=" + count + "). ", 1, count);
 
     List<VerificationAppSession> verificationList = appSessionrepository.findAll();
     assertNotNull(verificationList);
@@ -349,10 +408,10 @@ public class VerificationApplicationTest {
     log.info("process callGetRegistrationTokenByUnknownTeleTan() ");
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_TELE_TAN, RegistrationTokenKeyType.TELETAN);
-    when(this.tanService.verifyTeleTan(TEST_TELE_TAN)).thenCallRealMethod();
+    given(this.tanService.verifyTeleTan(TEST_TELE_TAN)).willReturn(false);
     given(this.tanService.getEntityByTan(TEST_TELE_TAN)).willReturn(Optional.empty());
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+    mockMvc.perform(post(PREFIX_API_VERSION + REGISTRATION_TOKEN_URI)
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(request)))
       .andExpect(status().isBadRequest());
@@ -369,14 +428,13 @@ public class VerificationApplicationTest {
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_INVALID_GUI_HASH, RegistrationTokenKeyType.GUID);
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+    mockMvc.perform(post(PREFIX_API_VERSION + REGISTRATION_TOKEN_URI)
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(request)))
       .andExpect(status().isBadRequest());
   }
 
   /**
-   *
    * Test get registration token for a guid, but the guid already has a registration token.
    *
    * @throws Exception if the test cannot be performed.
@@ -387,7 +445,7 @@ public class VerificationApplicationTest {
     prepareAppSessionTestData();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+    mockMvc.perform(post(PREFIX_API_VERSION + REGISTRATION_TOKEN_URI)
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(request)))
       .andExpect(status().isBadRequest());
@@ -411,7 +469,7 @@ public class VerificationApplicationTest {
 
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_TELE_TAN, RegistrationTokenKeyType.TELETAN);
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/registrationToken")
+    mockMvc.perform(post(PREFIX_API_VERSION + REGISTRATION_TOKEN_URI)
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(request)))
       .andExpect(status().isBadRequest());
@@ -428,7 +486,7 @@ public class VerificationApplicationTest {
 
     prepareAppSessionTestData();
 
-    given(this.labServerService.result(new HashedGuid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
+    given(this.testResultServerService.result(new HashedGuid(TEST_GUI_HASH))).willReturn(TEST_LAB_POSITIVE_RESULT);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(new RegistrationToken(TEST_REG_TOK))))
@@ -465,9 +523,11 @@ public class VerificationApplicationTest {
 
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(getVerificationTANTestData()));
 
-    assertFalse("Is TAN redeemed?", this.tanService.getEntityByTan(TEST_TAN).get().isRedeemed());
+    Optional<VerificationTan> verificationTan = this.tanService.getEntityByTan(TEST_TAN);
+    assertFalse("Is TAN redeemed?", verificationTan
+      .map(VerificationTan::isRedeemed).orElse(true));
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify")
+    mockMvc.perform(post(PREFIX_API_VERSION + TAN_VERIFICATION_URI)
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(new Tan(TEST_TAN))))
       .andExpect(status().isOk());
@@ -483,7 +543,7 @@ public class VerificationApplicationTest {
     log.info("process callVerifyTANByVerificationTANIsEmpty()");
 
     // without mock tanService.getEntityByTan so this method will return empty entity
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify")
+    mockMvc.perform(post(PREFIX_API_VERSION + TAN_VERIFICATION_URI)
       .contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(new Tan(TEST_TAN))))
       .andExpect(status().isNotFound());
@@ -498,7 +558,7 @@ public class VerificationApplicationTest {
   public void callVerifyTANByTanWithInvalidSyntax() throws Exception {
     log.info("process callVerifyTANByTanWithInvalidSyntax()");
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(post(PREFIX_API_VERSION + TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(new Tan(TEST_INVALID_TAN))))
       .andExpect(status().isBadRequest());
   }
@@ -517,7 +577,7 @@ public class VerificationApplicationTest {
     cvtan.setValidFrom(LocalDateTime.now().plusDays(2));
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(post(PREFIX_API_VERSION + TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(new Tan(TEST_TAN))))
       .andExpect(status().isNotFound());
   }
@@ -536,7 +596,7 @@ public class VerificationApplicationTest {
     cvtan.setValidUntil(LocalDateTime.now().minusDays(2));
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(post(PREFIX_API_VERSION + TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(new Tan(TEST_TAN))))
       .andExpect(status().isNotFound());
   }
@@ -555,9 +615,41 @@ public class VerificationApplicationTest {
     cvtan.setRedeemed(true);
     given(this.tanService.getEntityByTan(TEST_TAN)).willReturn(Optional.of(cvtan));
 
-    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/verify").contentType(MediaType.APPLICATION_JSON)
+    mockMvc.perform(post(PREFIX_API_VERSION + TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
       .content(getAsJsonFormat(new Tan(TEST_TAN))))
       .andExpect(status().isNotFound());
+  }
+
+  private String getJwtTestData(final long expirationSecondsToAdd, PrivateKey privateKey, AuthorizationRole... roles) throws UnsupportedEncodingException {
+    final Map<String, List<String>> realmAccessMap = new HashMap<>();
+    final List<String> roleNames = new ArrayList<>();
+    for (AuthorizationRole role : roles) {
+      roleNames.add(role.getRoleName());
+    }
+
+    realmAccessMap.put("roles", roleNames);
+
+    return Jwts.builder()
+      .setExpiration(Date.from(Instant.now().plusSeconds(expirationSecondsToAdd)))
+      .setIssuedAt(Date.from(Instant.now()))
+      .setId("baeaa733-521e-4d2e-8abe-95bb440a9f5f")
+      .setIssuer("http://localhost:8080/auth/realms/cwa")
+      .setAudience("account")
+      .setSubject("72b3b494-a0f4-49f5-b235-1e9f93c86e58")
+      .claim("auth_time", "1590742669")
+      .claim("iss", "http://localhost:8080/auth/realms/cwa")
+      .claim("aud", "account")
+      .claim("typ", "Bearer")
+      .claim("azp", "verification-portal")
+      .claim("session_state", "41cc4d83-e394-4d08-b887-28d8c5372d4a")
+      .claim("acr", "0")
+      .claim("realm_access", realmAccessMap)
+      .claim("resource_access", new HashMap<>())
+      .claim("scope", "openid profile email")
+      .claim("email_verified", false)
+      .claim("preferred_username", "test")
+      .signWith(SignatureAlgorithm.RS256, privateKey)
+      .compact();
   }
 
   private void prepareAppSessionTestData() {

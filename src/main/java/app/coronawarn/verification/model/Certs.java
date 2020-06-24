@@ -21,12 +21,18 @@
 
 package app.coronawarn.verification.model;
 
-/**
- * This class represents the possible sources of trust for a TAN entity.
- *
- * @see <a href="https://github.com/corona-warn-app/cwa-verification-server/blob/master/docs/architecture-overview.md#entity-tan">Entity TAN - sourceOfTrust</a>
- */
-public enum TanSourceOfTrust {
-  CONNECTED_LAB,
-  TELETAN
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Certs {
+  
+  private List<Key> keys = null;
+  private Map<String, Object> additionalProperties = new HashMap<>();
 }

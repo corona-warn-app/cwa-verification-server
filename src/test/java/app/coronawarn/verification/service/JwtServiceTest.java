@@ -37,12 +37,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import lombok.Setter;
@@ -51,15 +46,7 @@ import org.bouncycastle.util.io.pem.PemWriter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ContextConfiguration(classes = VerificationApplication.class)
 public class JwtServiceTest
 {
   public static final String TOKEN_PREFIX = "Bearer ";
@@ -70,8 +57,7 @@ public class JwtServiceTest
   private PublicKey publicKey;
   private PrivateKey privateKey;
 
-  @Autowired
-  private JwtService jwtService;
+  private JwtService jwtService = new JwtService(new IamClientMock(), new VerificationApplicationConfig());
 
   @Before
   public void setUp() throws NoSuchAlgorithmException {
@@ -84,7 +70,7 @@ public class JwtServiceTest
 
   /**
    * Test to validate an valid Token, with the
-   * {@link JwtService#validateToken(java.lang.String)} method.
+   * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
    *
    * @throws java.io.UnsupportedEncodingException
    * @throws java.security.NoSuchAlgorithmException
@@ -97,7 +83,7 @@ public class JwtServiceTest
   
   /**
    * Test the negative case by not given public key, with the
-   * {@link JwtService#validateToken(java.lang.String)} method.
+   * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
    *
    * @throws java.io.UnsupportedEncodingException
    * @throws java.security.NoSuchAlgorithmException
@@ -125,7 +111,7 @@ public class JwtServiceTest
 
   /**
    * Test to validate an expired Token, with the
-   * {@link JwtService#validateToken(java.lang.String)} method.
+   * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
    *
    * @throws java.io.UnsupportedEncodingException
    * @throws java.security.NoSuchAlgorithmException
@@ -137,12 +123,12 @@ public class JwtServiceTest
   }
 
   private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-    final Map<String, List<String>> realm_accessMap = new HashMap<>();
+    final Map<String, List<String>> realmAccessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
     for (AuthorizationRole role : roles) {
       roleNames.add(role.getRoleName());
     }
-    realm_accessMap.put("roles", roleNames);
+    realmAccessMap.put("roles", roleNames);
     return Jwts.builder()
             .setExpiration(Date.from(Instant.now().plusSeconds(expirationSecondsToAdd)))
             .setIssuedAt(Date.from(Instant.now()))
@@ -157,7 +143,7 @@ public class JwtServiceTest
             .claim("azp", "verification-portal")
             .claim("session_state", "41cc4d83-e394-4d08-b887-28d8c5372d4a")
             .claim("acr", "0")
-            .claim("realm_access", realm_accessMap)
+            .claim("realm_access", realmAccessMap)
             .claim("resource_access", new HashMap<>())
             .claim("scope", "openid profile email")
             .claim("email_verified", false)
@@ -200,7 +186,7 @@ public class JwtServiceTest
       key.setEe("AQAB");
       key.setX5t("s-pJCbOOR0JExZQ2Yh7-oeo_1tU");
       key.setX5tS256("9fxRTYYStVwlh8Cvoxcx9CxK3D9559HcYBOU19_981M");
-      key.setX5c(Arrays.asList(pem));
+      key.setX5c(Collections.singletonList(pem));
       keys.add(key);
       certs.setKeys(keys);
       return certs;

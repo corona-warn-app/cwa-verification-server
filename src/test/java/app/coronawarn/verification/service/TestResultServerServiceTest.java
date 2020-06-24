@@ -21,22 +21,14 @@
 
 package app.coronawarn.verification.service;
 
-import app.coronawarn.verification.VerificationApplication;
-import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.client.TestResultServerClient;
+import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.TestResult;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ContextConfiguration(classes = VerificationApplication.class)
 public class TestResultServerServiceTest {
 
   public static final String TEST_GUI_HASH_1 = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";

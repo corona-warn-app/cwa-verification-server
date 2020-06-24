@@ -141,7 +141,8 @@ The implementation of user stories around verification involves several componen
 Implemented by
 * Use Case Verify TAN
 ###	User Story E06.01 – Scan QR Code with mobile App
-Not relevant for Verification Server.
+Implemented by
+* Use Case Create Registration Token
 ###	User Story E06.02 – Notify user if a test result is available
 Implemented by
 * Use Case Get Test Result

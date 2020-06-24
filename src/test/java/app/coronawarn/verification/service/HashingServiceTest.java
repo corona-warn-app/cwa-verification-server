@@ -44,6 +44,7 @@ public class HashingServiceTest {
     assertFalse(hashingService.isHashValid("523463041ef9ffa2950d8z50feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
     assertFalse(hashingService.isHashValid("0"));
     assertFalse(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000f"));
+    assertFalse(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000\n"));
   }
 
   @Test

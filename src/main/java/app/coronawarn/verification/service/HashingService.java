@@ -67,6 +67,6 @@ public class HashingService {
    */
   public boolean isHashValid(String toValidate) {
     Matcher matcher = PATTERN.matcher(toValidate);
-    return matcher.find();
+    return matcher.matches();
   }
 }

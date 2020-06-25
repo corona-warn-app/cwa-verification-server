@@ -22,10 +22,9 @@
 package app.coronawarn.verification.repository;
 
 import app.coronawarn.verification.domain.VerificationTan;
+import app.coronawarn.verification.model.TanType;
 import java.time.LocalDateTime;
 import java.util.Optional;
-
-import app.coronawarn.verification.model.TanType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

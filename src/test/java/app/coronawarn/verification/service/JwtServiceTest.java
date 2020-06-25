@@ -38,9 +38,10 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -55,8 +56,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JwtServiceTest
-{
+@Slf4j
+public class JwtServiceTest {
   public static final String TOKEN_PREFIX = "Bearer ";
   public static final String BEGIN_PEM = "-----BEGIN PUBLIC KEY-----";
   public static final String END_PEM = "-----END PUBLIC KEY-----";
@@ -83,7 +84,8 @@ public class JwtServiceTest
    * Test to validate an valid Token, with the
    * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
    *
-   * @throws Exception if the test cannot be performed.
+   * @throws java.io.UnsupportedEncodingException if the test cannot be performed.
+   * @throws java.security.NoSuchAlgorithmException if the test cannot be performed.
    */
   @Test
   public void validateToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
@@ -95,7 +97,8 @@ public class JwtServiceTest
    * Test the negative case by not given public key, with the
    * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
    *
-   * @throws Exception if the test cannot be performed.
+   * @throws java.io.UnsupportedEncodingException if the test cannot be performed.
+   * @throws java.security.NoSuchAlgorithmException if the test cannot be performed.
    */
   @Test
   public void validateTokenByPublicKeyIsNull() throws UnsupportedEncodingException, NoSuchAlgorithmException {
@@ -106,7 +109,8 @@ public class JwtServiceTest
   /**
    * Test is Token authorized, with the {@link JwtService#isAuthorized(java.lang.String)} method.
    *
-   * @throws Exception if the test cannot be performed.
+   * @throws java.io.UnsupportedEncodingException if the test cannot be performed.
+   * @throws java.security.NoSuchAlgorithmException if the test cannot be performed.
    */
   @Test
   public void tokenIsAuthorized() throws UnsupportedEncodingException, NoSuchAlgorithmException {
@@ -122,7 +126,8 @@ public class JwtServiceTest
    * Test to validate an expired Token, with the
    * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
    *
-   * @throws Exception if the test cannot be performed.
+   * @throws java.io.UnsupportedEncodingException if the test cannot be performed.
+   * @throws java.security.NoSuchAlgorithmException if the test cannot be performed.
    */
   @Test
   public void validateExpiredToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {

@@ -28,11 +28,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * This class represents the authorization token (JWT), which is used for the
+ * This class represents the authorization bearer token (JWT), which is used for the
  * creation of a teleTan.
  */
 @Schema(
-  description = "The jwt token header model."
+  description = "The bearer jwt token header model."
 )
 @Data
 @NoArgsConstructor

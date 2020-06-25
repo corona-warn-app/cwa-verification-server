@@ -24,6 +24,8 @@ package app.coronawarn.verification.repository;
 import app.coronawarn.verification.domain.VerificationTan;
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import app.coronawarn.verification.model.TanType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -53,4 +55,14 @@ public interface VerificationTanRepository extends JpaRepository<VerificationTan
    * @param before LocalDateTime to delete older entities
    */
   void deleteByCreatedAtBefore(LocalDateTime before);
+
+  /**
+   * This method counts entities which are newer then after value.
+   *
+   * @param after - LocalDateTime to count entities
+   * @param tanType - TanType of the tans that should be counted
+   * @return number of relevant entities
+   */
+  int countByCreatedAtIsAfterAndTypeIs(LocalDateTime after, TanType tanType);
+
 }

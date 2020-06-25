@@ -239,7 +239,7 @@ public class TanService {
     verificationTan.setRedeemed(false);
     verificationTan.setCreatedAt(LocalDateTime.now());
     verificationTan.setUpdatedAt(LocalDateTime.now());
-    verificationTan.setType(tanType.name());
+    verificationTan.setType(tanType);
     return verificationTan;
   }
 
@@ -252,6 +252,27 @@ public class TanService {
   public Optional<VerificationTan> getEntityByTan(String tan) {
     log.info("Start getEntityByTan.");
     return tanRepository.findByTanHash(hashingService.hash(tan));
+  }
+
+  /**
+   * Checks whether the rate limit for new TeleTans is not exceeded.
+   *
+   * @return true if new TeleTans can be created false if not.
+   */
+  public boolean isTeleTanRateLimitNotExceeded() {
+    int maxNumberOfTans = verificationApplicationConfig.getTan().getTele().getRateLimiting().getCount();
+    int timeWindow = verificationApplicationConfig.getTan().getTele().getRateLimiting().getSeconds();
+
+    LocalDateTime timestamp = LocalDateTime.now().minusSeconds(timeWindow);
+    int countedTans = tanRepository.countByCreatedAtIsAfterAndTypeIs(timestamp, TanType.TELETAN);
+
+    boolean result = countedTans < maxNumberOfTans;
+
+    if (!result) {
+      log.info("The TeleTan Rate Limit is exceeded! (maximum {} tans within {} seconds)", maxNumberOfTans, timeWindow);
+    }
+
+    return result;
   }
 
   /*

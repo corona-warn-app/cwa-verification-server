@@ -24,16 +24,7 @@ package app.coronawarn.verification;
 import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
-import app.coronawarn.verification.model.AppSessionSourceOfTrust;
-import app.coronawarn.verification.model.AuthorizationRole;
-import app.coronawarn.verification.model.HashedGuid;
-import app.coronawarn.verification.model.RegistrationToken;
-import app.coronawarn.verification.model.RegistrationTokenKeyType;
-import app.coronawarn.verification.model.RegistrationTokenRequest;
-import app.coronawarn.verification.model.Tan;
-import app.coronawarn.verification.model.TanSourceOfTrust;
-import app.coronawarn.verification.model.TanType;
-import app.coronawarn.verification.model.TestResult;
+import app.coronawarn.verification.model.*;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import app.coronawarn.verification.service.JwtService;
 import app.coronawarn.verification.service.TanService;
@@ -42,30 +33,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.io.UnsupportedEncodingException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -75,6 +46,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.io.UnsupportedEncodingException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -102,7 +87,7 @@ public class VerificationApplicationTest {
   public static final String TEST_INVALID_TAN = "1ea6ce8a-9740-11ea-is-invalid";
   public static final TanSourceOfTrust TEST_SOT = TanSourceOfTrust.CONNECTED_LAB;
   public static final String TEST_HASHED_TAN = "cfb5368fc0fca485847acb28e6a96c958bb6ab7350ac766be88ad13841750231";
-  public static final String TEST_TAN_TYPE = "TAN";
+  public static final TanType TEST_TAN_TYPE = TanType.TAN;
   private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
   private static final String PREFIX_API_VERSION = "/version/v1";
 
@@ -116,7 +101,7 @@ public class VerificationApplicationTest {
   private VerificationAppSessionRepository appSessionrepository;
   @Autowired
   private ObjectMapper mapper;
-  
+
   @Autowired
   private VerificationApplicationConfig verificationApplicationConfig;
 
@@ -616,6 +601,20 @@ public class VerificationApplicationTest {
       .andExpect(status().isNotFound());
   }
 
+  @Test
+  public void shouldReturn429StatusCodeIfRateLimitIsExceeded() throws Exception {
+    given(this.jwtService.isAuthorized(any())).willReturn(Boolean.TRUE);
+    given(this.tanService.isTeleTanRateLimitNotExceeded()).willReturn(Boolean.TRUE);
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", ""))
+        .andExpect(status().isCreated());
+
+    given(this.tanService.isTeleTanRateLimitNotExceeded()).willReturn(Boolean.FALSE);
+
+    mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header("X-Auth-Token", ""))
+      .andExpect(status().isTooManyRequests());
+  }
+
   private String getJwtTestData(final long expirationSecondsToAdd, PrivateKey privateKey, AuthorizationRole... roles) throws UnsupportedEncodingException {
     final Map<String, List<String>> realm_accessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
@@ -684,7 +683,7 @@ public class VerificationApplicationTest {
     cvtan.setRedeemed(false);
     cvtan.setSourceOfTrust(TanSourceOfTrust.TELETAN);
     cvtan.setTanHash(TEST_HASHED_TAN);
-    cvtan.setType(TanType.TELETAN.name());
+    cvtan.setType(TanType.TELETAN);
     cvtan.setValidFrom(LocalDateTime.now());
     cvtan.setValidUntil(LocalDateTime.now().plusHours(1));
     return cvtan;

@@ -286,16 +286,22 @@ public class VerificationController {
     description = "A teleTAN is a human readable TAN with 7 characters which is supposed to be issued via call line"
   )
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "201", description = "TeleTan created")})
+    @ApiResponse(responseCode = "201", description = "TeleTan created"),
+    @ApiResponse(responseCode = "429", description = "Rate Limit exceed. Try again later.")
+  })
   @PostMapping(value = TELE_TAN_ROUTE,
     produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<TeleTan> createTeleTan(
     @RequestHeader(REQ_HEADER_X_AUTH_TOKEN) @Valid AuthorizationToken authorization) {
     if (jwtService.isAuthorized(authorization.getToken())) {
-      String teleTan = tanService.generateVerificationTeleTan();
-      log.info("The teleTAN is generated.");
-      return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));
+      if (tanService.isTeleTanRateLimitNotExceeded()) {
+        String teleTan = tanService.generateVerificationTeleTan();
+        log.info("The teleTAN is generated.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));
+      } else {
+        throw new VerificationServerException(HttpStatus.TOO_MANY_REQUESTS, "Rate Limit exceed. Try again later.");
+      }
     }
     throw new VerificationServerException(HttpStatus.UNAUTHORIZED, "JWT is invalid.");
   }

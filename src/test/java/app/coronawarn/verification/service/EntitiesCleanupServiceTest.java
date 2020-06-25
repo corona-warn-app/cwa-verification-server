@@ -26,6 +26,7 @@ import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
 import app.coronawarn.verification.model.TanSourceOfTrust;
+import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import app.coronawarn.verification.repository.VerificationTanRepository;
 import org.junit.Assert;
@@ -116,7 +117,7 @@ public class EntitiesCleanupServiceTest {
     cvtan.setRedeemed(false);
     cvtan.setSourceOfTrust(TanSourceOfTrust.CONNECTED_LAB);
     cvtan.setTanHash(TEST_HASHED_TAN);
-    cvtan.setType("TAN");
+    cvtan.setType(TanType.TAN);
     cvtan.setValidFrom(LocalDateTime.now().minusDays(5));
     cvtan.setValidUntil(LocalDateTime.now().plusDays(7));
     return cvtan;

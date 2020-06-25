@@ -38,15 +38,9 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -60,16 +54,12 @@ import org.bouncycastle.util.io.pem.PemWriter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@Slf4j
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class JwtServiceTest {
-
+public class JwtServiceTest
+{
+  public static final String TOKEN_PREFIX = "Bearer ";
+  public static final String BEGIN_PEM = "-----BEGIN PUBLIC KEY-----";
+  public static final String END_PEM = "-----END PUBLIC KEY-----";
   public static final String RSA = "RSA";
 
   private PublicKey publicKey;
@@ -80,8 +70,7 @@ public class JwtServiceTest {
     Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
   }
 
-  @Autowired
-  private JwtService jwtService;
+  private JwtService jwtService = new JwtService(new IamClientMock(), new VerificationApplicationConfig());
 
   @Before
   public void setUp() throws Exception {
@@ -91,23 +80,25 @@ public class JwtServiceTest {
   }
 
   /**
-   * Test to validate an valid Token, with the {@link JwtService#validateToken(java.lang.String)} method.
+   * Test to validate an valid Token, with the
+   * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
    *
    * @throws Exception if the test cannot be performed.
    */
   @Test
-  public void testValidateToken() throws Exception {
+  public void validateToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertTrue(jwtService.validateToken(jwToken, publicKey));
   }
 
   /**
-   * Test the negative case by not given public key, with the {@link JwtService#validateToken(java.lang.String)} method.
+   * Test the negative case by not given public key, with the
+   * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
    *
    * @throws Exception if the test cannot be performed.
    */
   @Test
-  public void testValidateTokenByPublicKeyIsNull() throws Exception {
+  public void validateTokenByPublicKeyIsNull() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertFalse(jwtService.validateToken(jwToken, null));
   }
@@ -118,7 +109,7 @@ public class JwtServiceTest {
    * @throws Exception if the test cannot be performed.
    */
   @Test
-  public void testAuthorizedToken() throws Exception {
+  public void tokenIsAuthorized() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     IamClientMock clientMock = createIamClientMock();
     VerificationApplicationConfig config = new VerificationApplicationConfig();
@@ -128,23 +119,24 @@ public class JwtServiceTest {
   }
 
   /**
-   * Test to validate an expired Token, with the {@link JwtService#validateToken(java.lang.String)} method.
+   * Test to validate an expired Token, with the
+   * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
    *
    * @throws Exception if the test cannot be performed.
    */
   @Test
-  public void testExpiredToken() throws Exception {
+  public void validateExpiredToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(0, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     Assert.assertFalse(jwtService.validateToken(jwToken, publicKey));
   }
 
   private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-    final Map<String, List<String>> realm_accessMap = new HashMap<>();
+    final Map<String, List<String>> realmAccessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
     for (AuthorizationRole role : roles) {
       roleNames.add(role.getRoleName());
     }
-    realm_accessMap.put("roles", roleNames);
+    realmAccessMap.put("roles", roleNames);
     return Jwts.builder()
       .setExpiration(Date.from(Instant.now().plusSeconds(expirationSecondsToAdd)))
       .setIssuedAt(Date.from(Instant.now()))
@@ -159,7 +151,7 @@ public class JwtServiceTest {
       .claim("azp", "verification-portal")
       .claim("session_state", "41cc4d83-e394-4d08-b887-28d8c5372d4a")
       .claim("acr", "0")
-      .claim("realm_access", realm_accessMap)
+      .claim("realm_access", realmAccessMap)
       .claim("resource_access", new HashMap<>())
       .claim("scope", "openid profile email")
       .claim("email_verified", false)
@@ -218,7 +210,7 @@ public class JwtServiceTest {
       key.setEe("AQAB");
       key.setX5t("s-pJCbOOR0JExZQ2Yh7-oeo_1tU");
       key.setX5tS256("9fxRTYYStVwlh8Cvoxcx9CxK3D9559HcYBOU19_981M");
-      key.setX5c(Arrays.asList(pem));
+      key.setX5c(Collections.singletonList(pem));
       keys.add(key);
       certs.setKeys(keys);
       return certs;

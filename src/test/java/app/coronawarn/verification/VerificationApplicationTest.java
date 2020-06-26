@@ -117,7 +117,7 @@ public class VerificationApplicationTest {
   private VerificationAppSessionRepository appSessionrepository;
   @Autowired
   private ObjectMapper mapper;
-  
+
   @Autowired
   private VerificationApplicationConfig verificationApplicationConfig;
 
@@ -333,6 +333,24 @@ public class VerificationApplicationTest {
     assertEquals(TEST_GUI_HASH, verificationList.get(0).getHashedGuid());
     assertEquals(AppSessionSourceOfTrust.HASHED_GUID, verificationList.get(0).getSourceOfTrust());
     assertNotNull(verificationList.get(0).getRegistrationTokenHash());
+  }
+
+  /**
+   * Test get registration token by a guid with a size larger than the maxSizeLimit.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGetRegistrationTokenByLargeRequest() throws Exception {
+    log.info("process callGetRegistrationTokenByLargeRequest() ");
+    appSessionrepository.deleteAll();
+    RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
+    //Set the maxSizeLimit to 10 for testing
+    verificationApplicationConfig.getRequest().setSizelimit(10);
+    mockMvc.perform(post(PREFIX_API_VERSION + REGISTRATION_TOKEN_URI)
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getAsJsonFormat(request)))
+      .andExpect(status().isNotAcceptable());
   }
 
   /**

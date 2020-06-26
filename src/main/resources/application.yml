@@ -67,6 +67,8 @@ entities:
   cleanup:
     days: 21
     rate: 3600000
+request:
+  sizelimit: 10000
 
 cwa-testresult-server:
   url: http://localhost:8088

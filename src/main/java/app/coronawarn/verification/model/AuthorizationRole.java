@@ -24,7 +24,7 @@ package app.coronawarn.verification.model;
 import lombok.Getter;
 
 /**
- * The differrent possible roles, which are authorizated to create a tele tan.
+ * The different possible roles, which are authorizated to create a tele tan.
  *
  * @see
  * <a href="https://github.com/corona-warn-app/cwa-verification-server/blob/master/docs/architecture-overview.md#use-case-create-teletan">
@@ -37,7 +37,7 @@ public enum AuthorizationRole {
 
   private final String roleName;
 
-  private AuthorizationRole(final String role) {
+  AuthorizationRole(final String role) {
     this.roleName = role;
   }
 }

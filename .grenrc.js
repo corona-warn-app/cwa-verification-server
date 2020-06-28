@@ -6,13 +6,17 @@ module.exports = {
     "Enhancements": [
       "enhancement",
       "internal",
-      "feat"
+      "feat",
+      "feature",
+      "code improvement"
     ],
     "Bug Fixes": [
-      "fix"
+      "fix",
+      "bug"
     ],
     "Documentation": [
-      "doc"
+      "doc",
+      "documentation"
     ],
     "Others": [
       "other"

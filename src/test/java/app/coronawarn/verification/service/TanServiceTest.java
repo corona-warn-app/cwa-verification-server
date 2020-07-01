@@ -27,24 +27,27 @@ import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Assert;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -68,8 +71,9 @@ public class TanServiceTest {
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSS");
   private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(14);
   private static final LocalDateTime TELE_TAN_VALID_UNTIL_IN_HOURS = LocalDateTime.now().plusHours(1);
-  private static final int TELE_TAN_RATE_LIMIT_COUNT = 5;
+  private static final int TELE_TAN_RATE_LIMIT_COUNT = 10;
   private static final int TELE_TAN_RATE_LIMIT_SECONDS = 60;
+  private static final int TELE_TAN_RATE_LIMIT_THRESHOLD = 80;
 
   @Autowired
   private TanService tanService;
@@ -286,6 +290,36 @@ public class TanServiceTest {
     tanService.generateVerificationTeleTan();
 
     assertThat(tanService.isTeleTanRateLimitNotExceeded()).isFalse();
+  }
+
+  @Test
+  public void testLogMessagesForRateLimits() throws NoSuchFieldException, IllegalAccessException {
+    Logger loggerMock = Mockito.mock(Logger.class);
+
+    // Usage of Relection API to "inject" mock for SLF4J Logger
+    Field loggerField = TanService.class.getDeclaredField("log");
+    Field modifiersField = Field.class.getDeclaredField("modifiers");
+    modifiersField.setAccessible(true);
+    modifiersField.setInt(loggerField, loggerField.getModifiers() & ~Modifier.FINAL);
+    loggerField.setAccessible(true);
+    loggerField.set(null, loggerMock);
+
+    config.getTan().getTele().getRateLimiting().setCount(TELE_TAN_RATE_LIMIT_COUNT);
+    config.getTan().getTele().getRateLimiting().setSeconds(TELE_TAN_RATE_LIMIT_SECONDS);
+    config.getTan().getTele().getRateLimiting().setThresholdInPercent(TELE_TAN_RATE_LIMIT_THRESHOLD);
+
+    for (int i = 0; i < (TELE_TAN_RATE_LIMIT_COUNT * TELE_TAN_RATE_LIMIT_THRESHOLD / 100) - 1; i++) tanService.generateVerificationTeleTan();
+    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
+    Mockito.verify(loggerMock, Mockito.never()).warn(Mockito.any(String.class), Mockito.any(Integer.class), Mockito.any(Integer.class), Mockito.any(Integer.class));
+
+    tanService.generateVerificationTeleTan();
+    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
+    Mockito.verify(loggerMock).warn(Mockito.any(String.class), Mockito.any(Integer.class), Mockito.any(Integer.class), Mockito.any(Integer.class));
+
+    for (int i = 0; i < (TELE_TAN_RATE_LIMIT_COUNT * (100 - TELE_TAN_RATE_LIMIT_THRESHOLD) / 100); i++) tanService.generateVerificationTeleTan();
+
+    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isFalse();
+    Mockito.verify(loggerMock).warn(Mockito.any(String.class), Mockito.any(Integer.class), Mockito.any(Integer.class));
   }
 
   /**

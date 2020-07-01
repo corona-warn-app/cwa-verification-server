@@ -29,7 +29,7 @@ springdoc:
     path: /api/swagger
 management:
   server:
-    port: 8081
+    port: 8086
   endpoint:
     info:
       enabled: true
@@ -59,6 +59,7 @@ tan:
     ratelimiting:
       count: 1000
       seconds: 3600
+      threshold-in-percent: 80
     valid:
       length: 9
       hours: 1
@@ -82,3 +83,5 @@ cwa-testresult-server:
     key-store-password: changeit
     trust-store: classpath:truststore.jks
     trust-store-password: changeit
+server:
+  port: 8082

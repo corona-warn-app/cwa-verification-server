@@ -86,6 +86,8 @@ public class VerificationApplicationConfig {
         private int seconds = 3600;
         // Number of teletans that are allowed to create within time window
         private int count = 1000;
+        // Threshold in percent for a warning in log stream
+        private int thresholdInPercent = 80;
       }
     }
 

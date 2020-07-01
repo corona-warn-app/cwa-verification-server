@@ -261,6 +261,8 @@ public class TanService {
    */
   public boolean isTeleTanRateLimitNotExceeded() {
     int maxNumberOfTans = verificationApplicationConfig.getTan().getTele().getRateLimiting().getCount();
+    int thresholdInPercent = verificationApplicationConfig.getTan().getTele().getRateLimiting().getThresholdInPercent();
+    int thresholdTans = thresholdInPercent * maxNumberOfTans / 100;
     int timeWindow = verificationApplicationConfig.getTan().getTele().getRateLimiting().getSeconds();
 
     LocalDateTime timestamp = LocalDateTime.now().minusSeconds(timeWindow);
@@ -269,7 +271,10 @@ public class TanService {
     boolean result = countedTans < maxNumberOfTans;
 
     if (!result) {
-      log.info("The TeleTan Rate Limit is exceeded! (maximum {} tans within {} seconds)", maxNumberOfTans, timeWindow);
+      log.warn("The TeleTan rate limit is exceeded! (maximum {} tans within {} seconds)", maxNumberOfTans, timeWindow);
+    } else if (countedTans >= thresholdTans) {
+      log.warn("The TeleTan rate limit threshold of {}% is reached!"
+        + " (maximum {} tans within {} seconds)", thresholdInPercent, maxNumberOfTans, timeWindow);
     }
 
     return result;

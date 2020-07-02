@@ -26,10 +26,11 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import liquibase.util.StringUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpMethod;
+import org.apache.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -40,17 +41,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class PostSizeLimitFilter extends OncePerRequestFilter {
+public class RequestSizeLimitFilter extends OncePerRequestFilter {
 
   @NonNull
   private final VerificationApplicationConfig verificationApplicationConfig;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request,
-    HttpServletResponse response, FilterChain filterChain)
+                                  HttpServletResponse response, FilterChain filterChain)
     throws ServletException, IOException {
     long maxPostSize = verificationApplicationConfig.getRequest().getSizelimit();
-    if (isPost(request) && (request.getContentLengthLong() > maxPostSize || request.getContentLengthLong() == -1)) {
+    if (request.getContentLengthLong() > maxPostSize || isChunkedRequest(request)) {
       log.warn("The request size is too large or the request was sent via chunks.");
       response.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
       return;
@@ -58,8 +59,10 @@ public class PostSizeLimitFilter extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
   }
 
-  private boolean isPost(HttpServletRequest httpRequest) {
-    return HttpMethod.POST.matches(httpRequest.getMethod());
+  private boolean isChunkedRequest(HttpServletRequest request) {
+    String header = request.getHeader(HttpHeaders.TRANSFER_ENCODING);
+
+    return !StringUtils.isEmpty(header) && header.equalsIgnoreCase("chunked");
   }
 
 }

@@ -55,18 +55,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -126,9 +126,18 @@ public class VerificationApplicationTest {
 
   private static final String TAN_VERIFICATION_URI = "/tan/verify";
 
-  @BeforeEach
-  void setUp() {
-    MockitoAnnotations.initMocks(this);
+  private static long cachedRequestSize;
+
+  @Before
+  public void setUp() {
+    // Store max request size config property to allow tests to modify it
+    cachedRequestSize = verificationApplicationConfig.getRequest().getSizelimit();
+  }
+
+  @After
+  public void tearDown() {
+    // Reset max request size to cached value
+    verificationApplicationConfig.getRequest().setSizelimit(cachedRequestSize);
   }
 
   /**
@@ -666,7 +675,7 @@ public class VerificationApplicationTest {
       .claim("scope", "openid profile email")
       .claim("email_verified", false)
       .claim("preferred_username", "test")
-      .signWith(SignatureAlgorithm.RS256, privateKey)
+      .signWith(privateKey, SignatureAlgorithm.RS256)
       .compact();
   }
 

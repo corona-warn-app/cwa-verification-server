@@ -205,20 +205,20 @@ API Endpoint:
 -	Body: { “registrationToken”: “<< registrationToken >>” }
 -	Authentication: none
 
-1.	Verify registrationToken, if registrationToken is invalid, exit with error HTTP 400
-2.	Verifiy whether the entity AppSession exists for the Registration token
+1.	Verify registration token, if registration token is invalid, exit with error HTTP 400
+2.	Verifiy whether the entity AppSession exists for the registration token
 	1.	If yes, check if TANcounter >= 1
 		1.	If yes, return error HTTP 400
 	1.	If no, return error HTTP 400
 3.	If AppSession.sourceOfTrust == “hashedGUID”
 	1. Get test result from Test Result Sever
 	1. Verify whether test result is positive, otherwise exit with error HTTP 400
-4.	generate TAN
+4.	Generate TAN
 	1. Generate random TAN
 	1. Check collision with existing TANs, if yes regenerate
 	1. Set source of trust accordingly
 5.	Persist TAN as entity TAN
-6.	Update entity AppSession, increment TANcounter
+6.	Update entity AppSession, increment TAN counter
 7.	Return TAN string
 
 
@@ -233,12 +233,12 @@ API Endpoint:
 
 1. Authenticate using mTLS
 1. Authenticate using JWT
-1. Execute Use Case Rate limit requests for teleTAN creation
+1. Execute Use Case rate limit requests for teleTAN creation
 1. Generate teleTAN (see also used cryptographic algorithms)
-	1.  use configured valid chars and configured length
-	1.  calculate check sum and append it
-	1.  persist teleTAN
-1. return teleTAN
+	1.  Use configured valid chars and configured length
+	1.  Calculate check sum and append it
+	1.  Persist teleTAN
+1. Return teleTAN
 
  
 ###	Use Case Verify TAN

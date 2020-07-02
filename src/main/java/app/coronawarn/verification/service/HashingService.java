@@ -44,7 +44,7 @@ public class HashingService {
    * @return the hash of the supplied string
    */
   public String hash(String toHash) {
-    log.info("Hash process has been called.");
+    log.debug("Hash process has been called.");
     return DigestUtils.sha256Hex(toHash);
   }
 
@@ -67,6 +67,10 @@ public class HashingService {
    */
   public boolean isHashValid(String toValidate) {
     Matcher matcher = PATTERN.matcher(toValidate);
-    return matcher.matches();
+    boolean matches = matcher.matches();
+    if (!matches) {
+      log.warn("The hashed guid has no valid pattern");
+    }
+    return matches;
   }
 }

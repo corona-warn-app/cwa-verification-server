@@ -278,9 +278,9 @@ i.	If validation fails return HTTP 400
 4.	Return teleTAN with HTTP 201
 
 ### Use Case Rate limit requests for teleTAN creation
-To limit the damage in case an authorized client for teleTAN creation is hacked, the number of teleTANs created per time frame is limitted. The limit is global for the component and applies to all users of the API endpoint for teleTAN creation. The limit and the time window is configurable.
+To limit the damage in case an authorized client for teleTAN creation was compromised, the number of teleTANs created per time frame is limited. The limit for the component is global and applies to all users of the API endpoint for teleTAN creation. The limit and the time window are configurable.
 
-In addition a specific warning message is logged when the number of created teleTANs is abve 80% of the limit.
+In addition a specific warning message is logged, when the number of created teleTANs is above 80% of the limit.
 
 The use case is part of the teleTAN creation use case.
 

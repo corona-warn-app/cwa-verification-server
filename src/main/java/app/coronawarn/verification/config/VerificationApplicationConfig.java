@@ -26,8 +26,8 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * This class and its nested subclasses are used to read in values from configuration file application.yml,
- * which is loaded via the '@EnableConfigurationProperties' annotation from SpringBootApplication main class.
+ * This class and its nested subclasses are used to read in values from configuration file application.yml, which is
+ * loaded via the '@EnableConfigurationProperties' annotation from SpringBootApplication main class.
  */
 @Getter
 @Setter
@@ -38,10 +38,10 @@ public class VerificationApplicationConfig {
   private AppSession appsession = new AppSession();
   private Entities entities = new Entities();
   private Jwt jwt = new Jwt();
+  private Request request = new Request();
 
   /**
-   * Configure the Tan with build property values and return the configured
-   * parameters.
+   * Configure the Tan with build property values and return the configured parameters.
    */
   @Getter
   @Setter
@@ -51,8 +51,7 @@ public class VerificationApplicationConfig {
     private Valid valid = new Valid();
 
     /**
-     * Configure the Tele with build property values and return the configured
-     * parameters.
+     * Configure the Tele with build property values and return the configured parameters.
      */
     @Getter
     @Setter
@@ -61,8 +60,7 @@ public class VerificationApplicationConfig {
       private Valid valid = new Valid();
 
       /**
-       * Configure the TeleValid with build property values and return the
-       * configured parameters.
+       * Configure the TeleValid with build property values and return the configured parameters.
        */
       @Getter
       @Setter
@@ -76,8 +74,7 @@ public class VerificationApplicationConfig {
     }
 
     /**
-     * Configure the Valid with build property values and return the configured
-     * parameters.
+     * Configure the Valid with build property values and return the configured parameters.
      */
     @Getter
     @Setter
@@ -89,8 +86,7 @@ public class VerificationApplicationConfig {
   }
 
   /**
-   * Configure the AppSession with build property values and return the
-   * configured parameters.
+   * Configure the AppSession with build property values and return the configured parameters.
    */
   @Getter
   @Setter
@@ -101,8 +97,7 @@ public class VerificationApplicationConfig {
   }
 
   /**
-   * Configure the Entities with build property values and return the
-   * configured parameters.
+   * Configure the Entities with build property values and return the configured parameters.
    */
   @Getter
   @Setter
@@ -111,8 +106,7 @@ public class VerificationApplicationConfig {
     private Cleanup cleanup = new Cleanup();
 
     /**
-     * Configure the Cleanup with build property values and return the
-     * configured parameters.
+     * Configure the Cleanup with build property values and return the configured parameters.
      */
     @Getter
     @Setter
@@ -124,8 +118,7 @@ public class VerificationApplicationConfig {
   }
 
   /**
-   * Configure the Jwt with build property values and return the configured
-   * parameters.
+   * Configure the Jwt with build property values and return the configured parameters.
    */
   @Getter
   @Setter
@@ -133,5 +126,15 @@ public class VerificationApplicationConfig {
 
     private String server = "http://localhost:8080";
     private Boolean enabled = false;
+  }
+
+  /**
+   * Configure the requests with build property values and return the configured parameters.
+   */
+  @Getter
+  @Setter
+  public static class Request {
+
+    private long sizelimit = 10000;
   }
 }

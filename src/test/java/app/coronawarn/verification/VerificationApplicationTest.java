@@ -435,8 +435,7 @@ public class VerificationApplicationTest {
     log.info("process callGetRegistrationTokenByUnknownTeleTan() ");
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TEST_TELE_TAN, RegistrationTokenKeyType.TELETAN);
-    given(this.tanService.verifyTeleTan(TEST_TELE_TAN)).willReturn(false);
-    given(this.tanService.getEntityByTan(TEST_TELE_TAN)).willReturn(Optional.empty());
+    given(this.tanService.verifyTeleTan(TEST_TELE_TAN)).willReturn(Boolean.FALSE);
 
     mockMvc.perform(post(PREFIX_API_VERSION + REGISTRATION_TOKEN_URI)
       .contentType(MediaType.APPLICATION_JSON)

@@ -234,7 +234,7 @@ API Endpoint:
 1. Authenticate using mTLS
 1. Authenticate using JWT
 1. Execute Use Case Rate limit requests for teleTAN creation
-1. Generate teleTAN (see also Used cryptographic algorithms)
+1. Generate teleTAN (see also used cryptographic algorithms)
 	1.  use configured valid chars and configured length
 	1.  calculate check sum and append it
 	1.  persist teleTAN

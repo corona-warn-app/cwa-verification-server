@@ -235,12 +235,10 @@ API Endpoint:
 1. Authenticate using JWT
 1. Execute Use Case Rate limit requests for teleTAN creation
 1. Generate teleTAN (see also Used cryptographic algorithms)
-  1. use configured valid chars and configured length
-  1. calculate check sum and append it
-  1. persist teleTAN
+	1.  use configured valid chars and configured length
+	1.  calculate check sum and append it
+	1.  persist teleTAN
 1. return teleTAN
-
-
 
  
 ###	Use Case Verify TAN
@@ -291,10 +289,11 @@ Steps
 2. If the number of created teleTANs is above 80% of the treshold log a specific warning message 
 3. If the number of created teleTANs is above the treshold return http 429
 
-### Use Case Allow to use component in an internal only XOR external only mode
-ToDo
-
-
+### Use Case Allow component to be used in an internal only XOR external only mode
+Based on configuration the component must be able to switch between an internal and external mode. 
+External mode means that only the designated public available endpoints of the API are active 
+and the internal ones (create teleTAN, verify TAN) are not active.
+  
 
 ##	API
 The API is REST based and the description below, is detailed by the implementation. The API endpoint provides a swagger definition. The API does not support versioning as part of the URI.

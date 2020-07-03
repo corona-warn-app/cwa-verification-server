@@ -286,8 +286,8 @@ The use case is part of the teleTAN creation use case.
 
 Steps
 1. Count the number of created teleTAN in the current time window 
-2. If the number of created teleTANs is above 80% of the treshold log a specific warning message 
-3. If the number of created teleTANs is above the treshold return http 429
+2. If the number of created teleTANs is above 80% of the threshold log a specific warning message 
+3. If the number of created teleTANs is above the threshold return http 429
 
 ### Use Case Allow component to be used in an internal only XOR external only mode
 Based on configuration the component must be able to switch between an internal and external mode. 
@@ -402,7 +402,7 @@ Categories follow STRIDE:
 ##	Complexity of secrets
 - TAN: 128 bits
 - Registration Token: 128 bits
-- teleTAN: 44 bits (31 characters, lenght of 9)
+- teleTAN: 44 bits (31 characters, length of 9)
 
 ## Used Timeframes
 TAN

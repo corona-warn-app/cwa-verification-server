@@ -24,7 +24,16 @@ package app.coronawarn.verification;
 import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.domain.VerificationTan;
-import app.coronawarn.verification.model.*;
+import app.coronawarn.verification.model.AppSessionSourceOfTrust;
+import app.coronawarn.verification.model.AuthorizationRole;
+import app.coronawarn.verification.model.HashedGuid;
+import app.coronawarn.verification.model.RegistrationToken;
+import app.coronawarn.verification.model.RegistrationTokenKeyType;
+import app.coronawarn.verification.model.RegistrationTokenRequest;
+import app.coronawarn.verification.model.Tan;
+import app.coronawarn.verification.model.TanSourceOfTrust;
+import app.coronawarn.verification.model.TanType;
+import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import app.coronawarn.verification.service.JwtService;
 import app.coronawarn.verification.service.TanService;
@@ -33,10 +42,30 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.io.UnsupportedEncodingException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -46,20 +75,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.io.UnsupportedEncodingException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.*;
-
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -612,7 +627,7 @@ public class VerificationApplicationTest {
     given(this.tanService.isTeleTanRateLimitNotExceeded()).willReturn(Boolean.TRUE);
 
     mockMvc.perform(post(PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, ""))
-        .andExpect(status().isCreated());
+      .andExpect(status().isCreated());
 
     given(this.tanService.isTeleTanRateLimitNotExceeded()).willReturn(Boolean.FALSE);
 

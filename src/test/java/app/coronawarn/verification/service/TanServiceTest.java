@@ -292,36 +292,6 @@ public class TanServiceTest {
     assertThat(tanService.isTeleTanRateLimitNotExceeded()).isFalse();
   }
 
-  @Test
-  public void testLogMessagesForRateLimits() throws NoSuchFieldException, IllegalAccessException {
-    Logger loggerMock = Mockito.mock(Logger.class);
-
-    // Usage of Relection API to "inject" mock for SLF4J Logger
-    Field loggerField = TanService.class.getDeclaredField("log");
-    Field modifiersField = Field.class.getDeclaredField("modifiers");
-    modifiersField.setAccessible(true);
-    modifiersField.setInt(loggerField, loggerField.getModifiers() & ~Modifier.FINAL);
-    loggerField.setAccessible(true);
-    loggerField.set(null, loggerMock);
-
-    config.getTan().getTele().getRateLimiting().setCount(TELE_TAN_RATE_LIMIT_COUNT);
-    config.getTan().getTele().getRateLimiting().setSeconds(TELE_TAN_RATE_LIMIT_SECONDS);
-    config.getTan().getTele().getRateLimiting().setThresholdInPercent(TELE_TAN_RATE_LIMIT_THRESHOLD);
-
-    for (int i = 0; i < (TELE_TAN_RATE_LIMIT_COUNT * TELE_TAN_RATE_LIMIT_THRESHOLD / 100) - 1; i++) tanService.generateVerificationTeleTan();
-    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
-    Mockito.verify(loggerMock, Mockito.never()).warn(Mockito.any(String.class), Mockito.any(Integer.class), Mockito.any(Integer.class), Mockito.any(Integer.class));
-
-    tanService.generateVerificationTeleTan();
-    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
-    Mockito.verify(loggerMock).warn(Mockito.any(String.class), Mockito.any(Integer.class), Mockito.any(Integer.class), Mockito.any(Integer.class));
-
-    for (int i = 0; i < (TELE_TAN_RATE_LIMIT_COUNT * (100 - TELE_TAN_RATE_LIMIT_THRESHOLD) / 100); i++) tanService.generateVerificationTeleTan();
-
-    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isFalse();
-    Mockito.verify(loggerMock).warn(Mockito.any(String.class), Mockito.any(Integer.class), Mockito.any(Integer.class));
-  }
-
   /**
    * Check Tele-TAN syntax constraints.
    *

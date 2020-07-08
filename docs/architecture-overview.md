@@ -5,7 +5,6 @@ by Alexander Stiefel (alexander.stiefel@t-systems.com)
 This document describes the component Verification Server for the System “Corona Warn App”. In the world of the Corona Warn App the Verification Server helps validating whether upload requests from the mobile App are valid or not.
 This document links the overall system architecture with the software design of the Verification Server, it links user stories with implementation inside the Verification Server.
 This document is intended to be read by people who want to get insights how verification works in detail, it is our guideline for implementation.
-Please be aware that several aspects in this document are not final, certain important information is missing.
 
 #	Overview
 ##	Purpose of the Software System Component
@@ -206,20 +205,20 @@ API Endpoint:
 -	Body: { “registrationToken”: “<< registrationToken >>” }
 -	Authentication: none
 
-1.	Verify registrationToken, if registrationToken is invalid, exit with error HTTP 400
-2.	Verifiy whether the entity AppSession exists for the Registration token
+1.	Verify registration token, if registration token is invalid, exit with error HTTP 400
+2.	Verifiy whether the entity AppSession exists for the registration token
 	1.	If yes, check if TANcounter >= 1
 		1.	If yes, return error HTTP 400
 	1.	If no, return error HTTP 400
 3.	If AppSession.sourceOfTrust == “hashedGUID”
 	1. Get test result from Test Result Sever
 	1. Verify whether test result is positive, otherwise exit with error HTTP 400
-4.	generate TAN
+4.	Generate TAN
 	1. Generate random TAN
 	1. Check collision with existing TANs, if yes regenerate
 	1. Set source of trust accordingly
 5.	Persist TAN as entity TAN
-6.	Update entity AppSession, increment TANcounter
+6.	Update entity AppSession, increment TAN counter
 7.	Return TAN string
 
 
@@ -231,6 +230,15 @@ API Endpoint:
 -	Authorization: JWT, the roles attribute contains one of the roles
 	- "c19hotline”
 	- “c19healthauthority”
+
+1. Authenticate using mTLS
+1. Authenticate using JWT
+1. Execute Use Case rate limit requests for teleTAN creation
+1. Generate teleTAN (see also used cryptographic algorithms)
+	1.  Use configured valid chars and configured length
+	1.  Calculate check sum and append it
+	1.  Persist teleTAN
+1. Return teleTAN
 
  
 ###	Use Case Verify TAN
@@ -268,6 +276,24 @@ i.	If validation fails return HTTP 400
 2.	Generate TAN
 3.	Mark teleTAN as redeemed
 4.	Return teleTAN with HTTP 201
+
+### Use Case Rate limit requests for teleTAN creation
+To limit the damage in case an authorized client for teleTAN creation was compromised, the number of teleTANs created per time frame is limited. The limit for the component is global and applies to all users of the API endpoint for teleTAN creation. The limit and the time window are configurable.
+
+In addition a specific warning message is logged, when the number of created teleTANs is above 80% of the limit.
+
+The use case is part of the teleTAN creation use case.
+
+Steps
+1. Count the number of created teleTAN in the current time window 
+2. If the number of created teleTANs is above 80% of the threshold log a specific warning message 
+3. If the number of created teleTANs is above the threshold return http 429
+
+### Use Case Allow component to be used in an internal only XOR external only mode
+Based on configuration the component must be able to switch between an internal and external mode. 
+External mode means that only the designated public available endpoints of the API are active 
+and the internal ones (create teleTAN, verify TAN) are not active.
+  
 
 ##	API
 The API is REST based and the description below, is detailed by the implementation. The API endpoint provides a swagger definition. The API does not support versioning as part of the URI.
@@ -369,19 +395,18 @@ Categories follow STRIDE:
 - Hashing of GUID: SHA-256, no salt, no pepper
 - Hashing of Registration Token: SHA-256, no salt, no pepper
 - Hashing of TAN: SHA-256, no salt, no pepper
-- Creating of Registration Token: tbd.
-- Creating of TAN: tbd.
-- Creating of teleTAN: tbd.
+- Creating of Registration Token: the JAVA UUID generation (UUID.randomUUID()) is used, which relies on Java SecureRandom (see https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/SecureRandom.html ) is used. this random is considered as cryptographically strong random number generator
+- Creating of TAN: the JAVA UUID generation (UUID.randomUUID()) is used, which relies on Java SecureRandom (see https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/SecureRandom.html ) is used. this random is considered as cryptographically strong random number generator
+- Creating of teleTAN: string of random chars, as random java SecureRandom (see https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/SecureRandom.html ) is used. this random is considered as cryptographically strong random number generator
 
 ##	Complexity of secrets
 - TAN: 128 bits
 - Registration Token: 128 bits
-- teleTAN: 35 bits (5 bits per character, 7 characters)
+- teleTAN: 44 bits (31 characters, length of 9)
 
 ## Used Timeframes
 TAN
--	Lifespan of TAN is 14 days
+-	Lifespan of TAN is configured to 14 days
 
 teleTAN
--	Lifespan of teleTAN is 1h
-
+-	Lifespan of teleTAN is configured to  1h

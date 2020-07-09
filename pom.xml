@@ -159,7 +159,6 @@
       <version>${jsonwebtoken.version}</version>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
@@ -211,6 +210,7 @@
       <version>3.2</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
       <version>${spring-security.version}</version>

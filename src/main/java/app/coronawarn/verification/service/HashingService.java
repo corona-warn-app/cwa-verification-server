@@ -28,7 +28,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * This class represents the hashing service.
+ * This class represents the hashing service for providing and check a hash string.
  */
 @Slf4j
 @Component
@@ -38,14 +38,25 @@ public class HashingService {
   private static final Pattern PATTERN = Pattern.compile(GUID_HASH_PATTERN);
 
   /**
-   * Returns the hash of the supplied string.
+   * Calculates the SHA-256 digest and returns the value as a hex string.
    *
    * @param toHash that will be Hashed
    * @return the hash of the supplied string
    */
   public String hash(String toHash) {
-    log.info("HashingService - hash has been called.");
+    log.debug("Hash process has been called.");
     return DigestUtils.sha256Hex(toHash);
+  }
+
+  /**
+   * Calculates the SHA-256 digest and returns an check digit.
+   *
+   * @param toHash that will be Hashed
+   * @return the check digit
+   */
+  public String getCheckDigit(String toHash) {
+    log.info("get check digit process has been called.");
+    return DigestUtils.sha256Hex(toHash).substring(0, 1).toUpperCase().replace("0", "G").replace("1", "H");
   }
 
   /**
@@ -56,6 +67,10 @@ public class HashingService {
    */
   public boolean isHashValid(String toValidate) {
     Matcher matcher = PATTERN.matcher(toValidate);
-    return matcher.find();
+    boolean matches = matcher.matches();
+    if (!matches) {
+      log.warn("The hashed guid has no valid pattern");
+    }
+    return matches;
   }
 }

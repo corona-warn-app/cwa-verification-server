@@ -18,7 +18,7 @@
   <a href="#licensing">Licensing</a>
 </p>
 
-The goal of this project is to develop the official Corona-Warn-App for Germany based on the exposure notification API from [Apple](https://www.apple.com/covid19/contacttracing/) and [Google](https://www.google.com/covid19/exposurenotifications/). The apps (for both iOS and Android) use Bluetooth technology to exchange anonymous encrypted data with other mobile phones (on which the app is also installed) in the vicinity of an app user's phone. The data is stored locally on each user's device, preventing authorities or other parties from accessing or controlling the data. This repository contains the **verification service** for the Corona-Warn-App. This implementation is still a **work in progress**, and the code it contains is currently alpha-quality code.
+The goal of this project is to develop the official Corona-Warn-App for Germany based on the exposure notification API from [Apple](https://www.apple.com/covid19/contacttracing/) and [Google](https://www.google.com/covid19/exposurenotifications/). The apps (for both iOS and Android) use Bluetooth technology to exchange anonymous encrypted data with other mobile phones (on which the app is also installed) in the vicinity of an app user's phone. The data is stored locally on each user's device, preventing authorities or other parties from accessing or controlling the data. This repository contains the **verification service** for the Corona-Warn-App.
 
 ## Status
 ![ci](https://github.com/corona-warn-app/cwa-verification-server/workflows/ci/badge.svg)
@@ -63,7 +63,7 @@ Whether you cloned or downloaded the 'zipped' sources you will either find the s
 In either case open a terminal pointing to the directory you put the sources in. The local build process is described afterwards depending on the way you choose.
 
 #### Maven based build
-This is the recommmended way for taking part in the development.  
+This is the recommended way for taking part in the development.  
 Please check, whether following prerequisites are installed on your machine:
 - [Open JDK 11](https://openjdk.java.net) or a similar JDK 11 compatible VM  
 - [Maven](https://maven.apache.org)
@@ -94,10 +94,10 @@ The docker image will then run on your local machine on port 8080 assuming you c
 #### API documentation  
 Along with the application there comes a [swagger2](https://swagger.io) API documentation, which you can access in your web browser when the verification server applications runs:
 
-    <base-url>/swagger-ui.html#/verification-controller
+    <base-url>/api/swagger
 
 Which results in the following URL on your local machine:
-http://localhost:8080/swagger-ui.html#/verification-controller
+http://localhost:8080/api/swagger
 
 #### Remarks
 This repository contains files which support our CI/CD pipeline and will be removed without further notice  

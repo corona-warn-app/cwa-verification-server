@@ -1,9 +1,9 @@
 /*
  * Corona-Warn-App / cwa-verification
  *
- * (C) 2020, YOUR_NAME, YOUR_COMPANY
+ * (C) 2020, T-Systems International GmbH
  *
- * Deutsche Telekom AG and all other contributors /
+ * Deutsche Telekom AG, SAP AG and all other contributors /
  * copyright owners license this file to you under the Apache 
  * License, Version 2.0 (the "License"); you may not use this 
  * file except in compliance with the License. 
@@ -18,3 +18,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+package app.coronawarn.verification.model;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * This class represents the authorization bearer token (JWT), which is used for the
+ * creation of a teleTan.
+ */
+@Schema(
+  description = "The bearer jwt token header model."
+)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuthorizationToken {
+
+  @NotNull
+  private String token;
+}

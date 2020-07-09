@@ -43,6 +43,7 @@ public class VerificationExceptionHandler {
 
   /**
    * This method handles unknown Exceptions and Server Errors.
+   *
    * @param ex the thrown exception
    * @param wr the WebRequest
    */
@@ -54,6 +55,7 @@ public class VerificationExceptionHandler {
 
   /**
    * This method handles Bad Requests.
+   *
    * @param ex the thrown exception
    * @param wr the WebRequest
    */
@@ -68,6 +70,7 @@ public class VerificationExceptionHandler {
 
   /**
    * This method handles Validation Exceptions.
+   *
    * @return ResponseEntity<?> returns Bad Request
    */
   @ExceptionHandler({
@@ -80,6 +83,7 @@ public class VerificationExceptionHandler {
 
   /**
    * This method handles Validation Exceptions.
+   *
    * @param exception the thrown exception
    * @return ResponseEntity<?> returns a HTTP Status
    */

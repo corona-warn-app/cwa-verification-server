@@ -1,7 +1,7 @@
 /*
  * Corona-Warn-App / cwa-verification
  *
- * (C) 2020, YOUR_NAME, YOUR_COMPANY
+ * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG and all other contributors /
  * copyright owners license this file to you under the Apache
@@ -26,95 +26,112 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * This class is used to read in values from configuration file application.yml.
- * It is loaded via the @EnableConfigurationProperties annotation from SpringBootApplication main class.
+ * This class and its nested subclasses are used to read in values from configuration file application.yml,
+ * which is loaded via the '@EnableConfigurationProperties' annotation from SpringBootApplication main class.
  */
 @Getter
 @Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
 
-  private TanCfg tan;
-  private AppSessionCfg appsession;
-  private EntitiesCfg entities;
+  private Tan tan = new Tan();
+  private AppSession appsession = new AppSession();
+  private Entities entities = new Entities();
+  private Jwt jwt = new Jwt();
 
   /**
-   * Configure the TeleValidCfg with build property values.
-   *
-   * @return the configured paramters
+   * Configure the Tan with build property values and return the configured
+   * parameters.
    */
-  public static class TeleCfg {
-    @Getter
-    @Setter
-    private TeleValidCfg valid;
+  @Getter
+  @Setter
+  public static class Tan {
+
+    private Tele tele = new Tele();
+    private Valid valid = new Valid();
 
     /**
-     * Configure the TeleValidCfg with build property values.
-     *
-     * @return the configured paramters
+     * Configure the Tele with build property values and return the configured
+     * parameters.
      */
-    public static class TeleValidCfg {
+    @Getter
+    @Setter
+    public static class Tele {
+
+      private Valid valid = new Valid();
+
+      /**
+       * Configure the TeleValid with build property values and return the
+       * configured parameters.
+       */
       @Getter
       @Setter
-      private int hours;
+      public static class Valid {
+
+        private String chars = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+        private int length = 1;
+        // Number of hours that teleTAN remains valid
+        private int hours = 1;
+      }
+    }
+
+    /**
+     * Configure the Valid with build property values and return the configured
+     * parameters.
+     */
+    @Getter
+    @Setter
+    public static class Valid {
+
+      // Number of days that TAN remains valid
+      int days = 14;
     }
   }
 
   /**
-   * Configure the ValidCfg with build property values.
-   *
-   * @return the configured paramters
+   * Configure the AppSession with build property values and return the
+   * configured parameters.
    */
-  public static class ValidCfg {
-    @Getter
-    @Setter
-    int days;
+  @Getter
+  @Setter
+  public static class AppSession {
+
+    // Maximum number of tans in a session at one time
+    int tancountermax = 2;
   }
 
   /**
-   * Configure the TanCfg with build property values.
-   *
-   * @return the configured paramters
+   * Configure the Entities with build property values and return the
+   * configured parameters.
    */
-  public static class TanCfg {
+  @Getter
+  @Setter
+  public static class Entities {
+
+    private Cleanup cleanup = new Cleanup();
+
+    /**
+     * Configure the Cleanup with build property values and return the
+     * configured parameters.
+     */
     @Getter
     @Setter
-    private TeleCfg tele;
-    @Getter
-    @Setter
-    private ValidCfg valid;
+    public static class Cleanup {
+
+      private Integer days = 21;
+    }
+
   }
 
   /**
-   * Configure the AppSessionCfg with build property values.
-   *
-   * @return the configured paramters
+   * Configure the Jwt with build property values and return the configured
+   * parameters.
    */
-  public static class AppSessionCfg {
-    @Getter
-    @Setter
-    int tancountermax;
-  }
+  @Getter
+  @Setter
+  public static class Jwt {
 
-  /**
-   * Configure the CleanupCfg with build property values.
-   *
-   * @return the configured paramters
-   */
-  public static class EntitiesCfg {
-    @Getter
-    @Setter
-    private CleanupCfg cleanup;
-  }
-
-  /**
-   * Configure the CleanupCfg with build property values.
-   *
-   * @return the configured paramters
-   */
-  public static class CleanupCfg {
-    @Getter
-    @Setter
-    private Integer days;
+    private String server = "http://localhost:8080";
+    private Boolean enabled = false;
   }
 }

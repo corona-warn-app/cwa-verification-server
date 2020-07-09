@@ -4,7 +4,7 @@
 
 All members of the project community must abide by the [Contributor Covenant, version 2.0](CODE_OF_CONDUCT.md).
 Only by respecting each other can we develop a productive, collaborative community.
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting [opensource@telekom.de](mailto:opensource@telekom.de) and/or a project maintainer.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting [cwa-opensource@telekom.de](mailto:cwa-opensource@telekom.de) and/or a project maintainer.
 
 We appreciate your courtesy of avoiding political questions here. Issues which are not related to the project itself will be closed by our community managers.
 
@@ -16,7 +16,7 @@ We use GitHub to manage reviews of pull requests.
 
 * If you have a trivial fix or improvement, go ahead and create a pull request, addressing (with `@...`) a suitable maintainer of this repository (see [CODEOWNERS](CODEOWNERS) of the  repository you want to contribute to) in the description of the pull request.
 
-* If you plan to do something more involved, please reach out to us and send an [email](mailto:opensource@telekom.de). This will avoid unnecessary work and surely give you and us a good deal of inspiration.
+* If you plan to do something more involved, please reach out to us and send an [email](mailto:cwa-opensource@telekom.de). This will avoid unnecessary work and surely give you and us a good deal of inspiration.
 
 * Relevant coding style guidelines are available in the respective sub-repositories as they are programming language-dependent.
 
@@ -35,7 +35,7 @@ You are welcome to contribute code in order to fix a bug or to implement a new f
 The following rule governs code contributions:
 
 * Contributions must be licensed under the [Apache 2.0 License](LICENSE)
-* Newly created files must be opened by an instantiated version of the file 'templates/file-header.txt'
+* Newly created files must be opened by a *license file header* which can be generated with the command `mvn clean license:update-file-header`.
 * At least if you add a new file to the repository, add your name into the contributor section of the file NOTICE (please respect the preset entry structure)
 
 ## Contributing Documentation

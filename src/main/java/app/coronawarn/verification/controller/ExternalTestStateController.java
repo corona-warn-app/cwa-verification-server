@@ -77,10 +77,11 @@ public class ExternalTestStateController {
       switch (sourceOfTrust) {
         case HASHED_GUID:
           String hash = appSession.get().getHashedGuid();
-          log.info("Requested result for registration token with hashed Guid.");
           TestResult testResult = testResultServerService.result(new HashedGuid(hash));
+          log.info("The result for registration token based on hashed Guid will be returned.");
           return ResponseEntity.ok(testResult);
         case TELETAN:
+          log.info("The result for registration token based on teleTAN will be returned.");
           return ResponseEntity.ok(new TestResult(LabTestResult.POSITIVE.getTestResult()));
         default:
           throw new VerificationServerException(HttpStatus.BAD_REQUEST,

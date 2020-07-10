@@ -94,10 +94,10 @@ The docker image will then run on your local machine on port 8080 assuming you c
 #### API documentation  
 Along with the application there comes a [swagger2](https://swagger.io) API documentation, which you can access in your web browser when the verification server applications runs:
 
-    <base-url>/swagger-ui.html#/verification-controller
+    <base-url>/api/swagger
 
 Which results in the following URL on your local machine:
-http://localhost:8080/swagger-ui.html#/verification-controller
+http://localhost:8080/api/swagger
 
 #### Remarks
 This repository contains files which support our CI/CD pipeline and will be removed without further notice  

@@ -33,11 +33,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
+  @Getter
+  @Setter
+  private Long initialFakeDelayMilliseconds;
+
+  @Getter
+  @Setter
+  private Long fakeDelayMovingAverageSamples;
 
   private Tan tan = new Tan();
   private AppSession appsession = new AppSession();
   private Entities entities = new Entities();
   private Jwt jwt = new Jwt();
+
 
   /**
    * Configure the Tan with build property values and return the configured

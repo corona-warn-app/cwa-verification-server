@@ -32,32 +32,74 @@ import org.springframework.stereotype.Component;
 public class FakeDelayService {
 
   private final long movingAverageSampleSize;
-  private long fakeDelay;
+  private long fakeDelayTest;
+
+  private long fakeDelayTan;
+
+  private long fakeDelayToken;
 
   public FakeDelayService(VerificationApplicationConfig applicationConfig) {
-    this.fakeDelay = applicationConfig.getInitialFakeDelayMilliseconds();
+    this.fakeDelayTest = applicationConfig.getInitialFakeDelayMilliseconds();
+    this.fakeDelayTan = applicationConfig.getInitialFakeDelayMilliseconds();
+    this.fakeDelayToken = applicationConfig.getInitialFakeDelayMilliseconds();
     this.movingAverageSampleSize = applicationConfig.getFakeDelayMovingAverageSamples();
   }
 
   /**
    * Returns the current fake delay after applying random jitter.
    */
-  public long getJitteredFakeDelay() {
-    return new PoissonDistribution(fakeDelay).sample();
+  public long getJitteredFakeTanDelay() {
+    return new PoissonDistribution(fakeDelayTan).sample();
   }
 
   /**
-   * Updates the moving average for the request duration with the specified value.
+   * Returns the current fake delay after applying random jitter.
    */
-  public void updateFakeRequestDelay(long realRequestDuration) {
-    final long currentDelay = fakeDelay;
-    fakeDelay = currentDelay + (realRequestDuration - currentDelay) / movingAverageSampleSize;
+  public long getJitteredFakeTestDelay() {
+    return new PoissonDistribution(fakeDelayTest).sample();
+  }
+
+  /**
+   * Returns the current fake delay after applying random jitter.
+   */
+  public long getJitteredFakeTokenDelay() {
+    return new PoissonDistribution(fakeDelayToken).sample();
+  }
+
+  /**
+   * Updates the moving average for the request duration for the Tan Endpoint with the specified value.
+   */
+  public void updateFakeTanRequestDelay(long realRequestDuration) {
+    final long currentDelay = fakeDelayTan;
+    fakeDelayTan = currentDelay + (realRequestDuration - currentDelay) / movingAverageSampleSize;
+  }
+
+  /**
+   * Updates the moving average for the request duration for the Tan Endpoint with the specified value.
+   */
+  public void updateFakeTestRequestDelay(long realRequestDuration) {
+    final long currentDelay = fakeDelayTan;
+    fakeDelayTan = currentDelay + (realRequestDuration - currentDelay) / movingAverageSampleSize;
+  }
+
+  /**
+   * Updates the moving average for the request duration for the Tan Endpoint with the specified value.
+   */
+  public void updateFakeTokenRequestDelay(long realRequestDuration) {
+    final long currentDelay = fakeDelayTan;
+    fakeDelayTan = currentDelay + (realRequestDuration - currentDelay) / movingAverageSampleSize;
   }
 
   /**
    * Returns the current fake delay in seconds. Used for monitoring.
    */
-  public Double getFakeDelayInSeconds() {
-    return fakeDelay / 1000.;
+  public Double getFakeTanDelayInSeconds() {
+    return fakeDelayTan / 1000.;
+  }
+  public Double getFakeTestDelayInSeconds() {
+    return fakeDelayTest / 1000.;
+  }
+  public Double getFakeTokenDelayInSeconds() {
+    return fakeDelayToken / 1000.;
   }
 }

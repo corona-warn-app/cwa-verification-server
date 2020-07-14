@@ -6,6 +6,7 @@ import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenKeyType;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.service.AppSessionService;
+import app.coronawarn.verification.service.FakeDelayService;
 import app.coronawarn.verification.service.TanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StopWatch;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +49,9 @@ public class ExternalTokenController {
   @NonNull
   private final TanService tanService;
 
+  @NonNull
+  private final FakeDelayService fakeDelayService;
+
   /**
    * This method generates a registrationToken by a hashed guid or a teleTAN.
    *
@@ -66,10 +71,14 @@ public class ExternalTokenController {
   )
   public ResponseEntity<RegistrationToken> generateRegistrationToken(
     @RequestBody @Valid RegistrationTokenRequest request) {
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
     String key = request.getKey();
     RegistrationTokenKeyType keyType = request.getKeyType();
     switch (keyType) {
       case GUID:
+        log.info("Returning the successfully generated tan.");
+        stopWatch.stop();
         return appSessionService.generateRegistrationTokenByGuid(key);
       case TELETAN:
         ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(key);
@@ -78,6 +87,9 @@ public class ExternalTokenController {
           VerificationTan teleTan = optional.get();
           teleTan.setRedeemed(true);
           tanService.saveTan(teleTan);
+          log.info("Returning the successfully generated tan.");
+          stopWatch.stop();
+          fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
           return response;
         }
         throw new VerificationServerException(HttpStatus.BAD_REQUEST, "The teleTAN verification failed");

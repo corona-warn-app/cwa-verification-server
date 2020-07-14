@@ -11,6 +11,7 @@ import app.coronawarn.verification.model.Tan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.service.AppSessionService;
+import app.coronawarn.verification.service.FakeDelayService;
 import app.coronawarn.verification.service.TanService;
 import app.coronawarn.verification.service.TestResultServerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StopWatch;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,6 +52,9 @@ public class ExternalTanController {
 
   @NonNull
   private final AppSessionService appSessionService;
+
+  @NonNull
+  private final FakeDelayService fakeDelayService;
 
   @NonNull
   private final VerificationApplicationConfig verificationApplicationConfig;
@@ -80,6 +85,8 @@ public class ExternalTanController {
   )
   public ResponseEntity<Tan> generateTan(@Valid @RequestBody RegistrationToken registrationToken) {
 
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
     Optional<VerificationAppSession> actual
       = appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
     if (actual.isPresent()) {
@@ -107,6 +114,8 @@ public class ExternalTanController {
         appSessionService.saveAppSession(appSession);
         String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
         log.info("Returning the successfully generated tan.");
+        stopWatch.stop();
+        fakeDelayService.updateFakeTanRequestDelay(stopWatch.getTotalTimeMillis());
         return ResponseEntity.status(HttpStatus.CREATED).body(new Tan(generatedTan));
       }
       throw new VerificationServerException(HttpStatus.BAD_REQUEST,

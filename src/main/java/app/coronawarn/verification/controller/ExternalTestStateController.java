@@ -9,6 +9,7 @@ import app.coronawarn.verification.model.LabTestResult;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.service.AppSessionService;
+import app.coronawarn.verification.service.FakeDelayService;
 import app.coronawarn.verification.service.TestResultServerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StopWatch;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,6 +52,9 @@ public class ExternalTestStateController {
   @NonNull
   private final TestResultServerService testResultServerService;
 
+  @NonNull
+  private final FakeDelayService fakeDelayService;
+
   /**
    * Returns the test status of the COVID-19 test.
    *
@@ -70,6 +75,8 @@ public class ExternalTestStateController {
   )
 
   public ResponseEntity<TestResult> getTestState(@Valid @RequestBody RegistrationToken registrationToken) {
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
     Optional<VerificationAppSession> appSession =
       appSessionService.getAppSessionByToken(registrationToken.getRegistrationToken());
     if (appSession.isPresent()) {
@@ -79,9 +86,13 @@ public class ExternalTestStateController {
           String hash = appSession.get().getHashedGuid();
           TestResult testResult = testResultServerService.result(new HashedGuid(hash));
           log.info("The result for registration token based on hashed Guid will be returned.");
+          stopWatch.stop();
+          fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
           return ResponseEntity.ok(testResult);
         case TELETAN:
           log.info("The result for registration token based on teleTAN will be returned.");
+          stopWatch.stop();
+          fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
           return ResponseEntity.ok(new TestResult(LabTestResult.POSITIVE.getTestResult()));
         default:
           throw new VerificationServerException(HttpStatus.BAD_REQUEST,

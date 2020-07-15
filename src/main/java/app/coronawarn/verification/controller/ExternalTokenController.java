@@ -67,7 +67,8 @@ public class ExternalTokenController {
     @ApiResponse(responseCode = "400", description = "GUID/TeleTAN already exists.")})
   @PostMapping(value = REGISTRATION_TOKEN_ROUTE,
     consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
+    produces = MediaType.APPLICATION_JSON_VALUE,
+    headers = {"cwa-fake=0"}
   )
   public ResponseEntity<RegistrationToken> generateRegistrationToken(
     @RequestBody @Valid RegistrationTokenRequest request) {

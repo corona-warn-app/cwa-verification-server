@@ -71,9 +71,9 @@ public class ExternalTestStateController {
     @ApiResponse(responseCode = "200", description = "Testresult retrieved")})
   @PostMapping(value = TESTRESULT_ROUTE,
     consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
+    produces = MediaType.APPLICATION_JSON_VALUE,
+    headers = {"cwa-fake=0"}
   )
-
   public ResponseEntity<TestResult> getTestState(@Valid @RequestBody RegistrationToken registrationToken) {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
@@ -86,9 +86,10 @@ public class ExternalTestStateController {
           String hash = appSession.get().getHashedGuid();
           TestResult testResult = testResultServerService.result(new HashedGuid(hash));
           log.info("The result for registration token based on hashed Guid will be returned.");
+          ResponseEntity returnEntity = ResponseEntity.ok(testResult);
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
-          return ResponseEntity.ok(testResult);
+          return returnEntity;
         case TELETAN:
           log.info("The result for registration token based on teleTAN will be returned.");
           stopWatch.stop();

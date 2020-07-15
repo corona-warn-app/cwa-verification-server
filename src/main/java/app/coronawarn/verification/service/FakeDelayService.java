@@ -38,6 +38,9 @@ public class FakeDelayService {
 
   private long fakeDelayToken;
 
+  /**
+   * Constructor for the FakeDelayService.
+   */
   public FakeDelayService(VerificationApplicationConfig applicationConfig) {
     this.fakeDelayTest = applicationConfig.getInitialFakeDelayMilliseconds();
     this.fakeDelayTan = applicationConfig.getInitialFakeDelayMilliseconds();
@@ -96,9 +99,17 @@ public class FakeDelayService {
   public Double getFakeTanDelayInSeconds() {
     return fakeDelayTan / 1000.;
   }
+
+  /**
+   * Returns the current fake delay in seconds. Used for monitoring.
+   */
   public Double getFakeTestDelayInSeconds() {
     return fakeDelayTest / 1000.;
   }
+
+  /**
+   * Returns the current fake delay in seconds. Used for monitoring.
+   */
   public Double getFakeTokenDelayInSeconds() {
     return fakeDelayToken / 1000.;
   }

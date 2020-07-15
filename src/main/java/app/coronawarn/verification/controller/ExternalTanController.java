@@ -81,10 +81,10 @@ public class ExternalTanController {
     @ApiResponse(responseCode = "400", description = "Registration Token does not exist")})
   @PostMapping(value = TAN_ROUTE,
     consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
+    produces = MediaType.APPLICATION_JSON_VALUE,
+    headers = {"cwa-fake=0"}
   )
   public ResponseEntity<Tan> generateTan(@Valid @RequestBody RegistrationToken registrationToken) {
-
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     Optional<VerificationAppSession> actual
@@ -114,9 +114,10 @@ public class ExternalTanController {
         appSessionService.saveAppSession(appSession);
         String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
         log.info("Returning the successfully generated tan.");
+        Tan returnTan = new Tan(generatedTan);
         stopWatch.stop();
         fakeDelayService.updateFakeTanRequestDelay(stopWatch.getTotalTimeMillis());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new Tan(generatedTan));
+        return ResponseEntity.status(HttpStatus.CREATED).body(returnTan);
       }
       throw new VerificationServerException(HttpStatus.BAD_REQUEST,
         "The maximum of generating tans for this registration token is reached");

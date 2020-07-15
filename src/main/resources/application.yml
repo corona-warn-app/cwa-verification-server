@@ -67,6 +67,8 @@ entities:
   cleanup:
     days: 21
     rate: 3600000
+initialFakeDelayMilliseconds: 10
+fakeDelayMovingAverageSamples: 5
 
 cwa-testresult-server:
   url: http://localhost:8088

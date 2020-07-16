@@ -59,7 +59,7 @@ public class ExternalTokenController {
    * @return RegistrationToken - the created registration token {@link RegistrationToken}
    */
   @Operation(
-    summary = "Get registration Token",
+    summary = "Get a fake registration Token with cwa-fake header",
     description = "Get a registration token by providing a SHA-256 hasehd GUID or a teleTAN"
   )
   @ApiResponses(value = {
@@ -69,6 +69,27 @@ public class ExternalTokenController {
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE,
     headers = {"cwa-fake=0"}
+  )
+  public ResponseEntity<RegistrationToken> generateRegistrationTokenWithFakeParam(
+    @RequestBody @Valid RegistrationTokenRequest request) {
+    return generateRegistrationToken(request);
+  }
+  /**
+   * This method generates a registrationToken by a hashed guid or a teleTAN.
+   *
+   * @param request {@link RegistrationTokenRequest}
+   * @return RegistrationToken - the created registration token {@link RegistrationToken}
+   */
+  @Operation(
+    summary = "Get registration Token",
+    description = "Get a registration token by providing a SHA-256 hasehd GUID or a teleTAN"
+  )
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "201", description = "registration token generated."),
+    @ApiResponse(responseCode = "400", description = "GUID/TeleTAN already exists.")})
+  @PostMapping(value = REGISTRATION_TOKEN_ROUTE,
+    consumes = MediaType.APPLICATION_JSON_VALUE,
+    produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<RegistrationToken> generateRegistrationToken(
     @RequestBody @Valid RegistrationTokenRequest request) {

@@ -67,6 +67,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("external")
 public class VerificationApplicationExternalTest {
 
+  private static final String TOKEN_PADDING = "";
   @Autowired
   private MockMvc mockMvc;
   @MockBean
@@ -99,7 +100,7 @@ public class VerificationApplicationExternalTest {
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .header("cwa-fake" ,"0" )
       .contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK))))
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isCreated());
 
     long count = appSessionrepository.count();
@@ -126,7 +127,7 @@ public class VerificationApplicationExternalTest {
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .header("cwa-fake" ,"0" )
       .contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK))))
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isBadRequest());
   }
 
@@ -142,10 +143,43 @@ public class VerificationApplicationExternalTest {
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .header("cwa-fake" ,"0" )
       .contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_INVALID_REG_TOK))))
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_INVALID_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isBadRequest());
   }
 
+  /**
+   * Test generateTAN with an fake test result from the lab-server.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGenerateTanWithNegativeCovidResultFaked() throws Exception {
+    log.info("process callGenerateTanWithNegativeCovidResult()");
+    TestUtils.prepareAppSessionTestData(appSessionrepository);
+    doReturn(TestUtils.TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
+
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
+      .header("cwa-fake" ,"1" )
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
+      .andExpect(status().isOk());
+  }
+  /**
+   * Test generateTAN with an negative test result from the lab-server.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGenerateTanWithNegativeCovidResultWithoutFakeHeader() throws Exception {
+    log.info("process callGenerateTanWithNegativeCovidResult()");
+    TestUtils.prepareAppSessionTestData(appSessionrepository);
+    doReturn(TestUtils.TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
+
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
+      .andExpect(status().isBadRequest());
+  }
   /**
    * Test generateTAN with an negative test result from the lab-server.
    *
@@ -160,7 +194,7 @@ public class VerificationApplicationExternalTest {
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .header("cwa-fake" ,"0" )
       .contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK))))
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isBadRequest());
   }
 
@@ -181,7 +215,7 @@ public class VerificationApplicationExternalTest {
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .header("cwa-fake" ,"0" )
       .contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK))))
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isBadRequest());
   }
 
@@ -202,7 +236,7 @@ public class VerificationApplicationExternalTest {
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .header("cwa-fake" ,"0" )
       .contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK))))
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isCreated());
   }
 
@@ -223,7 +257,7 @@ public class VerificationApplicationExternalTest {
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .header("cwa-fake" ,"0" )
       .contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK))))
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isBadRequest());
   }
 
@@ -416,7 +450,7 @@ public class VerificationApplicationExternalTest {
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
       .header("cwa-fake" ,"0" )
-      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK))))
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.testResult").value(TestUtils.TEST_LAB_POSITIVE_RESULT.getTestResult()));
   }
@@ -436,7 +470,7 @@ public class VerificationApplicationExternalTest {
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult")
       .header("cwa-fake" ,"0" )
       .contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK))))
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isBadRequest());
   }
 

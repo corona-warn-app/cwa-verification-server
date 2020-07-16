@@ -43,6 +43,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppSessionService {
 
+  private static final String TOKEN_PADDING = "";
   /**
    * The {@link VerificationAppSessionRepository}.
    */
@@ -92,7 +93,7 @@ public class AppSessionService {
       appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
       saveAppSession(appSession);
       log.info("Returning the successfully created registration token.");
-      return ResponseEntity.status(HttpStatus.CREATED).body(new RegistrationToken(registrationToken));
+      return ResponseEntity.status(HttpStatus.CREATED).body(new RegistrationToken(registrationToken, TOKEN_PADDING));
     }
   }
 
@@ -114,7 +115,7 @@ public class AppSessionService {
       appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
       saveAppSession(appSession);
       log.info("Returning the successfully created registration token.");
-      return ResponseEntity.status(HttpStatus.CREATED).body(new RegistrationToken(registrationToken));
+      return ResponseEntity.status(HttpStatus.CREATED).body(new RegistrationToken(registrationToken,TOKEN_PADDING));
     }
   }
 

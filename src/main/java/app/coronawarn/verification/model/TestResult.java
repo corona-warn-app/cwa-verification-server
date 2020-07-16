@@ -39,4 +39,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TestResult {
   private int testResult;
+  private String responsePadding;
+
 }

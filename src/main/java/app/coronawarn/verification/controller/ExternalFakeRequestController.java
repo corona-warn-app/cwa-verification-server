@@ -29,14 +29,14 @@ import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.model.Tan;
 import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.service.FakeDelayService;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,15 +51,12 @@ import org.springframework.web.context.request.async.DeferredResult;
 @RequestMapping("/version/v1 ")
 public class ExternalFakeRequestController {
 
-  private static final String RESULT_PADDING = "" ;
+  private static final String RESULT_PADDING = "";
   @NonNull
   private final FakeDelayService fakeDelayService;
 
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
-  public static final String TAN_ROUTE = "/tan";
-  public static final String REGISTRATION_TOKEN_ROUTE = "/registrationToken";
-  public static final String TESTRESULT_ROUTE = "/testresult";
 
   public ExternalFakeRequestController(@NonNull FakeDelayService fakeDelayService) {
     this.fakeDelayService = fakeDelayService;
@@ -76,7 +73,9 @@ public class ExternalFakeRequestController {
   public DeferredResult<ResponseEntity<Tan>> generateTan(@Valid @RequestBody RegistrationToken registrationToken) {
     long delay =  fakeDelayService.getJitteredFakeTanDelay();
     DeferredResult<ResponseEntity<Tan>> deferredResult = new DeferredResult<>();
-    scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.ok().build()), delay, MILLISECONDS);
+    Tan returnTan = new Tan(UUID.randomUUID().toString(),RESULT_PADDING);
+    scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.status(HttpStatus.CREATED)
+      .body(returnTan)), delay, MILLISECONDS);
     return deferredResult;
   }
 
@@ -109,7 +108,7 @@ public class ExternalFakeRequestController {
     long delay =  fakeDelayService.getJitteredFakeTanDelay();
     DeferredResult<ResponseEntity<TestResult>> deferredResult = new DeferredResult<>();
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity
-      .ok(new TestResult(LabTestResult.POSITIVE.getTestResult(),RESULT_PADDING))), delay, MILLISECONDS);
+      .ok(new TestResult(LabTestResult.POSITIVE.getTestResult()))), delay, MILLISECONDS);
     return deferredResult;
 
   }

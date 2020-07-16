@@ -1,11 +1,12 @@
 package app.coronawarn.verification.controller;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenKeyType;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
-import app.coronawarn.verification.model.Tan;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.FakeDelayService;
 import app.coronawarn.verification.service.TanService;
@@ -25,10 +26,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
-
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * This class represents the rest controller for externally reachable TAN interactions.
@@ -49,6 +52,9 @@ public class ExternalTokenController {
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
   @NonNull
+  private final ExternalFakeRequestController fakeRequestController;
+
+  @NonNull
   private final AppSessionService appSessionService;
 
   @NonNull
@@ -65,18 +71,21 @@ public class ExternalTokenController {
    */
   @Operation(
     summary = "Get registration Token",
-    description = "Get a registration token by providing a SHA-256 hasehd GUID or a teleTAN"
-  )
+    description = "Get a registration token by providing a SHA-256 hasehd GUID or a teleTAN")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "201", description = "registration token generated."),
     @ApiResponse(responseCode = "400", description = "GUID/TeleTAN already exists.")})
   @PostMapping(value = REGISTRATION_TOKEN_ROUTE,
     consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
-  )
+    produces = MediaType.APPLICATION_JSON_VALUE)
   public DeferredResult<ResponseEntity<RegistrationToken>> generateRegistrationToken(
     @RequestBody @Valid RegistrationTokenRequest request,
     @RequestHeader(value = "cwa-fake", required = false) String fake) {
+    if (fake != null) {
+      if (fake.equals("1")) {
+        return fakeRequestController.generateRegistrationToken(request);
+      }
+    }
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     String key = request.getKey();
@@ -86,9 +95,9 @@ public class ExternalTokenController {
     switch (keyType) {
       case GUID:
         log.info("Returning the successfully generated tan.");
+        ResponseEntity<RegistrationToken> responseEntity = appSessionService.generateRegistrationTokenByGuid(key);
         stopWatch.stop();
-        scheduledExecutor.schedule(() -> deferredResult.setResult(
-          appSessionService.generateRegistrationTokenByGuid(key)), 0, MILLISECONDS);
+        scheduledExecutor.schedule(() -> deferredResult.setResult(responseEntity), 0, MILLISECONDS);
         return deferredResult;
       case TELETAN:
         ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(key);

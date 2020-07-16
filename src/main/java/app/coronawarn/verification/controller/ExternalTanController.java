@@ -1,5 +1,7 @@
 package app.coronawarn.verification.controller;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.exception.VerificationServerException;
@@ -30,10 +32,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 
 /**
@@ -70,7 +75,8 @@ public class ExternalTanController {
   @NonNull
   private final TanService tanService;
 
-  ExternalFakeRequestController fakeRequestController;
+  @NonNull
+  private final ExternalFakeRequestController fakeRequestController;
 
   /**
    * This method generates a transaction number by a Registration Token, if the state of the COVID-19 lab-test is
@@ -93,8 +99,10 @@ public class ExternalTanController {
   public DeferredResult<ResponseEntity<Tan>> generateTan(@Valid @RequestBody RegistrationToken registrationToken,
                                                          @RequestHeader(value = "cwa-fake", required = false)
                                                            String fake) {
-    if (fake.equals('1')){
-      return fakeRequestController.generateTan(registrationToken) ;
+    if (fake != null) {
+      if (fake.equals("1")) {
+        return fakeRequestController.generateTan(registrationToken);
+      }
     }
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
@@ -125,11 +133,12 @@ public class ExternalTanController {
         appSessionService.saveAppSession(appSession);
         String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
         log.info("Returning the successfully generated tan.");
-        Tan returnTan = new Tan(generatedTan,RESULT_PADDING);
+        Tan returnTan = new Tan(generatedTan, RESULT_PADDING);
         stopWatch.stop();
         fakeDelayService.updateFakeTanRequestDelay(stopWatch.getTotalTimeMillis());
         DeferredResult<ResponseEntity<Tan>> deferredResult = new DeferredResult<>();
-        scheduledExecutor.schedule(() -> deferredResult.setResult( ResponseEntity.status(HttpStatus.CREATED).body(returnTan)), 0, MILLISECONDS);
+        scheduledExecutor.schedule(() -> deferredResult.setResult(
+          ResponseEntity.status(HttpStatus.CREATED).body(returnTan)), 0, MILLISECONDS);
         return deferredResult;
       }
       throw new VerificationServerException(HttpStatus.BAD_REQUEST,

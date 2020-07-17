@@ -24,6 +24,7 @@ import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -53,6 +54,7 @@ public class ExternalTestStateController {
    */
   public static final String TESTRESULT_ROUTE = "/testresult";
 
+  public static final Integer RESPONSE_PADDING_LENGTH = 43;
 
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
@@ -105,7 +107,7 @@ public class ExternalTestStateController {
         case HASHED_GUID:
           String hash = appSession.get().getHashedGuid();
           TestResult testResult = testResultServerService.result(new HashedGuid(hash));
-          testResult.setResponsePadding(UUID.randomUUID().toString());
+          testResult.setResponsePadding(RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
           log.debug("Result {}",testResult);
           log.info("The result for registration token based on hashed Guid will be returned.");
           stopWatch.stop();

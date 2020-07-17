@@ -27,6 +27,7 @@ import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -57,7 +58,7 @@ public class ExternalTanController {
    * The route to the tan generation endpoint.
    */
   public static final String TAN_ROUTE = "/tan";
-  private static final String RESULT_PADDING = "1";
+  private static final Integer RESPONSE_PADDING_LENGTH = 15;
 
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
@@ -134,7 +135,7 @@ public class ExternalTanController {
         appSessionService.saveAppSession(appSession);
         String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
         log.info("Returning the successfully generated tan.");
-        Tan returnTan = new Tan(generatedTan, RESULT_PADDING);
+        Tan returnTan = new Tan(generatedTan, RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
         stopWatch.stop();
         fakeDelayService.updateFakeTanRequestDelay(stopWatch.getTotalTimeMillis());
         DeferredResult<ResponseEntity<Tan>> deferredResult = new DeferredResult<>();

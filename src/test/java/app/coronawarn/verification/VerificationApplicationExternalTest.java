@@ -67,7 +67,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("external")
 public class VerificationApplicationExternalTest {
 
-  private static final String TOKEN_PADDING = "1";
+  private static final Integer TOKEN_PADDING = 1;
   @Autowired
   private MockMvc mockMvc;
   @MockBean

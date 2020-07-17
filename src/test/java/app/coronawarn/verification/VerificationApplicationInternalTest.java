@@ -62,7 +62,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("internal")
 public class VerificationApplicationInternalTest {
 
-  private static final String TAN_PADDING = "";
+  private static final Integer TAN_PADDING = 1;
   @Autowired
   private MockMvc mockMvc;
   @MockBean

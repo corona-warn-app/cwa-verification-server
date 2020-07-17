@@ -119,7 +119,7 @@ public class ExternalTestStateController {
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
           scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.ok(
-            new TestResult(LabTestResult.POSITIVE.getTestResult(),UUID.randomUUID().toString()))), 0, MILLISECONDS);
+            new TestResult(LabTestResult.POSITIVE.getTestResult(),RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH)))), 0, MILLISECONDS);
           return deferredResult;
         default:
           throw new VerificationServerException(HttpStatus.BAD_REQUEST,

@@ -67,7 +67,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("external")
 public class VerificationApplicationExternalTest {
 
-  private static final String TOKEN_PADDING = "";
+  private static final String TOKEN_PADDING = "1";
   @Autowired
   private MockMvc mockMvc;
   @MockBean
@@ -142,7 +142,7 @@ public class VerificationApplicationExternalTest {
   @Test
   public void callGenerateTanByUnknownToken() throws Exception {
     log.info("process callGenerateTanByUnknownToken()");
-
+    appSessionrepository.deleteAll();
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
       .header("cwa-fake" ,"0" )
@@ -196,8 +196,7 @@ public class VerificationApplicationExternalTest {
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .contentType(MediaType.APPLICATION_JSON)
       .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
-//      .andReturn().getAsyncResult().toString().contains("400"));
-        .andExpect(status().isBadRequest());
+      .andExpect(status().isBadRequest());
   }
   /**
    * Test generateTAN with an negative test result from the lab-server.
@@ -310,6 +309,25 @@ public class VerificationApplicationExternalTest {
   }
 
   /**
+   * Test get registration token by a guid with fake.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGetRegistrationTokenByGuidWithFake() throws Exception {
+    log.info("process callGetRegistrationTokenByGuid() ");
+    appSessionrepository.deleteAll();
+    RegistrationTokenRequest request = new RegistrationTokenRequest(TestUtils.TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
+    String ret = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.REGISTRATION_TOKEN_URI)
+      .contentType(MediaType.APPLICATION_JSON)
+      .header("cwa-fake" ,"1" )
+      .content(TestUtils.getAsJsonFormat(request)))
+      .andReturn().getAsyncResult().toString();
+    assertTrue(ret.contains("201"));
+
+  }
+
+  /**
    * Test get registration token by a keytype which is null.
    *
    * @throws Exception if the test cannot be performed.
@@ -361,8 +379,6 @@ public class VerificationApplicationExternalTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(TestUtils.getAsJsonFormat(request)))
       .andReturn().getAsyncResult().toString().contains("201"));
-//      .andExpect(status().isCreated())
-//      .andExpect(jsonPath("$.registrationToken").exists());
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
@@ -474,7 +490,25 @@ public class VerificationApplicationExternalTest {
       .header("cwa-fake" ,"0" )
       .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isOk());
-//      .andExpect(jsonPath("$.testResult").value(TestUtils.TEST_LAB_POSITIVE_RESULT.getTestResult()));
+  }
+
+  /**
+   * Test getTestState fake.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGetTestStateWithFake() throws Exception {
+    log.info("process callGetTestState()");
+
+    TestUtils.prepareAppSessionTestData(appSessionrepository);
+
+    given(this.testResultServerService.result(new HashedGuid(TestUtils.TEST_GUI_HASH))).willReturn(TestUtils.TEST_LAB_POSITIVE_RESULT);
+
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
+      .header("cwa-fake" ,"1" )
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
+      .andExpect(status().isOk());
   }
 
   /**

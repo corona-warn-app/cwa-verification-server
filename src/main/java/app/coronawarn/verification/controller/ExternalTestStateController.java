@@ -11,6 +11,7 @@ import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.FakeDelayService;
+import app.coronawarn.verification.service.FakeRequestService;
 import app.coronawarn.verification.service.TestResultServerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -56,7 +57,7 @@ public class ExternalTestStateController {
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
   @NonNull
-  private final ExternalFakeRequestController fakeRequestController;
+  private final FakeRequestService fakeRequestController;
 
   @NonNull
   private final AppSessionService appSessionService;

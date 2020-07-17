@@ -14,6 +14,7 @@ import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.FakeDelayService;
+import app.coronawarn.verification.service.FakeRequestService;
 import app.coronawarn.verification.service.TanService;
 import app.coronawarn.verification.service.TestResultServerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,7 +77,7 @@ public class ExternalTanController {
   private final TanService tanService;
 
   @NonNull
-  private final ExternalFakeRequestController fakeRequestController;
+  private final FakeRequestService fakeRequestController;
 
   /**
    * This method generates a transaction number by a Registration Token, if the state of the COVID-19 lab-test is

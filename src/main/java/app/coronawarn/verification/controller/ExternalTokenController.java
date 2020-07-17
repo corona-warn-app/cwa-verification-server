@@ -9,6 +9,7 @@ import app.coronawarn.verification.model.RegistrationTokenKeyType;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.FakeDelayService;
+import app.coronawarn.verification.service.FakeRequestService;
 import app.coronawarn.verification.service.TanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -52,7 +53,7 @@ public class ExternalTokenController {
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
   @NonNull
-  private final ExternalFakeRequestController fakeRequestController;
+  private final FakeRequestService fakeRequestController;
 
   @NonNull
   private final AppSessionService appSessionService;

@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package app.coronawarn.verification.controller;
+package app.coronawarn.verification.service;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -28,7 +28,6 @@ import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.model.Tan;
 import app.coronawarn.verification.model.TestResult;
-import app.coronawarn.verification.service.FakeDelayService;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,19 +36,17 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
 
 /**
- * This method generates a transaction number by a Registration Token, if the state of the COVID-19 lab-test is.
+ * This Servoce generates the fake responses for the Endpoints.
  */
 @Slf4j
-@RestController
-@RequestMapping("/version/v1 ")
-public class ExternalFakeRequestController {
+@Component
+public class FakeRequestService {
 
   private static final String RESULT_PADDING = "1";
   @NonNull
@@ -58,7 +55,7 @@ public class ExternalFakeRequestController {
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
 
-  public ExternalFakeRequestController(@NonNull FakeDelayService fakeDelayService) {
+  public FakeRequestService(@NonNull FakeDelayService fakeDelayService) {
     this.fakeDelayService = fakeDelayService;
   }
 

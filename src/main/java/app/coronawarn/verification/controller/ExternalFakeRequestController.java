@@ -51,7 +51,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 @RequestMapping("/version/v1 ")
 public class ExternalFakeRequestController {
 
-  private static final String RESULT_PADDING = "";
+  private static final String RESULT_PADDING = "1";
   @NonNull
   private final FakeDelayService fakeDelayService;
 
@@ -90,8 +90,8 @@ public class ExternalFakeRequestController {
     @RequestBody @Valid RegistrationTokenRequest request) {
     long delay =  fakeDelayService.getJitteredFakeTanDelay();
     DeferredResult<ResponseEntity<RegistrationToken>> deferredResult = new DeferredResult<>();
-    scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.ok(new RegistrationToken())),
-      delay, MILLISECONDS);
+    scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.status(HttpStatus.CREATED)
+      .body(new RegistrationToken(UUID.randomUUID().toString(),RESULT_PADDING))), delay, MILLISECONDS);
     return deferredResult;
   }
 
@@ -108,9 +108,8 @@ public class ExternalFakeRequestController {
     long delay =  fakeDelayService.getJitteredFakeTanDelay();
     DeferredResult<ResponseEntity<TestResult>> deferredResult = new DeferredResult<>();
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity
-      .ok(new TestResult(LabTestResult.POSITIVE.getTestResult()))), delay, MILLISECONDS);
+      .ok(new TestResult(LabTestResult.POSITIVE.getTestResult(),UUID.randomUUID().toString()))), delay, MILLISECONDS);
     return deferredResult;
-
   }
 
 }

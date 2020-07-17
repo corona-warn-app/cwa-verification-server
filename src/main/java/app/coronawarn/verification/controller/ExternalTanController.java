@@ -56,7 +56,7 @@ public class ExternalTanController {
    * The route to the tan generation endpoint.
    */
   public static final String TAN_ROUTE = "/tan";
-  private static final String RESULT_PADDING = "";
+  private static final String RESULT_PADDING = "1";
 
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 

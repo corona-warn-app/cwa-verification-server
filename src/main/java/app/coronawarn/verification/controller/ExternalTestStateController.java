@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.validation.Valid;
@@ -51,7 +52,6 @@ public class ExternalTestStateController {
    */
   public static final String TESTRESULT_ROUTE = "/testresult";
 
-  private static final String RESULT_PADDING = "";
 
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
@@ -104,6 +104,7 @@ public class ExternalTestStateController {
         case HASHED_GUID:
           String hash = appSession.get().getHashedGuid();
           TestResult testResult = testResultServerService.result(new HashedGuid(hash));
+          testResult.setResponsePadding(UUID.randomUUID().toString());
           log.debug("Result {}",testResult);
           log.info("The result for registration token based on hashed Guid will be returned.");
           stopWatch.stop();
@@ -115,7 +116,7 @@ public class ExternalTestStateController {
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
           scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.ok(
-            new TestResult(LabTestResult.POSITIVE.getTestResult()))), 0, MILLISECONDS);
+            new TestResult(LabTestResult.POSITIVE.getTestResult(),UUID.randomUUID().toString()))), 0, MILLISECONDS);
           return deferredResult;
         default:
           throw new VerificationServerException(HttpStatus.BAD_REQUEST,

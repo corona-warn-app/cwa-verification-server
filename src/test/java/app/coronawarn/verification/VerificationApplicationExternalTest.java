@@ -147,8 +147,6 @@ public class VerificationApplicationExternalTest {
       .contentType(MediaType.APPLICATION_JSON)
       .header("cwa-fake" ,"0" )
       .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK))))
-//      .andReturn().getAsyncResult().toString();
-//    assertTrue(async.contains("400"));
       .andExpect(status().isBadRequest());
   }
 

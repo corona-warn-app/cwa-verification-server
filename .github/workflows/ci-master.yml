@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - master
+    - feat-fake-header
 jobs:
   build:
     runs-on: ubuntu-latest

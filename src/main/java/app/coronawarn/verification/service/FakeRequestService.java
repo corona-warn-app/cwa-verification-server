@@ -49,13 +49,15 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Component
 public class FakeRequestService {
 
-  private static final String RESULT_PADDING = "1";
   @NonNull
   private final FakeDelayService fakeDelayService;
 
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
-  public static final Integer TEST_RESPONSE_PADDING_LENGTH = 45;
+  private static final Integer TEST_RESPONSE_PADDING_LENGTH = 45;
+  private static final Integer TESTRESULT_RESULT_PADDING = 1;
+  private static final Integer TAN_RESPONSE_PADDING_LENGTH = 15;
+
 
   public FakeRequestService(@NonNull FakeDelayService fakeDelayService) {
     this.fakeDelayService = fakeDelayService;
@@ -72,7 +74,8 @@ public class FakeRequestService {
   public DeferredResult<ResponseEntity<Tan>> generateTan(@Valid @RequestBody RegistrationToken registrationToken) {
     long delay =  fakeDelayService.getJitteredFakeTanDelay();
     DeferredResult<ResponseEntity<Tan>> deferredResult = new DeferredResult<>();
-    Tan returnTan = new Tan(UUID.randomUUID().toString(),RESULT_PADDING);
+    Tan returnTan = new Tan(UUID.randomUUID().toString(),
+      RandomStringUtils.randomAlphanumeric(TAN_RESPONSE_PADDING_LENGTH));
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.status(HttpStatus.CREATED)
       .body(returnTan)), delay, MILLISECONDS);
     return deferredResult;
@@ -90,7 +93,8 @@ public class FakeRequestService {
     long delay =  fakeDelayService.getJitteredFakeTanDelay();
     DeferredResult<ResponseEntity<RegistrationToken>> deferredResult = new DeferredResult<>();
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.status(HttpStatus.CREATED)
-      .body(new RegistrationToken(UUID.randomUUID().toString(),RESULT_PADDING))), delay, MILLISECONDS);
+      .body(new RegistrationToken(UUID.randomUUID().toString(),
+        RandomStringUtils.randomAlphanumeric(TESTRESULT_RESULT_PADDING)))), delay, MILLISECONDS);
     return deferredResult;
   }
 

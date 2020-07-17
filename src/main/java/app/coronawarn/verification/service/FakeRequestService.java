@@ -34,6 +34,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -54,6 +55,7 @@ public class FakeRequestService {
 
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
+  public static final Integer TEST_RESPONSE_PADDING_LENGTH = 45;
 
   public FakeRequestService(@NonNull FakeDelayService fakeDelayService) {
     this.fakeDelayService = fakeDelayService;
@@ -105,7 +107,8 @@ public class FakeRequestService {
     long delay =  fakeDelayService.getJitteredFakeTanDelay();
     DeferredResult<ResponseEntity<TestResult>> deferredResult = new DeferredResult<>();
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity
-      .ok(new TestResult(LabTestResult.POSITIVE.getTestResult(),UUID.randomUUID().toString()))), delay, MILLISECONDS);
+      .ok(new TestResult(LabTestResult.POSITIVE.getTestResult(),
+        RandomStringUtils.randomAlphanumeric(TEST_RESPONSE_PADDING_LENGTH)))), delay, MILLISECONDS);
     return deferredResult;
   }
 

@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppSessionService {
 
-  private static final String TOKEN_PADDING = "1";
+  private static final Integer TOKEN_PADDING = 1;
   /**
    * The {@link VerificationAppSessionRepository}.
    */

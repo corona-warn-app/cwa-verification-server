@@ -49,5 +49,5 @@ public class RegistrationToken {
   private String registrationToken;
 
   @Transient
-  private String responsePadding;
+  private Integer responsePadding;
 }

@@ -45,6 +45,6 @@ public class Tan {
   private String tan;
 
   @Transient
-  private String responsePadding;
+  private Integer responsePadding;
 
 }

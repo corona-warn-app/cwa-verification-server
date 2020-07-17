@@ -54,7 +54,7 @@ public class ExternalTestStateController {
    */
   public static final String TESTRESULT_ROUTE = "/testresult";
 
-  public static final Integer RESPONSE_PADDING_LENGTH = 43;
+  public static final Integer RESPONSE_PADDING_LENGTH = 45;
 
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 

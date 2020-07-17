@@ -48,7 +48,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Component
 public class FakeRequestService {
 
-  private static final Integer RESULT_PADDING = 1;
+  private static final String RESULT_PADDING = "1";
   @NonNull
   private final FakeDelayService fakeDelayService;
 

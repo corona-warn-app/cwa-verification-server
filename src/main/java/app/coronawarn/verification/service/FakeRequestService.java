@@ -43,7 +43,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 
 /**
- * This Servoce generates the fake responses for the Endpoints.
+ * This Service generates the fake responses for the Endpoints.
  */
 @Slf4j
 @Component

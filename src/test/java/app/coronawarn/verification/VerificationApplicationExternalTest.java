@@ -486,7 +486,6 @@ public class VerificationApplicationExternalTest {
     given(this.testResultServerService.result(new HashedGuid(TestUtils.TEST_GUI_HASH))).willReturn(TestUtils.TEST_LAB_POSITIVE_RESULT);
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
-      .header("cwa-fake" ,"0" )
       .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isOk());
   }

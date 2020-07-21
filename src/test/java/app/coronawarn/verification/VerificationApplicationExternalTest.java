@@ -210,7 +210,6 @@ public class VerificationApplicationExternalTest {
     doReturn(TestUtils.TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
-      .header("cwa-fake" ,"0" )
       .contentType(MediaType.APPLICATION_JSON)
       .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isBadRequest());

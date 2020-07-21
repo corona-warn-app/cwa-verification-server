@@ -96,7 +96,7 @@ public class ExternalTokenController {
         log.info("Returning the successfully generated tan.");
         ResponseEntity<RegistrationToken> responseEntity = appSessionService.generateRegistrationTokenByGuid(key);
         stopWatch.stop();
-        scheduledExecutor.schedule(() -> deferredResult.setResult(responseEntity), 0, MILLISECONDS);
+        deferredResult.setResult(responseEntity);
         return deferredResult;
       case TELETAN:
         ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(key);

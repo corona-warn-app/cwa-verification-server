@@ -42,7 +42,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
 
-
 /**
  * This class represents the rest controller for external tan interactions.
  */

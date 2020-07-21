@@ -120,6 +120,7 @@ public class ExternalTestStateController {
               RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH)))), 0, MILLISECONDS);
           return deferredResult;
         default:
+          stopWatch.stop();
           throw new VerificationServerException(HttpStatus.BAD_REQUEST,
             "Unknown source of trust inside the appsession for the registration token");
       }

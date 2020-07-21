@@ -118,6 +118,7 @@ public class ExternalTanController {
           case HASHED_GUID:
             TestResult covidTestResult = testResultServerService.result(new HashedGuid(appSession.getHashedGuid()));
             if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()) {
+              stopWatch.stop();
               throw new VerificationServerException(HttpStatus.BAD_REQUEST,
                 "Tan cannot be created, caused by the non positive result of the labserver");
             }
@@ -126,6 +127,7 @@ public class ExternalTanController {
             tanSourceOfTrust = TanSourceOfTrust.TELETAN;
             break;
           default:
+            stopWatch.stop();
             throw new VerificationServerException(HttpStatus.BAD_REQUEST,
               "Unknown source of trust inside the appsession for the registration token");
         }

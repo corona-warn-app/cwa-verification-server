@@ -95,6 +95,7 @@ public class ExternalTokenController {
         log.info("Returning the successfully generated tan.");
         ResponseEntity<RegistrationToken> responseEntity = appSessionService.generateRegistrationTokenByGuid(key);
         stopWatch.stop();
+        fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
         scheduledExecutor.schedule(() -> deferredResult.setResult(responseEntity), 0, MILLISECONDS);
         return deferredResult;
       case TELETAN:
@@ -110,8 +111,10 @@ public class ExternalTokenController {
           scheduledExecutor.schedule(() -> deferredResult.setResult(response), 0, MILLISECONDS);
           return deferredResult;
         }
+        stopWatch.stop();
         throw new VerificationServerException(HttpStatus.BAD_REQUEST, "The teleTAN verification failed");
       default:
+        stopWatch.stop();
         throw new VerificationServerException(HttpStatus.BAD_REQUEST,
           "Unknown registration key type for registration token");
     }

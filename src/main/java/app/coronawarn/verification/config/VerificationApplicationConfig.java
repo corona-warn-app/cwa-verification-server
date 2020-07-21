@@ -46,7 +46,6 @@ public class VerificationApplicationConfig {
   private Entities entities = new Entities();
   private Jwt jwt = new Jwt();
 
-
   /**
    * Configure the Tan with build property values and return the configured
    * parameters.

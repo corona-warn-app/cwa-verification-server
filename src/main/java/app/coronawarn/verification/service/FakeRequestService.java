@@ -47,6 +47,7 @@ import org.springframework.web.context.request.async.DeferredResult;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class FakeRequestService {
 
   @NonNull
@@ -57,11 +58,6 @@ public class FakeRequestService {
   private static final Integer TEST_RESPONSE_PADDING_LENGTH = 45;
   private static final Integer TESTRESULT_RESULT_PADDING = 1;
   private static final Integer TAN_RESPONSE_PADDING_LENGTH = 15;
-
-
-  public FakeRequestService(@NonNull FakeDelayService fakeDelayService) {
-    this.fakeDelayService = fakeDelayService;
-  }
 
 
   /**

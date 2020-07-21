@@ -42,7 +42,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
 
-
 /**
  * This class represents the rest controller for external tan interactions.
  */
@@ -139,8 +138,7 @@ public class ExternalTanController {
         stopWatch.stop();
         fakeDelayService.updateFakeTanRequestDelay(stopWatch.getTotalTimeMillis());
         DeferredResult<ResponseEntity<Tan>> deferredResult = new DeferredResult<>();
-        scheduledExecutor.schedule(() -> deferredResult.setResult(
-          ResponseEntity.status(HttpStatus.CREATED).body(returnTan)), 0, MILLISECONDS);
+        deferredResult.setResult(ResponseEntity.status(HttpStatus.CREATED).body(returnTan));
         return deferredResult;
       }
       throw new VerificationServerException(HttpStatus.BAD_REQUEST,

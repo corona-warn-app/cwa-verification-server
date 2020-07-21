@@ -66,6 +66,7 @@ public class ExternalTokenController {
 
   /**
    * This method generates a registrationToken by a hashed guid or a teleTAN.
+   
    * @param request {@link RegistrationTokenRequest}
    * @return RegistrationToken - the created registration token {@link RegistrationToken}
    */
@@ -95,8 +96,7 @@ public class ExternalTokenController {
         log.info("Returning the successfully generated tan.");
         ResponseEntity<RegistrationToken> responseEntity = appSessionService.generateRegistrationTokenByGuid(key);
         stopWatch.stop();
-        fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
-        scheduledExecutor.schedule(() -> deferredResult.setResult(responseEntity), 0, MILLISECONDS);
+        deferredResult.setResult(responseEntity);
         return deferredResult;
       case TELETAN:
         ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(key);
@@ -108,7 +108,7 @@ public class ExternalTokenController {
           log.info("Returning the successfully generated tan.");
           stopWatch.stop();
           fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
-          scheduledExecutor.schedule(() -> deferredResult.setResult(response), 0, MILLISECONDS);
+          deferredResult.setResult(response);
           return deferredResult;
         }
         stopWatch.stop();

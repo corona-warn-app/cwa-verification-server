@@ -210,7 +210,6 @@ public class VerificationApplicationExternalTest {
     doReturn(TestUtils.TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
-      .header("cwa-fake" ,"0" )
       .contentType(MediaType.APPLICATION_JSON)
       .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isBadRequest());
@@ -487,7 +486,6 @@ public class VerificationApplicationExternalTest {
     given(this.testResultServerService.result(new HashedGuid(TestUtils.TEST_GUI_HASH))).willReturn(TestUtils.TEST_LAB_POSITIVE_RESULT);
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
-      .header("cwa-fake" ,"0" )
       .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
       .andExpect(status().isOk());
   }

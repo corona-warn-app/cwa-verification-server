@@ -109,15 +109,15 @@ public class ExternalTestStateController {
           log.info("The result for registration token based on hashed Guid will be returned.");
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
-          scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.ok(testResult)), 0, MILLISECONDS);
+          deferredResult.setResult(ResponseEntity.ok(testResult));
           return deferredResult;
         case TELETAN:
           log.info("The result for registration token based on teleTAN will be returned.");
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
-          scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.ok(
+          deferredResult.setResult(ResponseEntity.ok(
             new TestResult(LabTestResult.POSITIVE.getTestResult(),
-              RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH)))), 0, MILLISECONDS);
+              RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH))));
           return deferredResult;
         default:
           stopWatch.stop();

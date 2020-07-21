@@ -136,8 +136,7 @@ public class ExternalTanController {
         stopWatch.stop();
         fakeDelayService.updateFakeTanRequestDelay(stopWatch.getTotalTimeMillis());
         DeferredResult<ResponseEntity<Tan>> deferredResult = new DeferredResult<>();
-        scheduledExecutor.schedule(() -> deferredResult.setResult(
-          ResponseEntity.status(HttpStatus.CREATED).body(returnTan)), 0, MILLISECONDS);
+        deferredResult.setResult(ResponseEntity.status(HttpStatus.CREATED).body(returnTan));
         return deferredResult;
       }
       throw new VerificationServerException(HttpStatus.BAD_REQUEST,

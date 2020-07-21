@@ -108,7 +108,7 @@ public class ExternalTokenController {
           log.info("Returning the successfully generated tan.");
           stopWatch.stop();
           fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
-          scheduledExecutor.schedule(() -> deferredResult.setResult(response), 0, MILLISECONDS);
+          deferredResult.setResult(response);
           return deferredResult;
         }
         throw new VerificationServerException(HttpStatus.BAD_REQUEST, "The teleTAN verification failed");

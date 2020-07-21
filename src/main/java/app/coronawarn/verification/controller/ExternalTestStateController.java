@@ -115,9 +115,9 @@ public class ExternalTestStateController {
           log.info("The result for registration token based on teleTAN will be returned.");
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
-          scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.ok(
+          deferredResult.setResult(ResponseEntity.ok(
             new TestResult(LabTestResult.POSITIVE.getTestResult(),
-              RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH)))), 0, MILLISECONDS);
+              RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH))));
           return deferredResult;
         default:
           throw new VerificationServerException(HttpStatus.BAD_REQUEST,

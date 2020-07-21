@@ -109,7 +109,7 @@ public class ExternalTestStateController {
           log.info("The result for registration token based on hashed Guid will be returned.");
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
-          scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.ok(testResult)), 0, MILLISECONDS);
+          deferredResult.setResult(ResponseEntity.ok(testResult));
           return deferredResult;
         case TELETAN:
           log.info("The result for registration token based on teleTAN will be returned.");

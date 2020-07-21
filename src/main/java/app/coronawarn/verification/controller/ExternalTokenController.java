@@ -81,10 +81,8 @@ public class ExternalTokenController {
   public DeferredResult<ResponseEntity<RegistrationToken>> generateRegistrationToken(
     @RequestBody @Valid RegistrationTokenRequest request,
     @RequestHeader(value = "cwa-fake", required = false) String fake) {
-    if (fake != null) {
-      if (fake.equals("1")) {
-        return fakeRequestController.generateRegistrationToken(request);
-      }
+    if ((fake != null) && (fake.equals("1"))) {
+      return fakeRequestController.generateRegistrationToken(request);
     }
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();

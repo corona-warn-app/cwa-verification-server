@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.validation.Valid;
@@ -90,10 +89,8 @@ public class ExternalTestStateController {
   public DeferredResult<ResponseEntity<TestResult>> getTestState(
     @Valid @RequestBody RegistrationToken registrationToken,
     @RequestHeader(value = "cwa-fake", required = false) String fake) {
-    if (fake != null) {
-      if (fake.equals("1")) {
-        return fakeRequestController.getTestState(registrationToken);
-      }
+    if ((fake != null) && (fake.equals("1"))) {
+      return fakeRequestController.getTestState(registrationToken);
     }
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();

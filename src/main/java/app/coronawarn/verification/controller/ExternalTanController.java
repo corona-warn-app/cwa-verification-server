@@ -101,10 +101,8 @@ public class ExternalTanController {
   public DeferredResult<ResponseEntity<Tan>> generateTan(@Valid @RequestBody RegistrationToken registrationToken,
                                                          @RequestHeader(value = "cwa-fake", required = false)
                                                            String fake) {
-    if (fake != null) {
-      if (fake.equals("1")) {
-        return fakeRequestController.generateTan(registrationToken);
-      }
+    if ((fake != null) && (fake.equals("1"))) {
+      return fakeRequestController.generateTan(registrationToken);
     }
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();

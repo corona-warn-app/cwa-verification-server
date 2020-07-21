@@ -81,7 +81,7 @@ public class FakeDelayService {
    * Updates the moving average for the request duration for the Tan Endpoint with the specified value.
    */
   public void updateFakeTestRequestDelay(long realRequestDuration) {
-    final long currentDelay = fakeDelayTan;
+    final long currentDelay = fakeDelayTest;
     fakeDelayTan = currentDelay + (realRequestDuration - currentDelay) / movingAverageSampleSize;
   }
 
@@ -89,7 +89,7 @@ public class FakeDelayService {
    * Updates the moving average for the request duration for the Tan Endpoint with the specified value.
    */
   public void updateFakeTokenRequestDelay(long realRequestDuration) {
-    final long currentDelay = fakeDelayTan;
+    final long currentDelay = fakeDelayToken;
     fakeDelayTan = currentDelay + (realRequestDuration - currentDelay) / movingAverageSampleSize;
   }
 

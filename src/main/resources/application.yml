@@ -1,6 +1,8 @@
 spring:
   application:
     name: cwa-verification-server
+  profiles:
+    active: internal,external
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:verification

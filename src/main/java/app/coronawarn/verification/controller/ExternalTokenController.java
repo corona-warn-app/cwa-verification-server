@@ -1,7 +1,5 @@
 package app.coronawarn.verification.controller;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.RegistrationToken;
@@ -15,8 +13,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

@@ -52,6 +52,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -101,7 +102,8 @@ public class VerificationApplicationExternalTest {
       .header("cwa-fake", "1")
       .contentType(MediaType.APPLICATION_JSON)
       .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK, TOKEN_PADDING)))).andReturn();
-    assertTrue(result.getAsyncResult().toString().contains("201"));
+    mockMvc.perform(asyncDispatch(result))
+      .andExpect(status().isCreated());
   }
 
   /**
@@ -116,11 +118,14 @@ public class VerificationApplicationExternalTest {
     TestUtils.prepareAppSessionTestData(appSessionrepository);
     doReturn(TestUtils.TEST_LAB_POSITIVE_RESULT).when(testResultServerService).result(any());
 
-    assertTrue(mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
-      .header("cwa-fake" ,"0" )
+    MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
+      .header("cwa-fake", "0")
       .contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
-      .andReturn().getAsyncResult().toString().contains("201"));
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK, TOKEN_PADDING))))
+      .andReturn();
+
+    mockMvc.perform(asyncDispatch(result))
+      .andExpect(status().isCreated());
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
@@ -250,11 +255,13 @@ public class VerificationApplicationExternalTest {
     appSessionrepository.save(appSessionTestData);
     doReturn(TestUtils.TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
 
-    assertTrue(mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
-      .header("cwa-fake" ,"0" )
+    MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
+      .header("cwa-fake", "0")
       .contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
-      .andReturn().getAsyncResult().toString().contains("201"));
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK, TOKEN_PADDING))))
+      .andReturn();
+    mockMvc.perform(asyncDispatch(result))
+      .andExpect(status().isCreated());
   }
 
   /**
@@ -288,14 +295,13 @@ public class VerificationApplicationExternalTest {
     log.info("process callGetRegistrationTokenByGuid() ");
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TestUtils.TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
-    String ret = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.REGISTRATION_TOKEN_URI)
+    MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.REGISTRATION_TOKEN_URI)
       .contentType(MediaType.APPLICATION_JSON)
       .header("cwa-fake" ,"0" )
       .content(TestUtils.getAsJsonFormat(request)))
-      .andReturn().getAsyncResult().toString();
-    assertTrue(ret.contains("201"));
-//      .andExpect(jsonPath("$.registrationToken").exists());
-
+      .andReturn();
+    mockMvc.perform(asyncDispatch(result))
+      .andExpect(status().isCreated());
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
     assertEquals("Verification Failed: Amount of verification entries is not 1 (Result=" + count + "). ", 1, count);
@@ -317,12 +323,13 @@ public class VerificationApplicationExternalTest {
     log.info("process callGetRegistrationTokenByGuid() ");
     appSessionrepository.deleteAll();
     RegistrationTokenRequest request = new RegistrationTokenRequest(TestUtils.TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
-    String ret = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.REGISTRATION_TOKEN_URI)
+    MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.REGISTRATION_TOKEN_URI)
       .contentType(MediaType.APPLICATION_JSON)
-      .header("cwa-fake" ,"1" )
+      .header("cwa-fake", "1")
       .content(TestUtils.getAsJsonFormat(request)))
-      .andReturn().getAsyncResult().toString();
-    assertTrue(ret.contains("201"));
+      .andReturn();
+    mockMvc.perform(asyncDispatch(result))
+      .andExpect(status().isCreated());
 
   }
 
@@ -374,10 +381,12 @@ public class VerificationApplicationExternalTest {
     given(this.tanService.isTeleTanValid(TestUtils.TEST_TELE_TAN)).willReturn(true);
     given(this.tanService.getEntityByTan(TestUtils.TEST_TELE_TAN)).willReturn(Optional.of(TestUtils.getTeleTanTestData()));
 
-    assertTrue(mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.REGISTRATION_TOKEN_URI)
+    MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.REGISTRATION_TOKEN_URI)
       .contentType(MediaType.APPLICATION_JSON)
       .content(TestUtils.getAsJsonFormat(request)))
-      .andReturn().getAsyncResult().toString().contains("201"));
+      .andReturn();
+    mockMvc.perform(asyncDispatch(result))
+      .andExpect(status().isCreated());
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
@@ -439,12 +448,14 @@ public class VerificationApplicationExternalTest {
     TestUtils.prepareAppSessionTestData(appSessionrepository);
     RegistrationTokenRequest request = new RegistrationTokenRequest(TestUtils.TEST_GUI_HASH, RegistrationTokenKeyType.GUID);
 
-    String async = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.REGISTRATION_TOKEN_URI)
-      .header("cwa-fake" ,"0" )
+    MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.REGISTRATION_TOKEN_URI)
+      .header("cwa-fake", "0")
       .contentType(MediaType.APPLICATION_JSON)
       .content(TestUtils.getAsJsonFormat(request)))
-      .andReturn().getAsyncResult().toString();
-     assertTrue(async.contains("400"));
+      .andReturn();
+    ;
+    mockMvc.perform(asyncDispatch(result))
+      .andExpect(status().isBadRequest());
   }
 
   /**

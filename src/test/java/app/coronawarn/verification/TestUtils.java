@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 public class TestUtils {
 
   static final String TEST_GUI_HASH = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
+  static final String RESULT_PADDING = "";
   static final String TEST_INVALID_GUI_HASH = "f0e4c2f76c58916ec2b";
   static final String TEST_TELE_TAN = "R3ZNUeV";
   static final String TEST_TELE_TAN_HASH = "eeaa54dc40aa84f587e3bc0cbbf18f7c05891558a5fe1348d52f3277794d8730";

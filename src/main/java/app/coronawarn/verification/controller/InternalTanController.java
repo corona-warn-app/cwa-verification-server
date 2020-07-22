@@ -121,9 +121,13 @@ public class InternalTanController {
   public ResponseEntity<TeleTan> createTeleTan(
     @RequestHeader(JwtService.HEADER_NAME_AUTHORIZATION) @Valid AuthorizationToken authorization) {
     if (jwtService.isAuthorized(authorization.getToken())) {
-      String teleTan = tanService.generateVerificationTeleTan();
-      log.info("The teleTAN is generated.");
-      return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));
+      if (tanService.isTeleTanRateLimitNotExceeded()) {
+        String teleTan = tanService.generateVerificationTeleTan();
+        log.info("The teleTAN is generated.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));
+      } else {
+        throw new VerificationServerException(HttpStatus.TOO_MANY_REQUESTS, "Rate Limit exceed. Try again later.");
+      }
     }
     throw new VerificationServerException(HttpStatus.UNAUTHORIZED, "JWT is invalid.");
   }

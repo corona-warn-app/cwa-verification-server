@@ -220,7 +220,14 @@ public class TanService {
     return tan;
   }
 
-  protected VerificationTan generateVerificationTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
+  /**
+   * This method generates a valid TAN Object but doesn't persist it.
+   * @param tan alphanumeric tan
+   * @param tanType type of the tan
+   * @param sourceOfTrust source of trust of the tan
+   * @return Tan object
+   */
+  public VerificationTan generateVerificationTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
     LocalDateTime from = LocalDateTime.now();
     LocalDateTime until;
     int tanValidInDays = verificationApplicationConfig.getTan().getValid().getDays();

@@ -60,8 +60,8 @@ public class ExternalTokenController {
 
   /**
    * This method generates a registrationToken by a hashed guid or a teleTAN.
-   
    * @param request {@link RegistrationTokenRequest}
+   * @param fake flag for fake request
    * @return RegistrationToken - the created registration token {@link RegistrationToken}
    */
   @Operation(

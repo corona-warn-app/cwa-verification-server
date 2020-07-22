@@ -104,7 +104,7 @@ public class VerificationApplicationConfig {
   public static class AppSession {
 
     // Maximum number of tans in a session at one time
-    int tancountermax = 2;
+    int tancountermax = 1;
   }
 
   /**

@@ -47,7 +47,7 @@ import org.springframework.web.context.request.async.DeferredResult;
  * This Service generates the fake responses for the Endpoints.
  */
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 public class FakeRequestService {
 

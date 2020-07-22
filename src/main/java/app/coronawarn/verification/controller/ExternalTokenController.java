@@ -50,8 +50,6 @@ public class ExternalTokenController {
    */
   public static final String REGISTRATION_TOKEN_ROUTE = "/registrationToken";
 
-  private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
-
   @NonNull
   private final FakeRequestService fakeRequestController;
 
@@ -96,6 +94,7 @@ public class ExternalTokenController {
         log.info("Returning the successfully generated tan.");
         ResponseEntity<RegistrationToken> responseEntity = appSessionService.generateRegistrationTokenByGuid(key);
         stopWatch.stop();
+        fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
         deferredResult.setResult(responseEntity);
         return deferredResult;
       case TELETAN:

@@ -59,8 +59,6 @@ public class ExternalTanController {
   public static final String TAN_ROUTE = "/tan";
   private static final Integer RESPONSE_PADDING_LENGTH = 15;
 
-  private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
-
   @NonNull
   private final AppSessionService appSessionService;
 
@@ -133,12 +131,12 @@ public class ExternalTanController {
         appSession.incrementTanCounter();
         appSessionService.saveAppSession(appSession);
         String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
-        log.info("Returning the successfully generated tan.");
         Tan returnTan = new Tan(generatedTan, RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
         stopWatch.stop();
         fakeDelayService.updateFakeTanRequestDelay(stopWatch.getTotalTimeMillis());
         DeferredResult<ResponseEntity<Tan>> deferredResult = new DeferredResult<>();
         deferredResult.setResult(ResponseEntity.status(HttpStatus.CREATED).body(returnTan));
+        log.info("Returning the successfully generated tan.");
         return deferredResult;
       }
       throw new VerificationServerException(HttpStatus.BAD_REQUEST,
@@ -146,5 +144,9 @@ public class ExternalTanController {
     }
     throw new VerificationServerException(HttpStatus.BAD_REQUEST,
       "VerificationAppSession not found for the registration token");
+  }
+
+  private DeferredResult<ResponseEntity<Tan>> handleFakeRequest(String fake){
+
   }
 }

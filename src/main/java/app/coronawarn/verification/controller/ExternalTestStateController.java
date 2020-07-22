@@ -55,8 +55,6 @@ public class ExternalTestStateController {
 
   public static final Integer RESPONSE_PADDING_LENGTH = 45;
 
-  private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
-
   @NonNull
   private final FakeRequestService fakeRequestController;
 

@@ -22,11 +22,12 @@
 package app.coronawarn.verification.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class represents the transaction number.
@@ -35,11 +36,15 @@ import lombok.NoArgsConstructor;
   description = "The transaction number model."
 )
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class Tan {
 
   @NotNull
   @Pattern(regexp = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$")
   private String tan;
+
+  @Transient
+  private String responsePadding;
+
 }

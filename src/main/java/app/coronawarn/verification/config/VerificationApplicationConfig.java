@@ -33,6 +33,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
+  @Getter
+  @Setter
+  private Long initialFakeDelayMilliseconds;
+
+  @Getter
+  @Setter
+  private Long fakeDelayMovingAverageSamples;
 
   private Tan tan = new Tan();
   private AppSession appsession = new AppSession();
@@ -58,6 +65,7 @@ public class VerificationApplicationConfig {
     public static class Tele {
 
       private Valid valid = new Valid();
+      private RateLimiting rateLimiting = new RateLimiting();
 
       /**
        * Configure the TeleValid with build property values and return the configured parameters.
@@ -70,6 +78,21 @@ public class VerificationApplicationConfig {
         private int length = 1;
         // Number of hours that teleTAN remains valid
         private int hours = 1;
+      }
+
+      /**
+       * Configure the rate limiting for creating new teletans.
+       */
+      @Getter
+      @Setter
+      public static class RateLimiting {
+
+        // Number of seconds for the rate limiting time window
+        private int seconds = 3600;
+        // Number of teletans that are allowed to create within time window
+        private int count = 1000;
+        // Threshold in percent for a warning in log stream
+        private int thresholdInPercent = 80;
       }
     }
 
@@ -93,7 +116,7 @@ public class VerificationApplicationConfig {
   public static class AppSession {
 
     // Maximum number of tans in a session at one time
-    int tancountermax = 2;
+    int tancountermax = 1;
   }
 
   /**

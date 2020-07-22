@@ -220,7 +220,14 @@ public class TanService {
     return tan;
   }
 
-  protected VerificationTan generateVerificationTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
+  /**
+   * This method generates a valid TAN Object but doesn't persist it.
+   * @param tan alphanumeric tan
+   * @param tanType type of the tan
+   * @param sourceOfTrust source of trust of the tan
+   * @return Tan object
+   */
+  public VerificationTan generateVerificationTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
     LocalDateTime from = LocalDateTime.now();
     LocalDateTime until;
     int tanValidInDays = verificationApplicationConfig.getTan().getValid().getDays();
@@ -239,7 +246,7 @@ public class TanService {
     verificationTan.setRedeemed(false);
     verificationTan.setCreatedAt(LocalDateTime.now());
     verificationTan.setUpdatedAt(LocalDateTime.now());
-    verificationTan.setType(tanType.name());
+    verificationTan.setType(tanType);
     return verificationTan;
   }
 
@@ -252,6 +259,32 @@ public class TanService {
   public Optional<VerificationTan> getEntityByTan(String tan) {
     log.info("Start getEntityByTan.");
     return tanRepository.findByTanHash(hashingService.hash(tan));
+  }
+
+  /**
+   * Checks whether the rate limit for new TeleTans is not exceeded.
+   *
+   * @return true if new TeleTans can be created false if not.
+   */
+  public boolean isTeleTanRateLimitNotExceeded() {
+    int maxNumberOfTans = verificationApplicationConfig.getTan().getTele().getRateLimiting().getCount();
+    int thresholdInPercent = verificationApplicationConfig.getTan().getTele().getRateLimiting().getThresholdInPercent();
+    int thresholdTans = thresholdInPercent * maxNumberOfTans / 100;
+    int timeWindow = verificationApplicationConfig.getTan().getTele().getRateLimiting().getSeconds();
+
+    LocalDateTime timestamp = LocalDateTime.now().minusSeconds(timeWindow);
+    int countedTans = tanRepository.countByCreatedAtIsAfterAndTypeIs(timestamp, TanType.TELETAN);
+
+    boolean result = countedTans < maxNumberOfTans;
+
+    if (!result) {
+      log.warn("The TeleTan rate limit is exceeded! (maximum {} tans within {} seconds)", maxNumberOfTans, timeWindow);
+    } else if (countedTans >= thresholdTans) {
+      log.warn("The TeleTan rate limit threshold of {}% is reached!"
+        + " (maximum {} tans within {} seconds)", thresholdInPercent, maxNumberOfTans, timeWindow);
+    }
+
+    return result;
   }
 
   /*

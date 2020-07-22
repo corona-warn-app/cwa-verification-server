@@ -41,7 +41,7 @@ public class TestUtils {
   static final String TEST_INVALID_TAN = "1ea6ce8a-9740-11ea-is-invalid";
   static final TanSourceOfTrust TEST_SOT = TanSourceOfTrust.CONNECTED_LAB;
   static final String TEST_HASHED_TAN = "cfb5368fc0fca485847acb28e6a96c958bb6ab7350ac766be88ad13841750231";
-  static final String TEST_TAN_TYPE = "TAN";
+  static final TanType TEST_TAN_TYPE = TanType.TAN;
   static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
   static final String PREFIX_API_VERSION = "/version/v1";
   static final String REGISTRATION_TOKEN_URI = "/registrationToken";
@@ -77,7 +77,7 @@ public class TestUtils {
     cvtan.setRedeemed(false);
     cvtan.setSourceOfTrust(TanSourceOfTrust.TELETAN);
     cvtan.setTanHash(TEST_HASHED_TAN);
-    cvtan.setType(TanType.TELETAN.name());
+    cvtan.setType(TanType.TELETAN);
     cvtan.setValidFrom(LocalDateTime.now());
     cvtan.setValidUntil(LocalDateTime.now().plusHours(1));
     return cvtan;

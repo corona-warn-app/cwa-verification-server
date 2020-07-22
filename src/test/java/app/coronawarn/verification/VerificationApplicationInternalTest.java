@@ -89,6 +89,7 @@ public class VerificationApplicationInternalTest {
     KeyPair kp = keyGenerator.genKeyPair();
     String jwtString = TestUtils.getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
 
+    given(this.tanService.isTeleTanRateLimitNotExceeded()).willReturn(Boolean.TRUE);
     given(this.jwtService.isAuthorized(any())).willReturn(Boolean.TRUE);
     given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
     when(this.jwtService.validateToken(jwtString, kp.getPublic())).thenCallRealMethod();
@@ -257,4 +258,19 @@ public class VerificationApplicationInternalTest {
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult"))
       .andExpect(status().isNotFound());
   }
+
+  @Test
+  public void shouldReturn429StatusCodeIfRateLimitIsExceeded() throws Exception {
+    given(this.jwtService.isAuthorized(any())).willReturn(Boolean.TRUE);
+    given(this.tanService.isTeleTanRateLimitNotExceeded()).willReturn(Boolean.TRUE);
+
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, ""))
+      .andExpect(status().isCreated());
+
+    given(this.tanService.isTeleTanRateLimitNotExceeded()).willReturn(Boolean.FALSE);
+
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, ""))
+      .andExpect(status().isTooManyRequests());
+  }
+
 }

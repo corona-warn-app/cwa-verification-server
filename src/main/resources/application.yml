@@ -58,6 +58,10 @@ management:
         enabled: true
 tan:
   tele:
+    ratelimiting:
+      count: 1000
+      seconds: 3600
+      threshold-in-percent: 80
     valid:
       length: 9
       hours: 1

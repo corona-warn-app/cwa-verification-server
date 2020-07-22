@@ -33,6 +33,7 @@ public class TestResultServerServiceTest {
 
   public static final String TEST_GUI_HASH_1 = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
   public static final String TEST_GUI_HASH_2 = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13c";
+  private static final String TEST_RESULT_PADDING = "";
   public static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2);
   public static final TestResult TEST_LAB_REDEEMED_RESULT = new TestResult(4);
   private TestResultServerService testResultServerService;

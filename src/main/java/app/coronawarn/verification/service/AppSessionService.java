@@ -31,6 +31,7 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppSessionService {
 
+  private static final Integer TOKEN_PADDING_LENGTH = 1;
   /**
    * The {@link VerificationAppSessionRepository}.
    */
@@ -92,7 +94,8 @@ public class AppSessionService {
       appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
       saveAppSession(appSession);
       log.info("Returning the successfully created registration token.");
-      return ResponseEntity.status(HttpStatus.CREATED).body(new RegistrationToken(registrationToken));
+      return ResponseEntity.status(HttpStatus.CREATED).body(new RegistrationToken(registrationToken,
+        RandomStringUtils.randomAlphanumeric(TOKEN_PADDING_LENGTH)));
     }
   }
 
@@ -114,7 +117,8 @@ public class AppSessionService {
       appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
       saveAppSession(appSession);
       log.info("Returning the successfully created registration token.");
-      return ResponseEntity.status(HttpStatus.CREATED).body(new RegistrationToken(registrationToken));
+      return ResponseEntity.status(HttpStatus.CREATED).body(new RegistrationToken(registrationToken,
+        RandomStringUtils.randomAlphanumeric(TOKEN_PADDING_LENGTH)));
     }
   }
 

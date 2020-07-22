@@ -62,6 +62,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("internal")
 public class VerificationApplicationInternalTest {
 
+  private static final String TAN_PADDING = "";
   @Autowired
   private MockMvc mockMvc;
   @MockBean
@@ -133,7 +134,7 @@ public class VerificationApplicationInternalTest {
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI)
       .contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN))))
+      .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN, TAN_PADDING))))
       .andExpect(status().isOk());
   }
 
@@ -149,7 +150,7 @@ public class VerificationApplicationInternalTest {
     // without mock tanService.getEntityByTan so this method will return empty entity
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI)
       .contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN))))
+      .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN, TAN_PADDING))))
       .andExpect(status().isNotFound());
   }
 
@@ -163,7 +164,7 @@ public class VerificationApplicationInternalTest {
     log.info("process callVerifyTANByTanWithInvalidSyntax()");
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_INVALID_TAN))))
+      .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_INVALID_TAN, TAN_PADDING))))
       .andExpect(status().isBadRequest());
   }
 
@@ -182,7 +183,7 @@ public class VerificationApplicationInternalTest {
     given(this.tanService.getEntityByTan(TestUtils.TEST_TAN)).willReturn(Optional.of(cvtan));
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN))))
+      .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN, TAN_PADDING))))
       .andExpect(status().isNotFound());
   }
 
@@ -201,7 +202,7 @@ public class VerificationApplicationInternalTest {
     given(this.tanService.getEntityByTan(TestUtils.TEST_TAN)).willReturn(Optional.of(cvtan));
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN))))
+      .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN, TAN_PADDING))))
       .andExpect(status().isNotFound());
   }
 
@@ -220,7 +221,7 @@ public class VerificationApplicationInternalTest {
     given(this.tanService.getEntityByTan(TestUtils.TEST_TAN)).willReturn(Optional.of(cvtan));
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
-      .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN))))
+      .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN, TAN_PADDING))))
       .andExpect(status().isNotFound());
   }
 

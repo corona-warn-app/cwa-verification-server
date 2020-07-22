@@ -33,6 +33,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
+  @Getter
+  @Setter
+  private Long initialFakeDelayMilliseconds;
+
+  @Getter
+  @Setter
+  private Long fakeDelayMovingAverageSamples;
 
   private Tan tan = new Tan();
   private AppSession appsession = new AppSession();
@@ -113,7 +120,7 @@ public class VerificationApplicationConfig {
   public static class AppSession {
 
     // Maximum number of tans in a session at one time
-    int tancountermax = 2;
+    int tancountermax = 1;
   }
 
   /**

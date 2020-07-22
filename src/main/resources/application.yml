@@ -1,6 +1,8 @@
 spring:
   application:
     name: cwa-verification-server
+  profiles:
+    active: internal,external
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:verification
@@ -71,6 +73,8 @@ entities:
   cleanup:
     days: 21
     rate: 3600000
+initialFakeDelayMilliseconds: 10
+fakeDelayMovingAverageSamples: 5
 
 cwa-testresult-server:
   url: http://localhost:8088

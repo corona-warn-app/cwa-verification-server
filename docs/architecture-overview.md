@@ -306,9 +306,9 @@ Requirements:
 Implementing those requirements makes it impossible to distinguish between "real" requests and "fake" requests and between calls to different REST endpoints.
 
 API Endpoint:
-- all Endpoints are affected 
+- all Endpoints used by the app are affected 
 - adding a request header "cwa-fake", setting it to "1" indicates a fake request, the header is optional.
-- adding an attribute to the JSON response "responsePadding" which is used to fill up the result to the fixed "equal" size 
+- adding an attribute "responsePadding" to the JSON response which is used to fill up the result to the fixed "equal" size 
 
 
 ##	API

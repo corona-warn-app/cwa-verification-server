@@ -128,7 +128,8 @@ public class ExternalTanController {
         appSession.incrementTanCounter();
         appSessionService.saveAppSession(appSession);
         String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
-        Tan returnTan = new Tan(generatedTan, RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
+        Tan returnTan = new Tan(generatedTan
+        /*, RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH*/));
         stopWatch.stop();
         fakeDelayService.updateFakeTanRequestDelay(stopWatch.getTotalTimeMillis());
         DeferredResult<ResponseEntity<Tan>> deferredResult = new DeferredResult<>();

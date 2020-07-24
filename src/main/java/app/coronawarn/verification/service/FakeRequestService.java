@@ -90,8 +90,8 @@ public class FakeRequestService {
     long delay =  fakeDelayService.getJitteredFakeTanDelay();
     DeferredResult<ResponseEntity<RegistrationToken>> deferredResult = new DeferredResult<>();
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.status(HttpStatus.CREATED)
-      .body(new RegistrationToken(UUID.randomUUID().toString(),
-        RandomStringUtils.randomAlphanumeric(TESTRESULT_RESULT_PADDING)))), delay, MILLISECONDS);
+      .body(new RegistrationToken(UUID.randomUUID().toString()
+      /*,RandomStringUtils.randomAlphanumeric(TESTRESULT_RESULT_PADDING*/ )))), delay, MILLISECONDS);
     return deferredResult;
   }
 

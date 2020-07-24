@@ -14,6 +14,8 @@ spring:
       ddl-auto: validate
   liquibase:
     change-log: classpath:db/changelog.yml
+server:
+  max-post-size: 10000
 feign:
   client:
     config:
@@ -75,6 +77,8 @@ entities:
     rate: 3600000
 initialFakeDelayMilliseconds: 10
 fakeDelayMovingAverageSamples: 5
+request:
+  sizelimit: 10000
 
 cwa-testresult-server:
   url: http://localhost:8088

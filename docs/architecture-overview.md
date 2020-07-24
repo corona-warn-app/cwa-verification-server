@@ -292,7 +292,25 @@ Steps
 Based on configuration the component must be able to switch between an internal and external mode. 
 External mode means that only the designated public available endpoints of the API are active 
 and the internal ones (create teleTAN, verify TAN) are not active.
-  
+
+### Use Case Plausible Deniablity for being positivly tested
+To allow a client to implement Plausible Deniablity for being positivly tested the service needs to fullfill two 
+changes acroos all API endpoints which are called by the mobile app. The use case takes the perspective of an attacking user which watches network traffic with regards to 
+request/response size and timing.
+
+Requirements:
+- all response sizes must be equal
+- response times must be similar for a time window
+- allowing to execute fake requests which do not change state
+
+Implementing those requirements makes it impossible to distinguish between "real" requests and "fake" requests and between calls to different REST endpoints.
+
+API Endpoint:
+- all Endpoints used by the app are affected 
+- adding a request header "cwa-fake", setting it to "1" indicates a fake request, the header is optional.
+- adding an attribute "responsePadding" to the JSON response which is used to fill up the result to the fixed "equal" size 
+
+
 ##	API
 The API is REST based and the description below, is detailed by the implementation. The API endpoint provides a swagger definition. The API does not support versioning as part of the URI.
 

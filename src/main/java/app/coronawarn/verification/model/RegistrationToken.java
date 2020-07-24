@@ -21,6 +21,7 @@
 
 package app.coronawarn.verification.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
@@ -48,8 +49,8 @@ public class RegistrationToken {
   @Pattern(regexp = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$")
   private String registrationToken;
 
- /* @Transient
+  @Transient
+  @JsonIgnore // temporarily disabled for compatibility reasond
   private String responsePadding;
 
-  */
 }

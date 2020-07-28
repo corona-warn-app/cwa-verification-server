@@ -5,6 +5,7 @@ import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenKeyType;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
+import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.FakeDelayService;
 import app.coronawarn.verification.service.FakeRequestService;
@@ -17,6 +18,7 @@ import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -88,13 +90,13 @@ public class ExternalTokenController {
     switch (keyType) {
       case GUID:
         log.info("Returning the successfully generated tan.");
-        ResponseEntity<RegistrationToken> responseEntity = appSessionService.generateRegistrationTokenByGuid(key);
+        ResponseEntity<RegistrationToken> responseEntity = appSessionService.generateRegistrationTokenByGuid(key, fake);
         stopWatch.stop();
         fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
         deferredResult.setResult(responseEntity);
         return deferredResult;
       case TELETAN:
-        ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(key);
+        ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(key, fake);
         Optional<VerificationTan> optional = tanService.getEntityByTan(key);
         if (optional.isPresent()) {
           VerificationTan teleTan = optional.get();

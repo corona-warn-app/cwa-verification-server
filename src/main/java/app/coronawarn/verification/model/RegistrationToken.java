@@ -21,7 +21,6 @@
 
 package app.coronawarn.verification.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
@@ -50,7 +49,6 @@ public class RegistrationToken {
   private String registrationToken;
 
   @Transient
-  @JsonIgnore // temporarily disabled for compatibility reasond
   private String responsePadding;
 
 }

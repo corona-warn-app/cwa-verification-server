@@ -104,15 +104,14 @@ public class ExternalTestStateController {
           log.info("The result for registration token based on hashed Guid will be returned.");
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
-          deferredResult.setResult(ResponseEntity.ok(testResult));
+          deferredResult.setResult(ResponseEntity.ok(generateReturnTestResult(testResult.getTestResult(),fake)));
           return deferredResult;
         case TELETAN:
           log.info("The result for registration token based on teleTAN will be returned.");
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
           deferredResult.setResult(ResponseEntity.ok(
-            new TestResult(LabTestResult.POSITIVE.getTestResult(),
-              RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH))));
+            generateReturnTestResult(LabTestResult.POSITIVE.getTestResult(), fake)));
           return deferredResult;
         default:
           stopWatch.stop();
@@ -123,6 +122,13 @@ public class ExternalTestStateController {
     log.info("The registration token doesn't exists.");
     throw new VerificationServerException(HttpStatus.BAD_REQUEST,
       "Returning the test result for the registration token failed");
+  }
+
+  private TestResult generateReturnTestResult(Integer testResult, String fake) {
+    if (fake == null) {
+      return new TestResult(testResult);
+    }
+    return new TestResult(testResult, RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
   }
 
 }

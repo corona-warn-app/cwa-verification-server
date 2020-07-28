@@ -202,6 +202,7 @@ public class VerificationApplicationInternalTest {
     given(this.tanService.getEntityByTan(TestUtils.TEST_TAN)).willReturn(Optional.of(cvtan));
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
+      .header("cwa-fake", 0)
       .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN, TAN_PADDING))))
       .andExpect(status().isNotFound());
   }

@@ -127,6 +127,7 @@ public class VerificationApplicationExternalTest {
 
     TestUtils.prepareAppSessionTestData(appSessionrepository);
     doReturn(TestUtils.TEST_LAB_POSITIVE_RESULT).when(testResultServerService).result(any());
+    doReturn(TestUtils.TEST_TAN).when(tanService).generateVerificationTan(any());
 
     MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .header("cwa-fake", "0")
@@ -265,6 +266,7 @@ public class VerificationApplicationExternalTest {
     appSessionTestData.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
     appSessionrepository.save(appSessionTestData);
     doReturn(TestUtils.TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
+    doReturn(TestUtils.TEST_TELE_TAN).when(tanService).generateVerificationTan(any());
 
     MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .header("cwa-fake", "0")

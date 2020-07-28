@@ -129,7 +129,7 @@ public class ExternalTanController {
         appSessionService.saveAppSession(appSession);
         String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
 
-        Tan returnTan =  generateRetunTan(generatedTan, fake);
+        Tan returnTan =  generateReturnTan(generatedTan, fake);
         stopWatch.stop();
         fakeDelayService.updateFakeTanRequestDelay(stopWatch.getTotalTimeMillis());
         DeferredResult<ResponseEntity<Tan>> deferredResult = new DeferredResult<>();
@@ -144,8 +144,7 @@ public class ExternalTanController {
       "VerificationAppSession not found for the registration token");
   }
 
-  private Tan generateRetunTan(String tan, String fake) {
-    log.info(tan);
+  private Tan generateReturnTan(String tan, String fake) {
     if (fake == null) {
       return new Tan(tan);
     }

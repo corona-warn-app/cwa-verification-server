@@ -104,14 +104,14 @@ public class ExternalTestStateController {
           log.info("The result for registration token based on hashed Guid will be returned.");
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
-          deferredResult.setResult(ResponseEntity.ok(generateRetunTestResult(testResult.getTestResult(),fake)));
+          deferredResult.setResult(ResponseEntity.ok(generateReturnTestResult(testResult.getTestResult(),fake)));
           return deferredResult;
         case TELETAN:
           log.info("The result for registration token based on teleTAN will be returned.");
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
           deferredResult.setResult(ResponseEntity.ok(
-            generateRetunTestResult(LabTestResult.POSITIVE.getTestResult(), fake)));
+            generateReturnTestResult(LabTestResult.POSITIVE.getTestResult(), fake)));
           return deferredResult;
         default:
           stopWatch.stop();
@@ -124,7 +124,7 @@ public class ExternalTestStateController {
       "Returning the test result for the registration token failed");
   }
 
-  private TestResult generateRetunTestResult(Integer testResult, String fake) {
+  private TestResult generateReturnTestResult(Integer testResult, String fake) {
     if (fake == null) {
       return new TestResult(testResult);
     }

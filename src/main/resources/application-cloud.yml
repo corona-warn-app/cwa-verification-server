@@ -6,3 +6,8 @@ spring:
     password: ${POSTGRESQL_PASSWORD}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+server:
+  ssl:
+    hostname-verify: false
+    key-store: classpath:keystore.jks
+    key-store-password: changeit

@@ -50,7 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http
       .requiresChannel()
-      .anyRequest().requiresSecure().and()
+      .anyRequest().requiresSecure();
+    http
       .authorizeRequests()
       .mvcMatchers("/api/**").permitAll()
       .mvcMatchers("/version/**").permitAll()

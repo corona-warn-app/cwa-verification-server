@@ -21,6 +21,7 @@
 
 package app.coronawarn.verification.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import javax.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -46,6 +47,7 @@ public class TestResult {
   @NonNull
   private int testResult;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @Transient
   private String responsePadding;
 

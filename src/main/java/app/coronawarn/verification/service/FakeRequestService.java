@@ -69,7 +69,7 @@ public class FakeRequestService {
    * @return A generated transaction number {@link Tan}.
    */
   public DeferredResult<ResponseEntity<Tan>> generateTan(@Valid @RequestBody RegistrationToken registrationToken) {
-    long delay = fakeDelayService.getJitteredFakeTanDelay();
+    long delay = fakeDelayService.getLongestJitter();
     DeferredResult<ResponseEntity<Tan>> deferredResult = new DeferredResult<>();
     Tan returnTan = new Tan(UUID.randomUUID().toString(),
       RandomStringUtils.randomAlphanumeric(TAN_RESPONSE_PADDING_LENGTH));
@@ -87,7 +87,7 @@ public class FakeRequestService {
    */
   public DeferredResult<ResponseEntity<RegistrationToken>> generateRegistrationToken(
     @RequestBody @Valid RegistrationTokenRequest request) {
-    long delay = fakeDelayService.getJitteredFakeTokenDelay();
+    long delay = fakeDelayService.getLongestJitter();
     DeferredResult<ResponseEntity<RegistrationToken>> deferredResult = new DeferredResult<>();
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.status(HttpStatus.CREATED)
       .body(new RegistrationToken(UUID.randomUUID().toString(),
@@ -105,7 +105,7 @@ public class FakeRequestService {
    */
   public DeferredResult<ResponseEntity<TestResult>> getTestState(
     @Valid @RequestBody RegistrationToken registrationToken) {
-    long delay = fakeDelayService.getJitteredFakeTestDelay();
+    long delay = fakeDelayService.getLongestJitter();
     DeferredResult<ResponseEntity<TestResult>> deferredResult = new DeferredResult<>();
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity
       .ok(new TestResult(LabTestResult.POSITIVE.getTestResult(),

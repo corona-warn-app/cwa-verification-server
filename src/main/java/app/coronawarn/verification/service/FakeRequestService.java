@@ -87,7 +87,7 @@ public class FakeRequestService {
    */
   public DeferredResult<ResponseEntity<RegistrationToken>> generateRegistrationToken(
     @RequestBody @Valid RegistrationTokenRequest request) {
-    long delay = fakeDelayService.getJitteredFakeTanDelay();
+    long delay = fakeDelayService.getJitteredFakeTokenDelay();
     DeferredResult<ResponseEntity<RegistrationToken>> deferredResult = new DeferredResult<>();
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.status(HttpStatus.CREATED)
       .body(new RegistrationToken(UUID.randomUUID().toString(),
@@ -105,7 +105,7 @@ public class FakeRequestService {
    */
   public DeferredResult<ResponseEntity<TestResult>> getTestState(
     @Valid @RequestBody RegistrationToken registrationToken) {
-    long delay = fakeDelayService.getJitteredFakeTanDelay();
+    long delay = fakeDelayService.getJitteredFakeTestDelay();
     DeferredResult<ResponseEntity<TestResult>> deferredResult = new DeferredResult<>();
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity
       .ok(new TestResult(LabTestResult.POSITIVE.getTestResult(),

@@ -22,6 +22,11 @@ module.exports = {
       "other"
     ]
   },
+  "ignoreIssuesWith": [
+    "wontfix",
+    "duplicate",
+    "chore"
+],
   "changelogFilename": "CHANGELOG.md",
   "template": {
       commit: ({ message, url, author, name }) => `- [${message}](${url}) - ${author ? `@${author}` : name}`,

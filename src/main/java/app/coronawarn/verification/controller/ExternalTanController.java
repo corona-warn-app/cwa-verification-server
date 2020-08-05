@@ -1,5 +1,7 @@
 package app.coronawarn.verification.controller;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.exception.VerificationServerException;
@@ -19,6 +21,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
-
 /**
  * This class represents the rest controller for external tan interactions.
  */
@@ -54,6 +57,7 @@ public class ExternalTanController {
    */
   public static final String TAN_ROUTE = "/tan";
   private static final Integer RESPONSE_PADDING_LENGTH = 15;
+  private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
   @NonNull
   private final AppSessionService appSessionService;
@@ -133,7 +137,9 @@ public class ExternalTanController {
         stopWatch.stop();
         fakeDelayService.updateFakeTanRequestDelay(stopWatch.getTotalTimeMillis());
         DeferredResult<ResponseEntity<Tan>> deferredResult = new DeferredResult<>();
-        deferredResult.setResult(ResponseEntity.status(HttpStatus.CREATED).body(returnTan));
+        scheduledExecutor.schedule(()  -> deferredResult.setResult(
+          ResponseEntity.status(HttpStatus.CREATED).body(returnTan)),
+          fakeDelayService.realDelayTan(),MILLISECONDS);
         log.info("Returning the successfully generated tan.");
         return deferredResult;
       }

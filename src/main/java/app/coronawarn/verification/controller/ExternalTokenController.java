@@ -1,11 +1,12 @@
 package app.coronawarn.verification.controller;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenKeyType;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
-import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.FakeDelayService;
 import app.coronawarn.verification.service.FakeRequestService;
@@ -14,11 +15,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,6 +49,8 @@ public class ExternalTokenController {
    * The route to the token registration endpoint.
    */
   public static final String REGISTRATION_TOKEN_ROUTE = "/registrationToken";
+
+  private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
   @NonNull
   private final FakeRequestService fakeRequestController;
@@ -105,7 +109,8 @@ public class ExternalTokenController {
           log.info("Returning the successfully generated tan.");
           stopWatch.stop();
           fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
-          deferredResult.setResult(response);
+          scheduledExecutor.schedule(() -> deferredResult.setResult(response),fakeDelayService.realDelayToken(),
+            MILLISECONDS);
           return deferredResult;
         }
         stopWatch.stop();

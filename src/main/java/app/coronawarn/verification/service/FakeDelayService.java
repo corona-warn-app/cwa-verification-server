@@ -113,4 +113,42 @@ public class FakeDelayService {
   public Double getFakeTokenDelayInSeconds() {
     return fakeDelayToken / 1000.;
   }
+
+  /**
+   * Returns the longest fake delay jittered in milliseconds.
+   * @return longest jittered
+   */
+  public long getLongestJitter() {
+    if ((fakeDelayTan > fakeDelayTest) && (fakeDelayTan > fakeDelayToken)) {
+      return getJitteredFakeTanDelay();
+    } else if ((fakeDelayToken > fakeDelayTest) && (fakeDelayToken > fakeDelayTan)) {
+      return getJitteredFakeTokenDelay();
+    } else {
+      return getJitteredFakeTestDelay();
+    }
+  }
+
+  /**
+   * Returns the longest fake delay minus average time for Tan in milliseconds.
+   * @return delay for TAN
+   */
+  public long realDelayTan() {
+    return (getLongestJitter() - getJitteredFakeTanDelay());
+  }
+
+  /**
+   * Returns the longest fake delay minus average time for RegistrationToken in milliseconds.
+   * @return delay for RegistrationToken
+   */
+  public long realDelayToken() {
+    return (getLongestJitter() - getJitteredFakeTokenDelay());
+  }
+
+  /**
+   * Returns the longest fake delay minus average time for TestResult in milliseconds.
+   * @return delay for TestResult
+   */
+  public long realDelayTest() {
+    return (getLongestJitter() - getJitteredFakeTestDelay());
+  }
 }

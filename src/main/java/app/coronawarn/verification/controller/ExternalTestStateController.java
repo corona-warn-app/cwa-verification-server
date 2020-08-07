@@ -1,5 +1,7 @@
 package app.coronawarn.verification.controller;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
@@ -15,6 +17,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
+
 /**
  * This class represents the rest controller for requests regarding test states.
  */
@@ -50,6 +55,8 @@ public class ExternalTestStateController {
   public static final String TESTRESULT_ROUTE = "/testresult";
 
   public static final Integer RESPONSE_PADDING_LENGTH = 45;
+
+  private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
   @NonNull
   private final FakeRequestService fakeRequestController;
@@ -110,8 +117,9 @@ public class ExternalTestStateController {
           log.info("The result for registration token based on teleTAN will be returned.");
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
-          deferredResult.setResult(ResponseEntity.ok(
-            generateReturnTestResult(LabTestResult.POSITIVE.getTestResult(), fake)));
+          scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.ok(
+            generateReturnTestResult(LabTestResult.POSITIVE.getTestResult(), fake))),
+            fakeDelayService.realDelayTest(), MILLISECONDS);
           return deferredResult;
         default:
           stopWatch.stop();

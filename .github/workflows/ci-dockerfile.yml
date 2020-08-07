@@ -3,7 +3,6 @@ on:
   push:
     branches:
     - master
-    - feat-add-ssl
     paths:
     - Dockerfile
     pull_request:

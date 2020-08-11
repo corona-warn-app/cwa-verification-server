@@ -93,11 +93,11 @@ public class ExternalTokenController {
 
     switch (keyType) {
       case GUID:
-        log.info("Returning the successfully generated tan.");
         ResponseEntity<RegistrationToken> responseEntity = appSessionService.generateRegistrationTokenByGuid(key, fake);
         stopWatch.stop();
         fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
         deferredResult.setResult(responseEntity);
+        log.info("Returning the successfully generated RegistrationToken.");
         return deferredResult;
       case TELETAN:
         ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(key, fake);
@@ -106,11 +106,11 @@ public class ExternalTokenController {
           VerificationTan teleTan = optional.get();
           teleTan.setRedeemed(true);
           tanService.saveTan(teleTan);
-          log.info("Returning the successfully generated tan.");
           stopWatch.stop();
           fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
           scheduledExecutor.schedule(() -> deferredResult.setResult(response),fakeDelayService.realDelayToken(),
             MILLISECONDS);
+          log.info("Returning the successfully generated RegistrationToken.");
           return deferredResult;
         }
         stopWatch.stop();

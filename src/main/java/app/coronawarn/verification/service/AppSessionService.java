@@ -85,6 +85,7 @@ public class AppSessionService {
   public ResponseEntity<RegistrationToken> generateRegistrationTokenByGuid(String hashedGuid, String fake) {
     if (checkRegistrationTokenAlreadyExistsForGuid(hashedGuid)) {
       log.warn("The registration token already exists for the hashed guid.");
+      log.debug("The registration token already exists for the hashed guid {} with fake {}.", hashedGuid, fake);
       return ResponseEntity.badRequest().build();
     } else {
       log.info("Start generating a new registration token for the given hashed guid.");

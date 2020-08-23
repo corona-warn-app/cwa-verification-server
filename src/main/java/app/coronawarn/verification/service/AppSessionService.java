@@ -31,6 +31,7 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppSessionService {
 
+  private static final Integer TOKEN_PADDING_LENGTH = 1;
   /**
    * The {@link VerificationAppSessionRepository}.
    */
@@ -80,7 +82,7 @@ public class AppSessionService {
    * @param hashedGuid the hashed guid
    * @return an {@link ResponseEntity}
    */
-  public ResponseEntity<RegistrationToken> generateRegistrationTokenByGuid(String hashedGuid) {
+  public ResponseEntity<RegistrationToken> generateRegistrationTokenByGuid(String hashedGuid, String fake) {
     if (checkRegistrationTokenAlreadyExistsForGuid(hashedGuid)) {
       log.warn("The registration token already exists for the hashed guid.");
       return ResponseEntity.badRequest().build();
@@ -91,7 +93,9 @@ public class AppSessionService {
       appSession.setHashedGuid(hashedGuid);
       appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
       saveAppSession(appSession);
-      return ResponseEntity.status(HttpStatus.CREATED).body(new RegistrationToken(registrationToken));
+      log.info("Returning the successfully created registration token.");
+      return ResponseEntity.status(HttpStatus.CREATED).body(
+        getBackwardCompatibleRegistrationToken(registrationToken, fake));
     }
   }
 
@@ -101,7 +105,7 @@ public class AppSessionService {
    * @param teleTan the TeleTan
    * @return an {@link ResponseEntity}
    */
-  public ResponseEntity<RegistrationToken> generateRegistrationTokenByTeleTan(String teleTan) {
+  public ResponseEntity<RegistrationToken> generateRegistrationTokenByTeleTan(String teleTan, String fake) {
     if (checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
       log.warn("The registration token already exists for this TeleTAN.");
       return ResponseEntity.badRequest().build();
@@ -112,7 +116,9 @@ public class AppSessionService {
       appSession.setTeleTanHash(hashingService.hash(teleTan));
       appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
       saveAppSession(appSession);
-      return ResponseEntity.status(HttpStatus.CREATED).body(new RegistrationToken(registrationToken));
+      log.info("Returning the successfully created registration token.");
+      return ResponseEntity.status(HttpStatus.CREATED).body(
+        getBackwardCompatibleRegistrationToken(registrationToken, fake));
     }
   }
 
@@ -159,4 +165,10 @@ public class AppSessionService {
     return appSessionRepository.findByTeleTanHash(hashingService.hash(teleTan)).isPresent();
   }
 
+  private RegistrationToken getBackwardCompatibleRegistrationToken(String registrationToken,String fake) {
+    if (fake == null) {
+      return new RegistrationToken(registrationToken);
+    }
+    return new RegistrationToken(registrationToken, RandomStringUtils.randomAlphanumeric(TOKEN_PADDING_LENGTH));
+  }
 }

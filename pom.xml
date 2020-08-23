@@ -5,7 +5,7 @@
 
   <groupId>app.coronawarn.verification</groupId>
   <artifactId>cwa-verification-server</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.3.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>cwa-verification-server</name>
@@ -34,12 +34,12 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <!-- dependencies -->
-    <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
-    <spring-security.version>5.2.5.RELEASE</spring-security.version>
+    <spring.boot.version>2.3.1.RELEASE</spring.boot.version>
+    <spring-security.version>5.3.3.RELEASE</spring-security.version>
     <spring.cloud.version>Hoxton.SR4</spring.cloud.version>
     <lombok.version>1.18.12</lombok.version>
-    <liquibase.version>3.9.0</liquibase.version>
-    <springdoc.version>1.3.9</springdoc.version>
+    <liquibase.version>3.10.0</liquibase.version>
+    <springdoc.version>1.4.2</springdoc.version>
     <jsonwebtoken.version>0.11.2</jsonwebtoken.version>
     <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
     <!-- plugins -->
@@ -159,7 +159,6 @@
       <version>${jsonwebtoken.version}</version>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
@@ -206,17 +205,22 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
+      <version>3.6.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
       <version>${spring-security.version}</version>
       <type>jar</type>
     </dependency>
     <dependency>
-      <groupId>org.hibernate</groupId>
+      <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
       <version>${hibernate-validator.version}</version>
     </dependency>
-
   </dependencies>
 
   <build>

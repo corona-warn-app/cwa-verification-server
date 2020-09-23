@@ -16,6 +16,8 @@ spring:
     change-log: classpath:db/changelog.yml
 server:
   max-post-size: 10000
+  ssl:
+    protocols: TLSv1.2
 feign:
   client:
     config:

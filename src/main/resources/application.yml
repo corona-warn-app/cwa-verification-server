@@ -16,6 +16,7 @@ spring:
     change-log: classpath:db/changelog.yml
 server:
   max-post-size: 10000
+  port: 8082
 feign:
   client:
     config:
@@ -35,7 +36,7 @@ management:
   server:
     ssl:
       enabled: false
-    port: 8081
+    port: 6081
   endpoint:
     info:
       enabled: true

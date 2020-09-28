@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - master
+    - fix/TLS
 
 jobs:
   build:

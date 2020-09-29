@@ -59,7 +59,7 @@ public class ExternalTestStateController {
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
   @NonNull
-  private final FakeRequestService fakeRequestController;
+  private final FakeRequestService fakeRequestService;
 
   @NonNull
   private final AppSessionService appSessionService;
@@ -92,7 +92,7 @@ public class ExternalTestStateController {
     @Valid @RequestBody RegistrationToken registrationToken,
     @RequestHeader(value = "cwa-fake", required = false) String fake) {
     if ((fake != null) && (fake.equals("1"))) {
-      return fakeRequestController.getTestState(registrationToken);
+      return fakeRequestService.getTestState(registrationToken);
     }
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();

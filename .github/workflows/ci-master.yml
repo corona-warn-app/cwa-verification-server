@@ -3,7 +3,7 @@ on:
   push:
     branches:
     - master
-
+    - feat/update_on_tan
 jobs:
   build:
     runs-on: ubuntu-latest

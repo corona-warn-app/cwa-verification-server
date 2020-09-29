@@ -130,6 +130,7 @@ public class ExternalTanController {
               "Unknown source of trust inside the appsession for the registration token");
         }
         appSession.incrementTanCounter();
+        appSession.setUpdatedAt(LocalDateTime.now());
         appSessionService.saveAppSession(appSession);
         String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
 

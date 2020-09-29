@@ -132,6 +132,7 @@ public class ExternalTanController {
         }
         appSession.incrementTanCounter();
         appSession.setUpdatedAt(LocalDateTime.now());
+        
         appSessionService.saveAppSession(appSession);
         String generatedTan = tanService.generateVerificationTan(tanSourceOfTrust);
 

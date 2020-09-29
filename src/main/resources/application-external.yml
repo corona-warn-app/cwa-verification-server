@@ -1,16 +1,5 @@
-spring:
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}
-    username: ${POSTGRESQL_USERNAME}
-    password: ${POSTGRESQL_PASSWORD}
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
 server:
   ssl:
-    hostname-verify: false
-    key-store: classpath:keystore.jks
-    key-store-password: changeit
     protocol: TLS
     enabled-protocols: TLSv1.3,TLSv1.2
     ciphers: >-

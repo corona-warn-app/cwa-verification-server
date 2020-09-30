@@ -1,0 +1,4 @@
+server:
+  ssl:
+    protocol: TLS
+    enabled-protocols: TLSv1.3

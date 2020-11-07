@@ -24,10 +24,10 @@ jobs:
       run: |
         sudo apt-get install --yes --no-install-recommends libxml-xpath-perl
         export ARTIFACT_ID=$(xpath -q -e "/project/artifactId/text()" pom.xml)
-        echo "::set-env name=ARTIFACT_ID::${ARTIFACT_ID}"
+        echo "ARTIFACT_ID=${ARTIFACT_ID}" >> $GITHUB_ENV
         export VERSION=$(xpath -q -e "/project/version/text()" pom.xml)
         export VERSION=${VERSION//-SNAPSHOT}-$(git rev-parse --short ${GITHUB_SHA})
-        echo "::set-env name=VERSION::${VERSION}"
+        echo "VERSION=${VERSION}" >> $GITHUB_ENV
     - name: mvn version
       run: mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=${VERSION}
     - name: mvn deploy

@@ -127,7 +127,7 @@ public class ExternalTestStateController {
             "Unknown source of trust inside the appsession for the registration token");
       }
     }
-    log.info("The registration token doesn't exists.");
+    log.info("The registration token doesn't exist.");
     throw new VerificationServerException(HttpStatus.BAD_REQUEST,
       "Returning the test result for the registration token failed");
   }

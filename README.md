@@ -124,18 +124,25 @@ Contribution and feedback is encouraged and always welcome. For more information
 The German government has asked SAP AG and Deutsche Telekom AG to develop the Corona-Warn-App for Germany as open source software. Deutsche Telekom is providing the network and mobile technology and will operate and run the backend for the app in a safe, scalable and stable manner. SAP is responsible for the app development, its framework and the underlying platform. Therefore, development teams of SAP and Deutsche Telekom are contributing to this project. At the same time our commitment to open source means that we are enabling -in fact encouraging- all interested parties to contribute and become part of its developer community.
 
 ## Repositories
-The following public repositories are currently available for the Corona-Warn-App:
 
 | Repository          | Description                                                           |
 | ------------------- | --------------------------------------------------------------------- |
-| [cwa-documentation] | Project overview, general documentation, and white papers             |
-| [cwa-server]        | Backend implementation for the Apple/Google exposure notification API |
-| [cwa-verification-server] | Backend implementation of the verification process|
-| [cwa-verification-portal] | The portal to interact with the verification server |
-| [cwa-verification-iam] | The identy and access management to interact with the verification server |
-| [cwa-testresult-server] | receives the test results from connected laboratories |
+| [cwa-documentation] | Project overview, general documentation, and white papers.            |
+| [cwa-app-ios]       | Native iOS app using the Apple/Google exposure notification API.      |
+| [cwa-app-android]   | Native Android app using the Apple/Google exposure notification API.  |
+| [cwa-wishlist]      | Community feature requests.                                           |
+| [cwa-website]       | The official website for the Corona-Warn-App                          |
+| [cwa-server]        | Backend implementation for the Apple/Google exposure notification API.|
+| [cwa-verification-server] | Backend implementation of the verification process.             |
+| [cwa-verification-portal] | The portal to interact with the verification server             |
+| [cwa-verification-iam]    | The identy and access management to interact with the verification server |
+| [cwa-testresult-server]   | Receives the test results from connected laboratories           |
 
 [cwa-documentation]: https://github.com/corona-warn-app/cwa-documentation
+[cwa-app-ios]: https://github.com/corona-warn-app/cwa-app-ios
+[cwa-app-android]: https://github.com/corona-warn-app/cwa-app-android
+[cwa-wishlist]: https://github.com/corona-warn-app/cwa-wishlist
+[cwa-website]: https://github.com/corona-warn-app/cwa-website
 [cwa-server]: https://github.com/corona-warn-app/cwa-server
 [cwa-verification-server]: https://github.com/corona-warn-app/cwa-verification-server
 [cwa-verification-portal]: https://github.com/corona-warn-app/cwa-verification-portal

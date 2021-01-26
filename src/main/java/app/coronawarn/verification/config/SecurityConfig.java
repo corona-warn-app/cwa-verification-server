@@ -26,10 +26,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 
+@EnableWebSecurity
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -46,8 +48,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.authorizeRequests()
-      .mvcMatchers("/api/**").permitAll()
+    http
+      .authorizeRequests()
+      .mvcMatchers("/api/**").permitAll().and().requiresChannel().mvcMatchers("/api/**").requiresSecure().and()
+      .authorizeRequests()
       .mvcMatchers("/version/**").permitAll()
       .mvcMatchers("/actuator/**").permitAll()
       .anyRequest().denyAll()

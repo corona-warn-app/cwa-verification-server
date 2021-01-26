@@ -33,42 +33,38 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@ContextConfiguration(classes = VerificationApplication.class)
 public class HashingServiceTest {
 
-  @Autowired
-  HashingService hashingService;
+  HashingService hashingService = new HashingService();
 
   @Test
-  public void testValidSha256Hash() {
+  public void validSha256Hash() {
     assertTrue(hashingService.isHashValid("523463041ef9ffa2950d8450feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
     assertTrue(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000"));
     assertTrue(hashingService.isHashValid("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"));
   }
 
   @Test
-  public void testInvalidSha256Hash() {
+  public void invalidSha256Hash() {
     assertFalse(hashingService.isHashValid("x23463041ef9ffa2950d8z50feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
     assertFalse(hashingService.isHashValid("523463041ef9ffa2950d8z50feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
     assertFalse(hashingService.isHashValid("0"));
     assertFalse(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000f"));
+    assertFalse(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000\n"));
   }
 
   @Test
-  public void testGetCheckDigit() {
-    assertThat(hashingService.getCheckDigit("FE9A5MAK6").equals("C"));
-    assertThat(hashingService.getCheckDigit("WPHSATMHD").equals("4"));
-    assertThat(hashingService.getCheckDigit("9N4UTTACE").equals("6"));
-    assertThat(hashingService.getCheckDigit("S3HHJJYJD").equals("3"));
-    assertThat(hashingService.getCheckDigit("W3M75DUD7").equals("C"));
-    assertThat(hashingService.getCheckDigit("BBA3M8UVU").equals("C"));
-    assertThat(hashingService.getCheckDigit("MNSHDZAEJ").equals("2"));
-    assertThat(hashingService.getCheckDigit("WS732AR8Q").equals("B"));
+  public void getCheckDigit() {
+    assertThat(hashingService.getCheckDigit("FE9A5MAK6").equals("C")).isTrue();
+    assertThat(hashingService.getCheckDigit("WPHSATMHD").equals("4")).isTrue();
+    assertThat(hashingService.getCheckDigit("9N4UTTACE").equals("6")).isTrue();
+    assertThat(hashingService.getCheckDigit("S3HHJJYJD").equals("3")).isTrue();
+    assertThat(hashingService.getCheckDigit("W3M75DUD7").equals("C")).isTrue();
+    assertThat(hashingService.getCheckDigit("BBA3M8UVU").equals("C")).isTrue();
+    assertThat(hashingService.getCheckDigit("MNSHDZAEJ").equals("2")).isTrue();
+    assertThat(hashingService.getCheckDigit("WS732AR8Q").equals("B")).isTrue();
     // special cases
-    assertThat(hashingService.getCheckDigit("FE9A5MAK9").equals("H"));
-    assertThat(hashingService.getCheckDigit("FE9A5MAKW").equals("G"));
+    assertThat(hashingService.getCheckDigit("FE9A5MAK9").equals("H")).isTrue();
+    assertThat(hashingService.getCheckDigit("FE9A5MAKW").equals("G")).isTrue();
   }
 }

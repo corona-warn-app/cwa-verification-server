@@ -22,6 +22,7 @@
 package app.coronawarn.verification.domain;
 
 import app.coronawarn.verification.model.TanSourceOfTrust;
+import app.coronawarn.verification.model.TanType;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -47,8 +48,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "tan")
 public class VerificationTan implements Serializable {
 
-  static final long serialVersionUid = 1L;
-
+  static final long SERIAL_VERSION_UID = 1L;
+  
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
@@ -81,7 +82,8 @@ public class VerificationTan implements Serializable {
   private boolean redeemed;
 
   @Column(name = "type")
-  private String type;
+  @Enumerated(EnumType.STRING)
+  private TanType type;
 
   /**
    * Check if the tan can be redeemed by date.

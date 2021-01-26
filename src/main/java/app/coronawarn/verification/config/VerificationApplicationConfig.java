@@ -1,7 +1,7 @@
 /*
  * Corona-Warn-App / cwa-verification
  *
- * (C) 2020, YOUR_NAME, YOUR_COMPANY
+ * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG and all other contributors /
  * copyright owners license this file to you under the Apache
@@ -26,22 +26,25 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * This class and its nested subclasses are used to read in values from configuration file application.yml,
- * which is loaded via the '@EnableConfigurationProperties' annotation from SpringBootApplication main class.
+ * This class and its nested subclasses are used to read in values from configuration file application.yml, which is
+ * loaded via the '@EnableConfigurationProperties' annotation from SpringBootApplication main class.
  */
 @Getter
 @Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
+  private Long initialFakeDelayMilliseconds;
+
+  private Long fakeDelayMovingAverageSamples;
 
   private Tan tan = new Tan();
   private AppSession appsession = new AppSession();
   private Entities entities = new Entities();
   private Jwt jwt = new Jwt();
+  private Request request = new Request();
 
   /**
-   * Configure the Tan with build property values and return the configured
-   * parameters.
+   * Configure the Tan with build property values and return the configured parameters.
    */
   @Getter
   @Setter
@@ -51,18 +54,17 @@ public class VerificationApplicationConfig {
     private Valid valid = new Valid();
 
     /**
-     * Configure the Tele with build property values and return the configured
-     * parameters.
+     * Configure the Tele with build property values and return the configured parameters.
      */
     @Getter
     @Setter
     public static class Tele {
 
       private Valid valid = new Valid();
+      private RateLimiting rateLimiting = new RateLimiting();
 
       /**
-       * Configure the TeleValid with build property values and return the
-       * configured parameters.
+       * Configure the TeleValid with build property values and return the configured parameters.
        */
       @Getter
       @Setter
@@ -73,11 +75,25 @@ public class VerificationApplicationConfig {
         // Number of hours that teleTAN remains valid
         private int hours = 1;
       }
+
+      /**
+       * Configure the rate limiting for creating new teletans.
+       */
+      @Getter
+      @Setter
+      public static class RateLimiting {
+
+        // Number of seconds for the rate limiting time window
+        private int seconds = 3600;
+        // Number of teletans that are allowed to create within time window
+        private int count = 1000;
+        // Threshold in percent for a warning in log stream
+        private int thresholdInPercent = 80;
+      }
     }
 
     /**
-     * Configure the Valid with build property values and return the configured
-     * parameters.
+     * Configure the Valid with build property values and return the configured parameters.
      */
     @Getter
     @Setter
@@ -89,20 +105,18 @@ public class VerificationApplicationConfig {
   }
 
   /**
-   * Configure the AppSession with build property values and return the
-   * configured parameters.
+   * Configure the AppSession with build property values and return the configured parameters.
    */
   @Getter
   @Setter
   public static class AppSession {
 
     // Maximum number of tans in a session at one time
-    int tancountermax = 2;
+    int tancountermax = 1;
   }
 
   /**
-   * Configure the Entities with build property values and return the
-   * configured parameters.
+   * Configure the Entities with build property values and return the configured parameters.
    */
   @Getter
   @Setter
@@ -111,8 +125,7 @@ public class VerificationApplicationConfig {
     private Cleanup cleanup = new Cleanup();
 
     /**
-     * Configure the Cleanup with build property values and return the
-     * configured parameters.
+     * Configure the Cleanup with build property values and return the configured parameters.
      */
     @Getter
     @Setter
@@ -124,8 +137,7 @@ public class VerificationApplicationConfig {
   }
 
   /**
-   * Configure the Jwt with build property values and return the configured
-   * parameters.
+   * Configure the Jwt with build property values and return the configured parameters.
    */
   @Getter
   @Setter
@@ -133,5 +145,15 @@ public class VerificationApplicationConfig {
 
     private String server = "http://localhost:8080";
     private Boolean enabled = false;
+  }
+
+  /**
+   * Configure the requests with build property values and return the configured parameters.
+   */
+  @Getter
+  @Setter
+  public static class Request {
+
+    private long sizelimit = 10000;
   }
 }

@@ -19,18 +19,20 @@
  * under the License.
  */
 
-package app.coronawarn.verification.client;
+package app.coronawarn.verification.model;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * This class represents the TestResult.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TestResult {
-  private int testResult;
+public class Certs {
+  
+  private List<Key> keys = null;
+  private Map<String, Object> additionalProperties = new HashMap<>();
 }

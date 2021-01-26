@@ -32,6 +32,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * A Service to delete entities that are older than configured days.
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -42,14 +45,14 @@ public class EntitiesCleanupService {
   private final VerificationTanRepository tanRepository;
 
   /**
-   * All entities that are older than configured days should get deleted.
+   * All entities that are older than configured days get deleted.
    */
   @Scheduled(
     fixedDelayString = "${entities.cleanup.rate}"
   )
   @Transactional
   public void cleanup() {
-    log.info("EntitiesCleanupService cleanup()");
+    log.info("cleanup execution");
     appSessionRepository.deleteByCreatedAtBefore(LocalDateTime.now()
       .minus(Period.ofDays(applicationConfig.getEntities().getCleanup().getDays())));
     tanRepository.deleteByCreatedAtBefore(LocalDateTime.now()

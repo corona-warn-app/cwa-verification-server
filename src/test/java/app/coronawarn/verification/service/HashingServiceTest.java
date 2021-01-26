@@ -21,41 +21,44 @@
 
 package app.coronawarn.verification.service;
 
-import app.coronawarn.verification.VerificationApplication;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ContextConfiguration(classes = VerificationApplication.class)
 public class HashingServiceTest {
 
-  @Autowired
-  HashingService hashingService;
+  HashingService hashingService = new HashingService();
 
   @Test
-  public void testValidSha256Hash() {
-
+  public void validSha256Hash() {
     assertTrue(hashingService.isHashValid("523463041ef9ffa2950d8450feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
     assertTrue(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000"));
     assertTrue(hashingService.isHashValid("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"));
   }
 
   @Test
-  public void testInvalidSha256Hash() {
-
+  public void invalidSha256Hash() {
     assertFalse(hashingService.isHashValid("x23463041ef9ffa2950d8z50feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
     assertFalse(hashingService.isHashValid("523463041ef9ffa2950d8z50feb34c88bc8692c40c9cf3c99dcdf75e270229e2"));
     assertFalse(hashingService.isHashValid("0"));
     assertFalse(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000f"));
+    assertFalse(hashingService.isHashValid("0000000000000000000000000000000000000000000000000000000000000000\n"));
   }
 
-
+  @Test
+  public void getCheckDigit() {
+    assertThat(hashingService.getCheckDigit("FE9A5MAK6").equals("C")).isTrue();
+    assertThat(hashingService.getCheckDigit("WPHSATMHD").equals("4")).isTrue();
+    assertThat(hashingService.getCheckDigit("9N4UTTACE").equals("6")).isTrue();
+    assertThat(hashingService.getCheckDigit("S3HHJJYJD").equals("3")).isTrue();
+    assertThat(hashingService.getCheckDigit("W3M75DUD7").equals("C")).isTrue();
+    assertThat(hashingService.getCheckDigit("BBA3M8UVU").equals("C")).isTrue();
+    assertThat(hashingService.getCheckDigit("MNSHDZAEJ").equals("2")).isTrue();
+    assertThat(hashingService.getCheckDigit("WS732AR8Q").equals("B")).isTrue();
+    // special cases
+    assertThat(hashingService.getCheckDigit("FE9A5MAK9").equals("H")).isTrue();
+    assertThat(hashingService.getCheckDigit("FE9A5MAKW").equals("G")).isTrue();
+  }
 }

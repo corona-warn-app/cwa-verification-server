@@ -19,20 +19,25 @@
  * under the License.
  */
 
-package app.coronawarn.verification.client;
+package app.coronawarn.verification.model;
 
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * This class represents the Labor Server service client.
+ * This class represents the hashed Guid.
+ * Hash (SHA256) aka QR-Code, GUID encoded as hex string.
+ *
+ * @see <a href="https://github.com/corona-warn-app/cwa-testresult-server/blob/master/docs/architecture-overview.md#core-entities">Core Entities</a>
  */
-@FeignClient(name = "labServerService", url = "${uri.endpoint.labserver}")
-public interface LabServerClient {
-  @PostMapping(value = "/api/v1/app/result",
-    consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
-  )
-  TestResult result(HashedGuid guid);
+@Schema(
+  description = "The hashed Guid request model."
+)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class HashedGuid {
+  private String id;
 }

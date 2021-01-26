@@ -7,15 +7,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 server:
-  port: 8080
-management:
-  server:
-    port: 8090
-  endpoints:
-    web:
-      exposure:
-        include: health
-  endpoint:
-    health:
-      show-details: ALWAYS
-      show-components: ALWAYS
+  ssl:
+    hostname-verify: false
+    key-store: classpath:keystore.jks
+    key-store-password: changeit

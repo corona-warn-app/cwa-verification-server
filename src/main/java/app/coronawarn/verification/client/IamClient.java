@@ -19,28 +19,24 @@
  * under the License.
  */
 
-package app.coronawarn.verification.service;
+package app.coronawarn.verification.client;
 
-import app.coronawarn.verification.client.HashedGuid;
-import app.coronawarn.verification.client.LabServerClient;
-import app.coronawarn.verification.client.TestResult;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import app.coronawarn.verification.model.Certs;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * This class represents the lab server service.
+ * This class represents the IAM feign client.
  */
-@Slf4j
-@RequiredArgsConstructor
-@Component
-public class LabServerService {
-
-  @NonNull
-  private final LabServerClient labServerClient;
-
-  public TestResult result(HashedGuid guid) {
-    return labServerClient.result(guid);
-  }
+@FeignClient(name = "IamService", url = "${jwt.server}")
+public interface IamClient {
+  /**
+   * This method gets the cert information from the IAM Server.
+   * @return Testresult from server
+   */
+  @GetMapping(value = "/auth/realms/cwa/protocol/openid-connect/certs",
+    consumes = MediaType.APPLICATION_JSON_VALUE
+  )
+   Certs certs();
 }

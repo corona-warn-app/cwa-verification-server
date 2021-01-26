@@ -1,7 +1,7 @@
 /*
  * Corona-Warn-App / cwa-verification
  *
- * (C) 2020, YOUR_NAME, YOUR_COMPANY
+ * (C) 2020, T-Systems International GmbH
  *
  * Deutsche Telekom AG and all other contributors /
  * copyright owners license this file to you under the Apache
@@ -26,60 +26,134 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * This class is used to read in values from configuration file application.yml.
- * It is loaded via the @EnableConfigurationProperties annotation from SpringBootApplication main class.
+ * This class and its nested subclasses are used to read in values from configuration file application.yml, which is
+ * loaded via the '@EnableConfigurationProperties' annotation from SpringBootApplication main class.
  */
 @Getter
 @Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
+  private Long initialFakeDelayMilliseconds;
 
-  private TanCfg tan;
-  private AppSessionCfg appsession;
-  private EntitiesCfg entities;
+  private Long fakeDelayMovingAverageSamples;
 
-  public static class TeleCfg {
+  private Tan tan = new Tan();
+  private AppSession appsession = new AppSession();
+  private Entities entities = new Entities();
+  private Jwt jwt = new Jwt();
+  private Request request = new Request();
+
+  /**
+   * Configure the Tan with build property values and return the configured parameters.
+   */
+  @Getter
+  @Setter
+  public static class Tan {
+
+    private Tele tele = new Tele();
+    private Valid valid = new Valid();
+
+    /**
+     * Configure the Tele with build property values and return the configured parameters.
+     */
     @Getter
     @Setter
-    private TeleValidCfg valid;
+    public static class Tele {
 
-    public static class TeleValidCfg {
+      private Valid valid = new Valid();
+      private RateLimiting rateLimiting = new RateLimiting();
+
+      /**
+       * Configure the TeleValid with build property values and return the configured parameters.
+       */
       @Getter
       @Setter
-      private int hours;
+      public static class Valid {
+
+        private String chars = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+        private int length = 1;
+        // Number of hours that teleTAN remains valid
+        private int hours = 1;
+      }
+
+      /**
+       * Configure the rate limiting for creating new teletans.
+       */
+      @Getter
+      @Setter
+      public static class RateLimiting {
+
+        // Number of seconds for the rate limiting time window
+        private int seconds = 3600;
+        // Number of teletans that are allowed to create within time window
+        private int count = 1000;
+        // Threshold in percent for a warning in log stream
+        private int thresholdInPercent = 80;
+      }
+    }
+
+    /**
+     * Configure the Valid with build property values and return the configured parameters.
+     */
+    @Getter
+    @Setter
+    public static class Valid {
+
+      // Number of days that TAN remains valid
+      int days = 14;
     }
   }
 
-  public static class ValidCfg {
-    @Getter
-    @Setter
-    int days;
+  /**
+   * Configure the AppSession with build property values and return the configured parameters.
+   */
+  @Getter
+  @Setter
+  public static class AppSession {
+
+    // Maximum number of tans in a session at one time
+    int tancountermax = 1;
   }
 
-  public static class TanCfg {
+  /**
+   * Configure the Entities with build property values and return the configured parameters.
+   */
+  @Getter
+  @Setter
+  public static class Entities {
+
+    private Cleanup cleanup = new Cleanup();
+
+    /**
+     * Configure the Cleanup with build property values and return the configured parameters.
+     */
     @Getter
     @Setter
-    private TeleCfg tele;
-    @Getter
-    @Setter
-    private ValidCfg valid;
+    public static class Cleanup {
+
+      private Integer days = 21;
+    }
+
   }
 
-  public static class AppSessionCfg {
-    @Getter
-    @Setter
-    int tancountermax;
+  /**
+   * Configure the Jwt with build property values and return the configured parameters.
+   */
+  @Getter
+  @Setter
+  public static class Jwt {
+
+    private String server = "http://localhost:8080";
+    private Boolean enabled = false;
   }
 
-  public static class EntitiesCfg {
-    @Getter
-    @Setter
-    private CleanupCfg cleanup;
-  }
+  /**
+   * Configure the requests with build property values and return the configured parameters.
+   */
+  @Getter
+  @Setter
+  public static class Request {
 
-  public static class CleanupCfg {
-    @Getter
-    @Setter
-    private Integer days;
+    private long sizelimit = 10000;
   }
 }

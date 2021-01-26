@@ -36,7 +36,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -44,30 +43,45 @@ import org.springframework.stereotype.Component;
  * This class represents the TanService service.
  */
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class TanService {
 
-  // Tele-TANs are a shorter, easier to communicate form of TAN
-  private static final int TELE_TAN_LENGTH = 7;
-  // Exclude characters which can be confusing in some fonts like 0-O or i-I-l.
-  private static final String TELE_TAN_ALLOWED_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz";
-  private static final String TELE_TAN_PATTERN = "^[" + TELE_TAN_ALLOWED_CHARS + "]{" + TELE_TAN_LENGTH + "}$";
-  private static final Pattern PATTERN = Pattern.compile(TELE_TAN_PATTERN);
+ 
+  private final VerificationApplicationConfig verificationApplicationConfig;
 
   /**
    * The {@link VerificationTanRepository}.
    */
-  @NonNull
   private final VerificationTanRepository tanRepository;
   /**
    * The {@link HashingService}.
    */
-  @NonNull
   private final HashingService hashingService;
 
-  @NonNull
-  private final VerificationApplicationConfig verificationApplicationConfig;
+  private final Pattern teleTanPattern;
+  private final int teleTanLength;
+  /**
+   * Constructor for the TanService that also builds the pattern for tele tan verification.
+   *
+   * @param verificationApplicationConfig the {@link VerificationApplicationConfig} with needed tan configurations
+   * @param tanRepository the {@link VerificationTanRepository} where tans are queried and inserted
+   * @param hashingService the {@link HashingService} implementation
+   */
+  public TanService(
+    @NonNull VerificationApplicationConfig verificationApplicationConfig,
+    @NonNull VerificationTanRepository tanRepository,
+    @NonNull HashingService hashingService
+  ) {
+    this.verificationApplicationConfig = verificationApplicationConfig;
+    this.tanRepository = tanRepository;
+    this.hashingService = hashingService;
+    this.teleTanLength = verificationApplicationConfig.getTan().getTele().getValid().getLength();
+    this.teleTanPattern = Pattern.compile("^["
+      + verificationApplicationConfig.getTan().getTele().getValid().getChars()
+      + "]{"
+      + (verificationApplicationConfig.getTan().getTele().getValid().getLength() + 1)
+      + "}$");
+  }
 
   /**
    * Saves a {@link VerificationTan} into the database.
@@ -89,33 +103,33 @@ public class TanService {
   }
 
   /**
-   * Check Tele-TAN syntax constraints.
+   * Check teleTAN syntax constraints.
    *
-   * @param teleTan the Tele TAN
-   * @return Tele TAN verification flag
+   * @param teleTan the teleTAN
+   * @return teleTAN verification flag
    */
   private boolean syntaxTeleTanVerification(String teleTan) {
-    Matcher matcher = PATTERN.matcher(teleTan);
+    Matcher matcher = teleTanPattern.matcher(teleTan);
     return matcher.find();
   }
 
   /**
-   * Verifies the tele transaction number (Tele TAN).
+   * Verifies the tele transaction number (teleTAN).
    *
-   * @param teleTan the Tele TAN to verify
-   * @return verified is teletan is verified
+   * @param teleTan the teleTAN to verify
+   * @return is teleTAN verified
    */
   public boolean verifyTeleTan(String teleTan) {
     boolean verified = false;
     if (syntaxTeleTanVerification(teleTan)) {
       Optional<VerificationTan> teleTanEntity = getEntityByTan(teleTan);
-      if (teleTanEntity.isPresent() && !teleTanEntity.get().isRedeemed()) {
+      if (teleTanEntity.isPresent() && teleTanEntity.get().canBeRedeemed(LocalDateTime.now())) {
         verified = true;
       } else {
-        log.warn("The Tele TAN is unknown or already redeemed.");
+        log.warn("The teleTAN is unknown, expired or already redeemed.");
       }
     } else {
-      log.warn("The Tele TAN is not valid to the syntax constraints.");
+      log.warn("The teleTAN is not valid to the syntax constraints.");
     }
     return verified;
   }
@@ -140,7 +154,7 @@ public class TanService {
   /**
    * This method generates a {@link VerificationTan} - entity and saves it.
    *
-   * @param tan the TAN
+   * @param tan     the TAN
    * @param tanType the TAN type
    * @return the persisted TAN
    */
@@ -152,11 +166,11 @@ public class TanService {
   /**
    * Creates a new TeleTan String.
    *
-   * @return a new TeleTan
+   * @return a new teleTAN
    */
   protected String createTeleTan() {
-    return IntStream.range(0, TELE_TAN_LENGTH)
-        .mapToObj(i -> TELE_TAN_ALLOWED_CHARS.charAt(Holder.NUMBER_GENERATOR.nextInt(TELE_TAN_ALLOWED_CHARS.length())))
+    return IntStream.range(0,teleTanLength )
+        .mapToObj(i -> teleTanPattern.charAt(Holder.NUMBER_GENERATOR.nextInt(teleTanPattern.length())))
         .collect(Collector.of(
             StringBuilder::new,
             StringBuilder::append,
@@ -165,10 +179,10 @@ public class TanService {
   }
 
   /**
-   * Returns the if a Tele Tan matches the Pattern requirements.
+   * Returns the if a teleTAN matches the Pattern requirements.
    *
-   * @param teleTan the Tele TAN to check
-   * @return The validity of the Tele TAN
+   * @param teleTan the teleTAN to check
+   * @return The validity of the teleTAN
    */
   public boolean isTeleTanValid(String teleTan) {
     return syntaxTeleTanVerification(teleTan);
@@ -196,9 +210,9 @@ public class TanService {
   }
 
   /**
-   * Returns a generated valid tele TAN and persists it.
+   * Returns a generated valid teleTAN and persists it.
    *
-   * @return a valid tele TAN
+   * @return a valid teleTAN
    */
   public String generateVerificationTeleTan() {
     String teleTan = generateValidTan(this::createTeleTan);
@@ -218,7 +232,14 @@ public class TanService {
     return tan;
   }
 
-  protected VerificationTan generateVerificationTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
+  /**
+   * This method generates a valid TAN Object but doesn't persist it.
+   * @param tan alphanumeric tan
+   * @param tanType type of the tan
+   * @param sourceOfTrust source of trust of the tan
+   * @return Tan object
+   */
+  public VerificationTan generateVerificationTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
     LocalDateTime from = LocalDateTime.now();
     LocalDateTime until;
     int tanValidInDays = verificationApplicationConfig.getTan().getValid().getDays();
@@ -237,7 +258,7 @@ public class TanService {
     verificationTan.setRedeemed(false);
     verificationTan.setCreatedAt(LocalDateTime.now());
     verificationTan.setUpdatedAt(LocalDateTime.now());
-    verificationTan.setType(tanType.name());
+    verificationTan.setType(tanType);
     return verificationTan;
   }
 
@@ -248,8 +269,34 @@ public class TanService {
    * @return Optional VerificationTan
    */
   public Optional<VerificationTan> getEntityByTan(String tan) {
-    log.info("TanService start getEntityByTan.");
+    log.info("Start getEntityByTan.");
     return tanRepository.findByTanHash(hashingService.hash(tan));
+  }
+
+  /**
+   * Checks whether the rate limit for new TeleTans is not exceeded.
+   *
+   * @return true if new TeleTans can be created false if not.
+   */
+  public boolean isTeleTanRateLimitNotExceeded() {
+    int maxNumberOfTans = verificationApplicationConfig.getTan().getTele().getRateLimiting().getCount();
+    int thresholdInPercent = verificationApplicationConfig.getTan().getTele().getRateLimiting().getThresholdInPercent();
+    int thresholdTans = thresholdInPercent * maxNumberOfTans / 100;
+    int timeWindow = verificationApplicationConfig.getTan().getTele().getRateLimiting().getSeconds();
+
+    LocalDateTime timestamp = LocalDateTime.now().minusSeconds(timeWindow);
+    int countedTans = tanRepository.countByCreatedAtIsAfterAndTypeIs(timestamp, TanType.TELETAN);
+
+    boolean result = countedTans < maxNumberOfTans;
+
+    if (!result) {
+      log.warn("The TeleTan rate limit is exceeded! (maximum {} tans within {} seconds)", maxNumberOfTans, timeWindow);
+    } else if (countedTans >= thresholdTans) {
+      log.warn("The TeleTan rate limit threshold of {}% is reached!"
+        + " (maximum {} tans within {} seconds)", thresholdInPercent, maxNumberOfTans, timeWindow);
+    }
+
+    return result;
   }
 
   /*

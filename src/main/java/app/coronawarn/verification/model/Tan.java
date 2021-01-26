@@ -21,23 +21,36 @@
 
 package app.coronawarn.verification.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * This class represents the transaction number.
  */
-@Schema
+@Schema(
+  description = "The transaction number model."
+)
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
+@NoArgsConstructor
 public class Tan {
 
   @NotNull
+  @NonNull
   @Pattern(regexp = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$")
-  private String value;
+  private String tan;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @Transient
+  private String responsePadding;
+
 }

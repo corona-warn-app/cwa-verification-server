@@ -22,31 +22,34 @@
 package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.VerificationApplication;
+import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 @Slf4j
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
 public class TanServiceTest {
@@ -54,16 +57,22 @@ public class TanServiceTest {
   public static final String TEST_TAN = "1ea6ce8a-9740-11ea-bb37-0242ac130002";
   public static final String TEST_TAN_HASH = "8de76b627f0be70ea73c367a9a560d6a987eacec71f57ca3d86b2e4ed5b6f780";
   public static final String TEST_GUI_HASH = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
-  public static final String TEST_TAN_TYPE = TanType.TAN.name();
-  public static final String TEST_TELE_TAN = "R3ZNUeV";
-  public static final String TEST_TELE_TAN_HASH = "eeaa54dc40aa84f587e3bc0cbbf18f7c05891558a5fe1348d52f3277794d8730";
-  private static final String TELE_TAN_REGEX = "^[2-9A-HJ-KMNP-Za-kmnp-z]{7}$";
+  public static final TanType TEST_TAN_TYPE = TanType.TAN;
+  public static final String TEST_TELE_TAN = "R3ZNUEV";
+  public static final String TEST_TELE_TAN_HASH = "a865dd70e90e02286ea06a25f0babe88020d27d2923241ad792fac81f1254c75";
+  // note the length of teleTAN, is made up of the teletan length and the check digit
+  private static final String TELE_TAN_REGEX = "^[2-9A-HJ-KMNP-Z]{10}$";
   private static final String TAN_REGEX = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$";
   private static final TanSourceOfTrust TEST_TELE_TAN_SOURCE_OF_TRUST = TanSourceOfTrust.TELETAN;
+  private static final TanSourceOfTrust TEST_TAN_SOURCE_OF_TRUST = TanSourceOfTrust.CONNECTED_LAB;
   private static final Pattern TELE_TAN_PATTERN = Pattern.compile(TELE_TAN_REGEX);
   private static final Pattern TAN_PATTERN = Pattern.compile(TAN_REGEX);
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSSSS");
-  private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(7);
+  private static final LocalDateTime TAN_VALID_UNTIL_IN_DAYS = LocalDateTime.now().plusDays(14);
+  private static final LocalDateTime TELE_TAN_VALID_UNTIL_IN_HOURS = LocalDateTime.now().plusHours(1);
+  private static final int TELE_TAN_RATE_LIMIT_COUNT = 10;
+  private static final int TELE_TAN_RATE_LIMIT_SECONDS = 60;
+  private static final int TELE_TAN_RATE_LIMIT_THRESHOLD = 80;
 
   @Autowired
   private TanService tanService;
@@ -71,7 +80,10 @@ public class TanServiceTest {
   @Autowired
   private VerificationTanRepository tanRepository;
 
-  @Before
+  @Autowired
+  private VerificationApplicationConfig config;
+
+  @BeforeEach
   public void setUp() {
     tanRepository.deleteAll();
   }
@@ -95,7 +107,7 @@ public class TanServiceTest {
     tanService.saveTan(tan);
 
     Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
-    Assert.assertEquals(tan, tanFromDB.get());
+    Assertions.assertEquals(tan, tanFromDB.get());
     tanService.deleteTan(tan);
     tanFromDB = tanService.getEntityByTan(TEST_TAN);
     assertFalse(tanFromDB.isPresent());
@@ -105,7 +117,7 @@ public class TanServiceTest {
    * Test saveTan.
    */
   @Test
-  public void saveTanTest() {
+  public void saveTan() {
     VerificationTan tan = new VerificationTan();
     tan.setCreatedAt(LocalDateTime.now());
     tan.setUpdatedAt(LocalDateTime.now());
@@ -115,13 +127,12 @@ public class TanServiceTest {
     tan.setValidUntil(TAN_VALID_UNTIL_IN_DAYS);
     tan.setType(TEST_TAN_TYPE);
     tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
-
     VerificationTan retunedTan = tanService.saveTan(tan);
-    Assert.assertEquals(retunedTan, tan);
+    Assertions.assertEquals(retunedTan, tan);
   }
 
   @Test
-  public void getEntityByTanTest() {
+  public void getEntityByTan() {
     VerificationTan tan = new VerificationTan();
     LocalDateTime start = LocalDateTime.parse(LocalDateTime.now().format(FORMATTER));
     tan.setCreatedAt(start);
@@ -136,7 +147,7 @@ public class TanServiceTest {
     tanService.saveTan(tan);
 
     Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
-    Assert.assertEquals(tan, tanFromDB.get());
+    Assertions.assertEquals(tan, tanFromDB.get());
   }
 
   @Test
@@ -147,10 +158,9 @@ public class TanServiceTest {
     tan.setUpdatedAt(start);
     tan.setRedeemed(false);
     tan.setTanHash(TEST_TELE_TAN_HASH);
-
     tan.setValidFrom(start);
-    tan.setValidUntil(LocalDateTime.parse((TAN_VALID_UNTIL_IN_DAYS.format(FORMATTER))));
-    tan.setType(TanType.TELETAN.name());
+    tan.setValidUntil(LocalDateTime.parse((TELE_TAN_VALID_UNTIL_IN_HOURS.format(FORMATTER))));
+    tan.setType(TanType.TELETAN);
     tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
     tanService.saveTan(tan);
     assertFalse(tanService.checkTanNotExist(TEST_TELE_TAN));
@@ -188,8 +198,10 @@ public class TanServiceTest {
   @Test
   public void verifyAlreadyRedeemedTeleTan() {
     String teleTan = tanService.generateVerificationTeleTan();
-    VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).get();
-    teleTanFromDB.setRedeemed(true);
+    VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).orElse(null);
+    if (teleTanFromDB != null) {
+      teleTanFromDB.setRedeemed(true);
+    }
     tanService.saveTan(teleTanFromDB);
     assertFalse(tanService.verifyTeleTan(teleTan));
   }
@@ -201,24 +213,88 @@ public class TanServiceTest {
   }
 
   @Test
+  public void verifyExpiredTeleTan() {
+    String teleTan = tanService.generateVerificationTeleTan();
+    VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).orElse(null);
+    LocalDateTime validFrom = LocalDateTime.now().minusHours(1).minusMinutes(1);
+    if (teleTanFromDB != null) {
+      teleTanFromDB.setValidFrom(validFrom);
+      teleTanFromDB.setValidUntil(validFrom.plusHours(1));
+    }
+    tanService.saveTan(teleTanFromDB);
+    assertFalse(tanService.verifyTeleTan(teleTan));
+  }
+
+  @Test
   public void testTeleTANFormat() {
-    assertThat(tanService.isTeleTanValid("29zAE4E")).isTrue();
-    assertThat(tanService.isTeleTanValid("29zAE4O")).isFalse();
-    assertThat(tanService.isTeleTanValid("29zAE40")).isFalse();
-    assertThat(tanService.isTeleTanValid("29zAE41")).isFalse();
-    assertThat(tanService.isTeleTanValid("29zAE4I")).isFalse();
-    assertThat(tanService.isTeleTanValid("29zAE4L")).isFalse();
-    assertThat(tanService.isTeleTanValid("29zAEil")).isFalse();
-    assertThat(tanService.isTeleTanValid("29zA?ßö")).isFalse();
-    assertThat(tanService.isTeleTanValid("29zAE4EZ")).isFalse();
-    assertThat(tanService.isTeleTanValid("29zAE4")).isFalse();
-    assertThat(tanService.isTeleTanValid("29zAL4-")).isFalse();
+    assertThat(tanService.isTeleTanValid("29ABCZAE4E")).isTrue();
+    assertThat(tanService.isTeleTanValid("29ABCzAE4O")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAABCE40")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAABCE41")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAABCE4I")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAABCE4L")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAABCEil")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zABCA?ßö")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zABCAE4EZ")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAABCE4")).isFalse();
+    assertThat(tanService.isTeleTanValid("29zAABCL4-")).isFalse();
+  }
+
+  @Test
+  public void testRateLimitCheckForTeleTan() {
+    config.getTan().getTele().getRateLimiting().setCount(TELE_TAN_RATE_LIMIT_COUNT);
+    config.getTan().getTele().getRateLimiting().setSeconds(TELE_TAN_RATE_LIMIT_SECONDS);
+
+    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
+
+    for (int i = 0; i < TELE_TAN_RATE_LIMIT_COUNT - 1; i++) tanService.generateVerificationTeleTan();
+
+    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
+
+    tanService.generateVerificationTeleTan();
+
+    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isFalse();
+  }
+
+  @Test
+  public void testRateLimitShouldNotCountNonTeleTan() {
+    config.getTan().getTele().getRateLimiting().setCount(TELE_TAN_RATE_LIMIT_COUNT);
+    config.getTan().getTele().getRateLimiting().setSeconds(TELE_TAN_RATE_LIMIT_SECONDS);
+
+    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
+
+    for (int i = 0; i < TELE_TAN_RATE_LIMIT_COUNT + 1; i++) tanService.generateVerificationTan(TEST_TAN_SOURCE_OF_TRUST);
+
+    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
+  }
+
+  @Test
+  public void testRateLimitShouldNotCountTeleTansOlderThanDefinedTimeWindow() {
+    config.getTan().getTele().getRateLimiting().setCount(TELE_TAN_RATE_LIMIT_COUNT);
+    config.getTan().getTele().getRateLimiting().setSeconds(TELE_TAN_RATE_LIMIT_SECONDS);
+
+    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
+
+    VerificationTan tan1 = tanService.generateVerificationTan("tan1", TanType.TELETAN, TEST_TELE_TAN_SOURCE_OF_TRUST);
+    VerificationTan tan2 = tanService.generateVerificationTan("tan2", TanType.TELETAN, TEST_TELE_TAN_SOURCE_OF_TRUST);
+    tan1.setCreatedAt(LocalDateTime.now().minusSeconds(TELE_TAN_RATE_LIMIT_SECONDS + 1));
+    tan2.setCreatedAt(LocalDateTime.now().minusSeconds(TELE_TAN_RATE_LIMIT_SECONDS + 1));
+    tanService.saveTan(tan1);
+    tanService.saveTan(tan2);
+
+    for (int i = 0; i < TELE_TAN_RATE_LIMIT_COUNT - 1; i++) tanService.generateVerificationTeleTan();
+
+    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
+
+    tanService.generateVerificationTeleTan();
+
+    assertThat(tanService.isTeleTanRateLimitNotExceeded()).isFalse();
   }
 
   /**
    * Check Tele-TAN syntax constraints.
    *
-   * @param teleTan the Tele TAN
+   * @param tan the Tele TAN
    * @return Tele TAN verification flag
    */
   private boolean syntaxTanVerification(String teleTan) {

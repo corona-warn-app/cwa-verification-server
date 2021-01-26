@@ -191,7 +191,8 @@ public class TanServiceTest {
   public void verifyTeletan() {
     String teleTan = tanService.generateVerificationTeleTan();
     assertTrue(tanService.checkTanNotExist(TEST_TELE_TAN));
-    assertTrue(tanService.verifyTeleTan(teleTan));
+    boolean value = tanService.verifyTeleTan(teleTan);
+    assertTrue(value);
     assertFalse(tanService.verifyTeleTan("R3ZNUI0"));
   }
 

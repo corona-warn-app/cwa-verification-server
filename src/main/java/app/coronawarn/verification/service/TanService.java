@@ -60,6 +60,7 @@ public class TanService {
 
   private final Pattern teleTanPattern;
   private final int teleTanLength;
+
   /**
    * Constructor for the TanService that also builds the pattern for tele tan verification.
    *
@@ -169,13 +170,17 @@ public class TanService {
    * @return a new teleTAN
    */
   protected String createTeleTan() {
-    return IntStream.range(0,teleTanLength )
-        .mapToObj(i -> teleTanPattern.charAt(Holder.NUMBER_GENERATOR.nextInt(teleTanPattern.length())))
-        .collect(Collector.of(
-            StringBuilder::new,
-            StringBuilder::append,
-            StringBuilder::append,
-            StringBuilder::toString));
+    final int length = verificationApplicationConfig.getTan().getTele().getValid().getLength();
+    final String chars = verificationApplicationConfig.getTan().getTele().getValid().getChars();
+    String teletan = IntStream.range(0, length)
+      .mapToObj(i -> chars.charAt(Holder.NUMBER_GENERATOR.nextInt(chars.length())))
+      .collect(Collector.of(
+        StringBuilder::new,
+        StringBuilder::append,
+        StringBuilder::append,
+        StringBuilder::toString));
+    return teletan + hashingService.getCheckDigit(teletan);
+
   }
 
   /**

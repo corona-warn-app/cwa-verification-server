@@ -23,27 +23,15 @@ package app.coronawarn.verification;
 
 import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
-import app.coronawarn.verification.model.AppSessionSourceOfTrust;
-import app.coronawarn.verification.model.HashedGuid;
-import app.coronawarn.verification.model.RegistrationToken;
-import app.coronawarn.verification.model.RegistrationTokenKeyType;
-import app.coronawarn.verification.model.RegistrationTokenRequest;
+import app.coronawarn.verification.model.*;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import app.coronawarn.verification.service.TanService;
 import app.coronawarn.verification.service.TestResultServerService;
-import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,9 +39,17 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -62,7 +58,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * This is the test class for the verification application.
  */
 @Slf4j
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
 @AutoConfigureMockMvc
@@ -84,13 +80,13 @@ public class VerificationApplicationExternalTest {
 
   private static long cachedRequestSize;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     // Store max request size config property to allow tests to modify it
     cachedRequestSize = verificationApplicationConfig.getRequest().getSizelimit();
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     // Reset max request size to cached value
     verificationApplicationConfig.getRequest().setSizelimit(cachedRequestSize);
@@ -142,7 +138,7 @@ public class VerificationApplicationExternalTest {
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
-    assertEquals("Verification Failed: Amount of verification entries is not 1 (Result=" + count + "). ", 1, count);
+    assertEquals(1, count, "Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ");
 
     List<VerificationAppSession> verificationList = appSessionrepository.findAll();
     assertNotNull(verificationList);
@@ -328,7 +324,7 @@ public class VerificationApplicationExternalTest {
       .andExpect(status().isCreated());
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
-    assertEquals("Verification Failed: Amount of verification entries is not 1 (Result=" + count + "). ", 1, count);
+    assertEquals(1, count, "Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ");
 
     List<VerificationAppSession> verificationList = appSessionrepository.findAll();
     assertNotNull(verificationList);
@@ -418,7 +414,7 @@ public class VerificationApplicationExternalTest {
 
     long count = appSessionrepository.count();
     log.info("Got {} verification entries from db repository.", count);
-    assertEquals("Verification Failed: Amount of verification entries is not 1 (Result=" + count + "). ", 1, count);
+    assertEquals(1, count, "Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ");
 
     List<VerificationAppSession> verificationList = appSessionrepository.findAll();
     assertNotNull(verificationList);

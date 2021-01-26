@@ -76,7 +76,7 @@ public class ExternalTanController {
   private final TanService tanService;
 
   @NonNull
-  private final FakeRequestService fakeRequestController;
+  private final FakeRequestService fakeRequestService;
 
   /**
    * This method generates a transaction number by a Registration Token, if the state of the COVID-19 lab-test is
@@ -101,7 +101,7 @@ public class ExternalTanController {
                                                          @RequestHeader(value = "cwa-fake", required = false)
                                                            String fake) {
     if ((fake != null) && (fake.equals("1"))) {
-      return fakeRequestController.generateTan(registrationToken);
+      return fakeRequestService.generateTan(registrationToken);
     }
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();

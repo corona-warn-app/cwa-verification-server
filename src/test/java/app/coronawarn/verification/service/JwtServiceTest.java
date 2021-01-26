@@ -27,21 +27,6 @@ import app.coronawarn.verification.model.Certs;
 import app.coronawarn.verification.model.Key;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Security;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -52,9 +37,20 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 
 @Slf4j
 public class JwtServiceTest {
@@ -73,11 +69,18 @@ public class JwtServiceTest {
 
   private JwtService jwtService = new JwtService(new IamClientMock(), new VerificationApplicationConfig());
 
-  @Before
-  public void setUp() throws Exception {
-    KeyPair pair = generateTestCertificate();
-    publicKey = pair.getPublic();
-    privateKey = pair.getPrivate();
+  @BeforeEach
+  public void setUp() throws NoSuchAlgorithmException {
+    KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(RSA);
+    keyGenerator.initialize(2048);
+    KeyPair kp = keyGenerator.genKeyPair();
+    publicKey = kp.getPublic();
+    privateKey = kp.getPrivate();
+    try {
+      cert = generateTestCertificate();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -90,7 +93,7 @@ public class JwtServiceTest {
   @Test
   public void validateToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    Assert.assertTrue(jwtService.validateToken(jwToken, publicKey));
+    Assertions.assertTrue(jwtService.validateToken(jwToken, publicKey));
   }
 
   /**
@@ -103,8 +106,8 @@ public class JwtServiceTest {
   @Test
   public void validateTokenByPublicKeyIsNull() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    Assert.assertFalse(jwtService.validateToken(jwToken, null));
-  }
+    Assertions.assertFalse(jwtService.validateToken(jwToken, null));
+  }  
 
   /**
    * Test is Token authorized, with the {@link JwtService#isAuthorized(java.lang.String)} method.
@@ -116,10 +119,8 @@ public class JwtServiceTest {
   public void tokenIsAuthorized() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     IamClientMock clientMock = createIamClientMock();
-    VerificationApplicationConfig config = new VerificationApplicationConfig();
-    config.getJwt().setEnabled(Boolean.TRUE);
-    jwtService = new JwtService(clientMock, config);
-    Assert.assertTrue(jwtService.isAuthorized(JwtService.TOKEN_PREFIX + jwToken));
+    jwtService = new JwtService(clientMock, new VerificationApplicationConfig());
+    Assertions.assertTrue(jwtService.isAuthorized(TOKEN_PREFIX + jwToken));
   }
 
   /**
@@ -132,7 +133,7 @@ public class JwtServiceTest {
   @Test
   public void validateExpiredToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(0, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    Assert.assertFalse(jwtService.validateToken(jwToken, publicKey));
+    Assertions.assertFalse(jwtService.validateToken(jwToken, publicKey));
   }
 
   private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException, NoSuchAlgorithmException {
@@ -165,9 +166,9 @@ public class JwtServiceTest {
       .compact();
   }
 
-  private KeyPair generateTestCertificate() throws Exception {
-    KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
-    KeyPair pair = kpGen.generateKeyPair();
+  private String generateTestCertificate() throws Exception {
+//    KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
+//    KeyPair pair = kpGen.generateKeyPair();
     LocalDateTime startDate = LocalDate.now().atStartOfDay();
     X509v3CertificateBuilder builder = new X509v3CertificateBuilder(
       new X500Name("CN=ca"),
@@ -175,9 +176,9 @@ public class JwtServiceTest {
       Date.from(startDate.atZone(ZoneId.systemDefault()).toInstant()),
       Date.from(startDate.plusDays(3650).atZone(ZoneId.systemDefault()).toInstant()),
       new X500Name("CN=ca"),
-      SubjectPublicKeyInfo.getInstance(pair.getPublic().getEncoded()));
+      SubjectPublicKeyInfo.getInstance(publicKey.getEncoded()));
     JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA512WithRSAEncryption");
-    ContentSigner signer = csBuilder.build(pair.getPrivate());
+    ContentSigner signer = csBuilder.build(privateKey);
     X509CertificateHolder holder = builder.build(signer);
     StringWriter writer = new StringWriter();
     PemWriter pemWriter = new PemWriter(writer);
@@ -188,8 +189,7 @@ public class JwtServiceTest {
     } catch (IOException ex) {
       log.warn("Error writeObject: {}.", ex.getMessage());
     }
-    cert = writer.toString();
-    return pair;
+    return writer.toString();
   }
 
   private IamClientMock createIamClientMock() {

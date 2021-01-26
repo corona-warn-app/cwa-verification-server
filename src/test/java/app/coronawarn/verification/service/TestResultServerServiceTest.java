@@ -24,8 +24,8 @@ package app.coronawarn.verification.service;
 import app.coronawarn.verification.client.TestResultServerClient;
 import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.TestResult;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,7 +38,7 @@ public class TestResultServerServiceTest {
   public static final TestResult TEST_LAB_REDEEMED_RESULT = new TestResult(4);
   private TestResultServerService testResultServerService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     testResultServerService = new TestResultServerService(new TestResultServerClientMock());
   }

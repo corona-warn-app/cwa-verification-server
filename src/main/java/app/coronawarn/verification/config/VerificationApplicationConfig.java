@@ -33,12 +33,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties
 public class VerificationApplicationConfig {
-  @Getter
-  @Setter
   private Long initialFakeDelayMilliseconds;
 
-  @Getter
-  @Setter
   private Long fakeDelayMovingAverageSamples;
 
   private Tan tan = new Tan();

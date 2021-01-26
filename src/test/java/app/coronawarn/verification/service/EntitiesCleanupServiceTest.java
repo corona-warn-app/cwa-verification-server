@@ -29,13 +29,14 @@ import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import app.coronawarn.verification.repository.VerificationTanRepository;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import rx.Single;
 
@@ -44,7 +45,7 @@ import java.time.Period;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(
   properties = {
     "entities.cleanup.rate=1000"
@@ -63,7 +64,7 @@ public class EntitiesCleanupServiceTest {
   @Autowired
   private VerificationTanRepository tanRepository;
 
-  @Before
+  @BeforeEach
   public void before() {
     appSessionRepository.deleteAll();
     tanRepository.deleteAll();
@@ -74,29 +75,29 @@ public class EntitiesCleanupServiceTest {
     LocalDateTime testCreationTime = LocalDateTime.now().minus(Period.ofDays(21));
     // create repo 1
     VerificationAppSession session = appSessionRepository.save(getAppSessionTestData(testCreationTime));
-    Assert.assertNotNull(session);
-    Assert.assertEquals(TEST_GUI_HASH, session.getHashedGuid());
+    Assertions.assertNotNull(session);
+    Assertions.assertEquals(TEST_GUI_HASH, session.getHashedGuid());
     // create repo 2
     VerificationTan tan = tanRepository.save(getVerificationTANTestData(testCreationTime));
-    Assert.assertNotNull(tan);
-    Assert.assertEquals(TEST_HASHED_TAN, tan.getTanHash());
+    Assertions.assertNotNull(tan);
+    Assertions.assertEquals(TEST_HASHED_TAN, tan.getTanHash());
     // find in repos
     Optional<VerificationAppSession> findSession = appSessionRepository.findByRegistrationTokenHash(TEST_REG_TOK_HASH);
-    Assert.assertTrue(findSession.isPresent());
-    Assert.assertEquals(TEST_GUI_HASH, findSession.get().getHashedGuid());
+    Assertions.assertTrue(findSession.isPresent());
+    Assertions.assertEquals(TEST_GUI_HASH, findSession.get().getHashedGuid());
 
-    Assert.assertEquals(testCreationTime.withNano(5), findSession.get().getCreatedAt().withNano(5));
+    Assertions.assertEquals(testCreationTime.withNano(5), findSession.get().getCreatedAt().withNano(5));
     Optional<VerificationTan> findTan = tanRepository.findByTanHash(TEST_HASHED_TAN);
-    Assert.assertTrue(findTan.isPresent());
-    Assert.assertEquals(TEST_HASHED_TAN, findTan.get().getTanHash());
-    Assert.assertEquals(testCreationTime.withNano(5), findTan.get().getCreatedAt().withNano(5));
+    Assertions.assertTrue(findTan.isPresent());
+    Assertions.assertEquals(TEST_HASHED_TAN, findTan.get().getTanHash());
+    Assertions.assertEquals(testCreationTime.withNano(5), findTan.get().getCreatedAt().withNano(5));
     // wait
     Single.fromCallable(() -> true).delay(1, TimeUnit.SECONDS).toBlocking().value();
     // find and check both repos clean up
     findSession = appSessionRepository.findByRegistrationTokenHash(TEST_REG_TOK_HASH);
-    Assert.assertFalse(findSession.isPresent());
+    Assertions.assertFalse(findSession.isPresent());
     findTan = tanRepository.findByTanHash(TEST_HASHED_TAN);
-    Assert.assertFalse(findTan.isPresent());
+    Assertions.assertFalse(findTan.isPresent());
   }
 
   private VerificationAppSession getAppSessionTestData(LocalDateTime testCreationTime) {

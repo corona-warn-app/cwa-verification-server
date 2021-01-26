@@ -59,7 +59,7 @@ public class ExternalTestStateController {
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
   @NonNull
-  private final FakeRequestService fakeRequestController;
+  private final FakeRequestService fakeRequestService;
 
   @NonNull
   private final AppSessionService appSessionService;
@@ -92,7 +92,7 @@ public class ExternalTestStateController {
     @Valid @RequestBody RegistrationToken registrationToken,
     @RequestHeader(value = "cwa-fake", required = false) String fake) {
     if ((fake != null) && (fake.equals("1"))) {
-      return fakeRequestController.getTestState(registrationToken);
+      return fakeRequestService.getTestState(registrationToken);
     }
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
@@ -127,7 +127,7 @@ public class ExternalTestStateController {
             "Unknown source of trust inside the appsession for the registration token");
       }
     }
-    log.info("The registration token doesn't exists.");
+    log.info("The registration token doesn't exist.");
     throw new VerificationServerException(HttpStatus.BAD_REQUEST,
       "Returning the test result for the registration token failed");
   }

@@ -27,30 +27,29 @@ import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.extern.slf4j.Slf4j;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.Assert;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 @Slf4j
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
 public class TanServiceTest {
@@ -84,7 +83,7 @@ public class TanServiceTest {
   @Autowired
   private VerificationApplicationConfig config;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     tanRepository.deleteAll();
   }
@@ -108,7 +107,7 @@ public class TanServiceTest {
     tanService.saveTan(tan);
 
     Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
-    Assert.assertEquals(tan, tanFromDB.orElse(null));
+    Assertions.assertEquals(tan, tanFromDB.get());
     tanService.deleteTan(tan);
     tanFromDB = tanService.getEntityByTan(TEST_TAN);
     assertFalse(tanFromDB.isPresent());
@@ -128,8 +127,8 @@ public class TanServiceTest {
     tan.setValidUntil(TAN_VALID_UNTIL_IN_DAYS);
     tan.setType(TEST_TAN_TYPE);
     tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
-    VerificationTan savedTan = tanService.saveTan(tan);
-    Assert.assertEquals(savedTan, tan);
+    VerificationTan retunedTan = tanService.saveTan(tan);
+    Assertions.assertEquals(retunedTan, tan);
   }
 
   @Test
@@ -148,7 +147,7 @@ public class TanServiceTest {
     tanService.saveTan(tan);
 
     Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
-    Assert.assertEquals(tan, tanFromDB.orElse(null));
+    Assertions.assertEquals(tan, tanFromDB.get());
   }
 
   @Test

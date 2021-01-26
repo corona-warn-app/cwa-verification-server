@@ -166,13 +166,11 @@ public class TanService {
   public String generateTeleTan() {
     final int length = verificationApplicationConfig.getTan().getTele().getValid().getLength();
     final String chars = verificationApplicationConfig.getTan().getTele().getValid().getChars();
-    String teletan = IntStream.range(0, length)
-      .mapToObj(i -> chars.charAt(Holder.NUMBER_GENERATOR.nextInt(chars.length())))
-      .collect(Collector.of(
-        StringBuilder::new,
-        StringBuilder::append,
-        StringBuilder::append,
-        StringBuilder::toString));
+    String teletan = Holder.NUMBER_GENERATOR
+      .ints(length, 0, chars.length())
+      .map(chars::codePointAt)
+      .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+      .toString();
     return teletan + hashingService.getCheckDigit(teletan);
   }
 

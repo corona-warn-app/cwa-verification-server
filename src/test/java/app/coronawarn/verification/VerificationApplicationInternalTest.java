@@ -26,18 +26,22 @@ import app.coronawarn.verification.model.AuthorizationRole;
 import app.coronawarn.verification.model.Tan;
 import app.coronawarn.verification.service.JwtService;
 import app.coronawarn.verification.service.TanService;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.time.LocalDateTime;
 import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
-import static org.junit.Assert.assertFalse;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -46,8 +50,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,7 +60,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * This is the test class for the verification application.
  */
 @Slf4j
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
 @AutoConfigureMockMvc
@@ -94,7 +99,7 @@ public class VerificationApplicationInternalTest {
     given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
     when(this.jwtService.validateToken(jwtString, kp.getPublic())).thenCallRealMethod();
 
-    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, JwtService.TOKEN_PREFIX + jwtString).secure( true ))
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, JwtService.TOKEN_PREFIX + jwtString).secure(true))
       .andExpect(status().isCreated());
   }
 
@@ -114,7 +119,7 @@ public class VerificationApplicationInternalTest {
     given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
     String jwtString = TestUtils.getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION,
-      JwtService.TOKEN_PREFIX + jwtString).secure( true ))
+      JwtService.TOKEN_PREFIX + jwtString).secure(true))
       .andExpect(status().isUnauthorized());
   }
 
@@ -130,12 +135,11 @@ public class VerificationApplicationInternalTest {
     given(this.tanService.getEntityByTan(TestUtils.TEST_TAN)).willReturn(Optional.of(TestUtils.getVerificationTANTestData()));
 
     Optional<VerificationTan> verificationTan = this.tanService.getEntityByTan(TestUtils.TEST_TAN);
-    assertFalse("Is TAN redeemed?", verificationTan
-      .map(VerificationTan::isRedeemed).orElse(true));
+    Assertions.assertFalse(   verificationTan.map(VerificationTan::isRedeemed).orElse(true));
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI)
       .contentType(MediaType.APPLICATION_JSON)
-      .secure( true )
+      .secure(true)
       .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN, TAN_PADDING))))
       .andExpect(status().isOk());
   }
@@ -151,7 +155,7 @@ public class VerificationApplicationInternalTest {
 
     // without mock tanService.getEntityByTan so this method will return empty entity
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI)
-      .secure( true )
+      .secure(true)
       .contentType(MediaType.APPLICATION_JSON)
       .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN, TAN_PADDING))))
       .andExpect(status().isNotFound());
@@ -167,7 +171,7 @@ public class VerificationApplicationInternalTest {
     log.info("process callVerifyTANByTanWithInvalidSyntax()");
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
-      .secure( true )
+      .secure(true)
       .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_INVALID_TAN, TAN_PADDING))))
       .andExpect(status().isBadRequest());
   }
@@ -187,7 +191,7 @@ public class VerificationApplicationInternalTest {
     given(this.tanService.getEntityByTan(TestUtils.TEST_TAN)).willReturn(Optional.of(cvtan));
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
-      .secure( true )
+      .secure(true)
       .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN, TAN_PADDING))))
       .andExpect(status().isNotFound());
   }
@@ -207,7 +211,7 @@ public class VerificationApplicationInternalTest {
     given(this.tanService.getEntityByTan(TestUtils.TEST_TAN)).willReturn(Optional.of(cvtan));
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
-      .secure( true )
+      .secure(true)
       .header("cwa-fake", 0)
       .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN, TAN_PADDING))))
       .andExpect(status().isNotFound());
@@ -228,7 +232,7 @@ public class VerificationApplicationInternalTest {
     given(this.tanService.getEntityByTan(TestUtils.TEST_TAN)).willReturn(Optional.of(cvtan));
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI).contentType(MediaType.APPLICATION_JSON)
-      .secure( true )
+      .secure(true)
       .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN, TAN_PADDING))))
       .andExpect(status().isNotFound());
   }
@@ -240,7 +244,7 @@ public class VerificationApplicationInternalTest {
    */
   @Test
   public void callGenerateTan() throws Exception {
-    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan").secure( true ))
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan").secure(true))
       .andExpect(status().isNotFound());
   }
 
@@ -252,7 +256,7 @@ public class VerificationApplicationInternalTest {
    */
   @Test
   public void callGetRegistrationTokenByGuid() throws Exception {
-    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.REGISTRATION_TOKEN_URI).secure( true ))
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.REGISTRATION_TOKEN_URI).secure(true))
       .andExpect(status().isNotFound());
   }
 
@@ -263,7 +267,7 @@ public class VerificationApplicationInternalTest {
    */
   @Test
   public void callGetTestState() throws Exception {
-    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").secure( true ))
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").secure(true))
       .andExpect(status().isNotFound());
   }
 
@@ -272,12 +276,12 @@ public class VerificationApplicationInternalTest {
     given(this.jwtService.isAuthorized(any())).willReturn(Boolean.TRUE);
     given(this.tanService.isTeleTanRateLimitNotExceeded()).willReturn(Boolean.TRUE);
 
-    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, "").secure( true ))
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, "").secure(true))
       .andExpect(status().isCreated());
 
     given(this.tanService.isTeleTanRateLimitNotExceeded()).willReturn(Boolean.FALSE);
 
-    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, "").secure( true ))
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, "").secure(true))
       .andExpect(status().isTooManyRequests());
   }
 

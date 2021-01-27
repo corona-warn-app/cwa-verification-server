@@ -30,6 +30,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
@@ -45,6 +46,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TanService {
 
+ 
   private final VerificationApplicationConfig verificationApplicationConfig;
 
   /**
@@ -57,6 +59,7 @@ public class TanService {
   private final HashingService hashingService;
 
   private final Pattern teleTanPattern;
+  private final int teleTanLength;
 
   /**
    * Constructor for the TanService that also builds the pattern for tele tan verification.
@@ -73,6 +76,7 @@ public class TanService {
     this.verificationApplicationConfig = verificationApplicationConfig;
     this.tanRepository = tanRepository;
     this.hashingService = hashingService;
+    this.teleTanLength = verificationApplicationConfig.getTan().getTele().getValid().getLength();
     this.teleTanPattern = Pattern.compile("^["
       + verificationApplicationConfig.getTan().getTele().getValid().getChars()
       + "]{"
@@ -132,15 +136,17 @@ public class TanService {
   }
 
   /**
-   * Returns the a Valid TAN String.
+   * Generates a new, valid TAN String.
+   * A TAN is considered as valid if it is not yet stored in the database.
    *
+   * @param tanCreator a supplier which creates a new TAN
    * @return a Valid TAN String
    */
-  private String generateValidTan() {
+  protected String generateValidTan(Supplier<String> tanCreator) {
     boolean validTan = false;
     String newTan = "";
     while (!validTan) {
-      newTan = UUID.randomUUID().toString();
+      newTan = tanCreator.get();
       validTan = checkTanNotExist(newTan);
     }
     return newTan;
@@ -159,19 +165,22 @@ public class TanService {
   }
 
   /**
-   * Returns the a new valid teleTAN String.
+   * Creates a new TeleTan String.
    *
    * @return a new teleTAN
    */
-  public String generateTeleTan() {
+  protected String createTeleTan() {
     final int length = verificationApplicationConfig.getTan().getTele().getValid().getLength();
     final String chars = verificationApplicationConfig.getTan().getTele().getValid().getChars();
-    String teletan = Holder.NUMBER_GENERATOR
-      .ints(length, 0, chars.length())
-      .map(chars::codePointAt)
-      .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-      .toString();
+    String teletan = IntStream.range(0, length)
+      .mapToObj(i -> chars.charAt(Holder.NUMBER_GENERATOR.nextInt(chars.length())))
+      .collect(Collector.of(
+        StringBuilder::new,
+        StringBuilder::append,
+        StringBuilder::append,
+        StringBuilder::toString));
     return teletan + hashingService.getCheckDigit(teletan);
+
   }
 
   /**
@@ -182,6 +191,16 @@ public class TanService {
    */
   public boolean isTeleTanValid(String teleTan) {
     return syntaxTeleTanVerification(teleTan);
+  }
+
+  /**
+   * Created a new TAN String.
+   *
+   * @return a new TAN
+   */
+  protected String createTanFromUuid() {
+    // A UUID is a 128 bit value
+    return UUID.randomUUID().toString();
   }
 
   /**
@@ -201,7 +220,7 @@ public class TanService {
    * @return a valid teleTAN
    */
   public String generateVerificationTeleTan() {
-    String teleTan = generateTeleTan();
+    String teleTan = generateValidTan(this::createTeleTan);
     persistTan(teleTan, TanType.TELETAN, TanSourceOfTrust.TELETAN);
     return teleTan;
   }
@@ -213,7 +232,7 @@ public class TanService {
    * @return a valid tan with given source of Trust
    */
   public String generateVerificationTan(TanSourceOfTrust sourceOfTrust) {
-    String tan = generateValidTan();
+    String tan = generateValidTan(this::createTanFromUuid);
     persistTan(tan, TanType.TAN, sourceOfTrust);
     return tan;
   }

@@ -175,14 +175,14 @@ public class TanServiceTest {
 
   @Test
   public void generateValidTan() {
-    String tan = tanService.generateVerificationTan(TEST_TAN_SOURCE_OF_TRUST);
+    String tan = tanService.generateValidTan(tanService::createTanFromUuid);
     assertTrue(syntaxTanVerification(tan));
     assertFalse(tan.isEmpty());
   }
 
   @Test
-  public void generateTeleTan() {
-    String teleTan = tanService.generateTeleTan();
+  public void createTeleTan() {
+    String teleTan = tanService.createTeleTan();
     Matcher matcher = TELE_TAN_PATTERN.matcher(teleTan);
     assertTrue(matcher.find());
   }
@@ -191,7 +191,8 @@ public class TanServiceTest {
   public void verifyTeletan() {
     String teleTan = tanService.generateVerificationTeleTan();
     assertTrue(tanService.checkTanNotExist(TEST_TELE_TAN));
-    assertTrue(tanService.verifyTeleTan(teleTan));
+    boolean value = tanService.verifyTeleTan(teleTan);
+    assertTrue(value);
     assertFalse(tanService.verifyTeleTan("R3ZNUI0"));
   }
 
@@ -208,7 +209,7 @@ public class TanServiceTest {
 
   @Test
   public void verifyUnknownTeleTan() {
-    String teleTan = tanService.generateTeleTan();
+    String teleTan = tanService.createTeleTan();
     assertFalse(tanService.verifyTeleTan(teleTan));
   }
 
@@ -297,8 +298,8 @@ public class TanServiceTest {
    * @param tan the Tele TAN
    * @return Tele TAN verification flag
    */
-  private boolean syntaxTanVerification(String tan) {
-    Matcher matcher = TAN_PATTERN.matcher(tan);
+  private boolean syntaxTanVerification(String teleTan) {
+    Matcher matcher = TAN_PATTERN.matcher(teleTan);
     return matcher.find();
   }
 }

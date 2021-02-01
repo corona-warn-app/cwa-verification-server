@@ -3,6 +3,8 @@ on:
   push:
     branches:
     - master
+    - feat-add-vault
+
 jobs:
   build:
     runs-on: ubuntu-latest

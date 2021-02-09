@@ -10,4 +10,11 @@ server:
   ssl:
     hostname-verify: false
     key-store: classpath:keystore.jks
-    key-store-password: changeit
+    key-store-password: ${SSL_VERIFICATION_KEYSTORE_PASSWORD} | changeit
+cwa-testresult-server:
+  ssl:
+    hostname-verify: false
+    key-store: classpath:keystore.jks
+    key-store-password: ${SSL_VERIFICATION_KEYSTORE_PASSWORD} | changeit
+    trust-store: classpath:truststore.jks
+    trust-store-password: ${SSL_VERIFICATION_TRUSTSTORE_PASSWORD} | changeit

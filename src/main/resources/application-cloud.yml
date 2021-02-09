@@ -9,12 +9,14 @@ spring:
 server:
   ssl:
     hostname-verify: false
-    key-store: classpath:keystore.jks
-    key-store-password: ${SSL_VERIFICATION_KEYSTORE_PASSWORD} | changeit
+    key-store: ${SSL_VERIFICATION_KEYSTORE_PATH}
+    key-store-password: ${SSL_VERIFICATION_KEYSTORE_PASSWORD}
+    trust-store:  ${SSL_VERIFICATION_TRUSTSTORE_PATH}
+    trust-store-password: ${SSL_VERIFICATION_TRUSTSTORE_PASSWORD}
 cwa-testresult-server:
   ssl:
     hostname-verify: false
-    key-store: classpath:keystore.jks
-    key-store-password: ${SSL_VERIFICATION_KEYSTORE_PASSWORD} | changeit
-    trust-store: classpath:truststore.jks
-    trust-store-password: ${SSL_VERIFICATION_TRUSTSTORE_PASSWORD} | changeit
+    key-store: ${SSL_VERIFICATION_KEYSTORE_PATH}
+    key-store-password: ${SSL_VERIFICATION_KEYSTORE_PASSWORD}
+    trust-store:  ${SSL_VERIFICATION_TRUSTSTORE_PATH}
+    trust-store-password: ${SSL_VERIFICATION_TRUSTSTORE_PASSWORD}

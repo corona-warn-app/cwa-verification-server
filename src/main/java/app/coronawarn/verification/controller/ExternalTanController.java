@@ -116,7 +116,9 @@ public class ExternalTanController {
         switch (appSessionSourceOfTrust) {
           case HASHED_GUID:
             TestResult covidTestResult = testResultServerService.result(new HashedGuid(appSession.getHashedGuid()));
-            if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()) {
+            if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()
+            || covidTestResult.getTestResult() != LabTestResult.QUICK_POSITIVE.getTestResult()
+            ) {
               stopWatch.stop();
               throw new VerificationServerException(HttpStatus.BAD_REQUEST,
                 "Tan cannot be created, caused by the non positive result of the labserver");

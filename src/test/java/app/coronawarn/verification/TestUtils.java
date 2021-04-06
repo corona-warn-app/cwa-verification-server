@@ -36,6 +36,7 @@ public class TestUtils {
   static final String TEST_REG_TOK = "1ea6ce8a-9740-41ea-bb37-0242ac130002";
   static final String TEST_REG_TOK_HASH = "0199effab87800689c15c08e234db54f088cc365132ffc230e882b82cd3ecf95";
   static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2);
+  static final TestResult QUICK_TEST_POSITIVE_RESULT = new TestResult(7);
   static final TestResult TEST_LAB_NEGATIVE_RESULT = new TestResult(1);
   static final String TEST_TAN = "1819d933-45f6-4e3c-80c7-eeffd2d44ee6";
   static final String TEST_INVALID_TAN = "1ea6ce8a-9740-11ea-is-invalid";

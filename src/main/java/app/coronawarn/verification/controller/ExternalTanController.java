@@ -117,7 +117,7 @@ public class ExternalTanController {
           case HASHED_GUID:
             TestResult covidTestResult = testResultServerService.result(new HashedGuid(appSession.getHashedGuid()));
             if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()
-              || covidTestResult.getTestResult() != LabTestResult.QUICK_POSITIVE.getTestResult()
+              && covidTestResult.getTestResult() != LabTestResult.QUICK_POSITIVE.getTestResult()
             ) {
               stopWatch.stop();
               throw new VerificationServerException(HttpStatus.BAD_REQUEST,

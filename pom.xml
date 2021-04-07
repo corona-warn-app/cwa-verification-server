@@ -36,7 +36,7 @@
     <!-- dependencies -->
     <spring.boot.version>2.4.1</spring.boot.version>
     <spring-security.version>5.3.3.RELEASE</spring-security.version>
-    <spring.cloud.version>Hoxton.SR4</spring.cloud.version>
+    <spring.cloud.version>2020.0.0</spring.cloud.version>
     <lombok.version>1.18.16</lombok.version>
     <liquibase.version>3.10.0</liquibase.version>
     <springdoc.version>1.4.2</springdoc.version>

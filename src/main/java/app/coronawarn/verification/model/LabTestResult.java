@@ -42,7 +42,12 @@ public enum LabTestResult {
   NEGATIVE(1),
   POSITIVE(2),
   INVALID(3),
-  REDEEMED(4);
+  REDEEMED(4),
+  QUICK_PENDING(5),
+  QUICK_NEGATIVE(6),
+  QUICK_POSITIVE(7),
+  QUICK_INVALID(8),
+  QUICK_REDEEMED(9);
 
   /**
    * The identifier for the test result from the lab-server.

@@ -1,13 +1,22 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}
-    username: ${POSTGRESQL_USERNAME}
+    url: jdbc:postgresql://${POSTGRESQL_SERVICE_HOST}:${POSTGRESQL_SERVICE_PORT}/${POSTGRESQL_DATABASE}
+    username: ${POSTGRESQL_USER}
     password: ${POSTGRESQL_PASSWORD}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 server:
   ssl:
     hostname-verify: false
-    key-store: classpath:keystore.jks
-    key-store-password: changeit
+    key-store: ${SSL_VERIFICATION_KEYSTORE_PATH}
+    key-store-password: ${SSL_VERIFICATION_KEYSTORE_PASSWORD}
+    trust-store:  ${SSL_VERIFICATION_TRUSTSTORE_PATH}
+    trust-store-password: ${SSL_VERIFICATION_TRUSTSTORE_PASSWORD}
+cwa-testresult-server:
+  ssl:
+    hostname-verify: false
+    key-store: ${SSL_VERIFICATION_KEYSTORE_PATH}
+    key-store-password: ${SSL_VERIFICATION_KEYSTORE_PASSWORD}
+    trust-store:  ${SSL_VERIFICATION_TRUSTSTORE_PATH}
+    trust-store-password: ${SSL_VERIFICATION_TRUSTSTORE_PASSWORD}

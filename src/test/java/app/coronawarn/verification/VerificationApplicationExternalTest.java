@@ -114,7 +114,7 @@ public class VerificationApplicationExternalTest {
   }
 
   /**
-   * Test generateTAN.
+   * Test generateTANForQuickTest.
    *
    * @throws Exception if the test cannot be performed.
    */
@@ -124,6 +124,35 @@ public class VerificationApplicationExternalTest {
 
     TestUtils.prepareAppSessionTestData(appSessionrepository);
     doReturn(TestUtils.TEST_LAB_POSITIVE_RESULT).when(testResultServerService).result(any());
+    doReturn(TestUtils.TEST_TAN).when(tanService).generateVerificationTan(any());
+
+    MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
+      .secure( true )
+      .header("cwa-fake", "0")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK, TOKEN_PADDING))))
+      .andReturn();
+
+    mockMvc.perform(asyncDispatch(result))
+      .andExpect(status().isCreated());
+
+    long count = appSessionrepository.count();
+    log.info("Got {} verification entries from db repository.", count);
+    assertEquals(1, count, "Verification Failed: Amount of verfication entries is not 1 (Result=" + count + "). ");
+
+    List<VerificationAppSession> verificationList = appSessionrepository.findAll();
+    assertNotNull(verificationList);
+    assertEquals(TestUtils.TEST_GUI_HASH, verificationList.get(0).getHashedGuid());
+    assertEquals(AppSessionSourceOfTrust.HASHED_GUID, verificationList.get(0).getSourceOfTrust());
+    assertEquals(TestUtils.TEST_REG_TOK_HASH, verificationList.get(0).getRegistrationTokenHash());
+
+  }
+  @Test
+  public void callGenerateTanForQuickTest() throws Exception {
+    log.info("process callGenerateTanForQuickTest()");
+
+    TestUtils.prepareAppSessionTestData(appSessionrepository);
+    doReturn(TestUtils.QUICK_TEST_POSITIVE_RESULT).when(testResultServerService).result(any());
     doReturn(TestUtils.TEST_TAN).when(tanService).generateVerificationTan(any());
 
     MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")

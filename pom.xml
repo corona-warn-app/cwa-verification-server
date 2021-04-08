@@ -34,9 +34,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <!-- dependencies -->
-    <spring.boot.version>2.3.1.RELEASE</spring.boot.version>
+    <spring.boot.version>2.4.1</spring.boot.version>
     <spring-security.version>5.3.3.RELEASE</spring-security.version>
-    <spring.cloud.version>Hoxton.SR4</spring.cloud.version>
+    <spring.cloud.version>2020.0.0</spring.cloud.version>
     <lombok.version>1.18.16</lombok.version>
     <liquibase.version>3.10.0</liquibase.version>
     <springdoc.version>1.4.2</springdoc.version>
@@ -47,7 +47,7 @@
     <plugin.sonar.version>3.6.1.1688</plugin.sonar.version>
     <plugin.jacoco.version>0.8.5</plugin.jacoco.version>
     <plugin.surefire.version>2.22.2</plugin.surefire.version>
-    <guava.version>29.0-jre</guava.version>
+    <guava.version>30.0-jre</guava.version>
     <license.projectName>Corona-Warn-App / cwa-verification</license.projectName>
     <license.inceptionYear>2020</license.inceptionYear>
     <license.licenseName>apache_v2</license.licenseName>
@@ -113,6 +113,14 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-vault-config</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-bootstrap</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -221,6 +229,11 @@
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
       <version>${hibernate-validator.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.reactivex</groupId>
+      <artifactId>rxjava</artifactId>
+      <version>1.3.8</version>
     </dependency>
   </dependencies>
 

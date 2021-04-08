@@ -1,4 +1,5 @@
 FROM gcr.io/distroless/java:11
+WORKDIR /
 COPY target/*.jar app.jar
 COPY scripts/Dpkg.java Dpkg.java
 RUN ["java", "Dpkg.java"]

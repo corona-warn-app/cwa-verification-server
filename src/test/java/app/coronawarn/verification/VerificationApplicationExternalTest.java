@@ -556,7 +556,11 @@ public class VerificationApplicationExternalTest {
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
       .secure( true )
       .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
-      .andExpect(status().isOk());
+      .andExpect(status().isOk())
+      .andReturn()
+      .getResponse()
+      .getContentAsString()
+      .contains("cs");
   }
 
   /**
@@ -576,7 +580,11 @@ public class VerificationApplicationExternalTest {
       .secure( true )
       .header("cwa-fake", "1")
       .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK,TOKEN_PADDING))))
-      .andExpect(status().isOk());
+      .andExpect(status().isOk())
+      .andReturn()
+      .getResponse()
+      .getContentAsString()
+      .contains("cs");
   }
 
   /**

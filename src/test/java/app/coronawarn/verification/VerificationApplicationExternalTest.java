@@ -21,12 +21,26 @@
 
 package app.coronawarn.verification;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
-import app.coronawarn.verification.model.*;
+import app.coronawarn.verification.model.AppSessionSourceOfTrust;
+import app.coronawarn.verification.model.HashedGuid;
+import app.coronawarn.verification.model.RegistrationToken;
+import app.coronawarn.verification.model.RegistrationTokenKeyType;
+import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import app.coronawarn.verification.service.TanService;
 import app.coronawarn.verification.service.TestResultServerService;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,17 +56,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doReturn;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * This is the test class for the verification application.
@@ -509,7 +512,6 @@ public class VerificationApplicationExternalTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(TestUtils.getAsJsonFormat(request)))
       .andReturn();
-    ;
     mockMvc.perform(asyncDispatch(result))
       .andExpect(status().isBadRequest());
   }
@@ -560,7 +562,7 @@ public class VerificationApplicationExternalTest {
       .andReturn()
       .getResponse()
       .getContentAsString()
-      .contains("cs");
+      .contains("sc");
   }
 
   /**
@@ -584,7 +586,7 @@ public class VerificationApplicationExternalTest {
       .andReturn()
       .getResponse()
       .getContentAsString()
-      .contains("cs");
+      .contains("sc");
   }
 
   /**

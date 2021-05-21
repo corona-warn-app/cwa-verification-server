@@ -49,7 +49,7 @@ public class TestResult {
   private int testResult;
 
   @NonNull
-  private long cs;
+  private long sc;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @Transient

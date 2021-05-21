@@ -115,7 +115,7 @@ public class ExternalTestStateController {
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
           deferredResult.setResult(ResponseEntity.ok(generateReturnTestResult(testResult.getTestResult(),fake,
-            testResult.getCs())));
+            testResult.getSc())));
           return deferredResult;
         case TELETAN:
           log.info("The result for registration token based on teleTAN will be returned.");

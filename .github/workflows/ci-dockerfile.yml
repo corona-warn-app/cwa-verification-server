@@ -1,5 +1,6 @@
 name: ci-dockerfile
 on:
+  workflow_dispatch:
   push:
     branches:
     - master

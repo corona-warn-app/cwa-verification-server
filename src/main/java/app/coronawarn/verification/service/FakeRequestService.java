@@ -108,7 +108,7 @@ public class FakeRequestService {
     long delay = fakeDelayService.getLongestJitter();
     DeferredResult<ResponseEntity<TestResult>> deferredResult = new DeferredResult<>();
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity
-      .ok(new TestResult(LabTestResult.POSITIVE.getTestResult(),
+      .ok(new TestResult(LabTestResult.POSITIVE.getTestResult(), System.currentTimeMillis(),
         RandomStringUtils.randomAlphanumeric(TEST_RESPONSE_PADDING_LENGTH)))), delay, MILLISECONDS);
     return deferredResult;
   }

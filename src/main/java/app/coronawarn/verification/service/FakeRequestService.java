@@ -28,6 +28,8 @@ import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.model.Tan;
 import app.coronawarn.verification.model.TestResult;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -108,7 +110,7 @@ public class FakeRequestService {
     long delay = fakeDelayService.getLongestJitter();
     DeferredResult<ResponseEntity<TestResult>> deferredResult = new DeferredResult<>();
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity
-      .ok(new TestResult(LabTestResult.POSITIVE.getTestResult(), System.currentTimeMillis(),
+      .ok(new TestResult(LabTestResult.POSITIVE.getTestResult(), LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
         RandomStringUtils.randomAlphanumeric(TEST_RESPONSE_PADDING_LENGTH)))), delay, MILLISECONDS);
     return deferredResult;
   }

@@ -16,6 +16,7 @@ import app.coronawarn.verification.service.TestResultServerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -141,7 +142,7 @@ public class ExternalTestStateController {
     if (fake == null) {
       return new TestResult(testResult,cs, RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
     }
-    return new TestResult(testResult, System.currentTimeMillis(),
+    return new TestResult(testResult, LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
       RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
   }
 

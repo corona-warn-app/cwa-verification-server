@@ -16,6 +16,7 @@ import app.coronawarn.verification.service.TestResultServerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -114,7 +115,7 @@ public class ExternalTestStateController {
           log.info("The result for registration token based on hashed Guid will be returned.");
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
-          deferredResult.setResult(ResponseEntity.ok(generateReturnTestResult(testResult.getTestResult(),fake,
+          deferredResult.setResult(ResponseEntity.ok(generateReturnTestResult(testResult.getTestResult(),
             testResult.getSc())));
           return deferredResult;
         case TELETAN:
@@ -122,7 +123,7 @@ public class ExternalTestStateController {
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
           scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity.ok(
-            generateReturnTestResult(LabTestResult.POSITIVE.getTestResult(), fake,
+            generateReturnTestResult(LabTestResult.POSITIVE.getTestResult(),
               appSession.get().getCreatedAt().toEpochSecond(ZoneOffset.UTC)))),
             fakeDelayService.realDelayTest(), MILLISECONDS);
           return deferredResult;
@@ -137,12 +138,8 @@ public class ExternalTestStateController {
       "Returning the test result for the registration token failed");
   }
 
-  private TestResult generateReturnTestResult(Integer testResult, String fake, Long cs) {
-    if (fake == null) {
-      return new TestResult(testResult,cs, RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
-    }
-    return new TestResult(testResult, System.currentTimeMillis(),
-      RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
+  private TestResult generateReturnTestResult(Integer testResult, Long sc) {
+    return new TestResult(testResult,sc, RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
   }
 
 }

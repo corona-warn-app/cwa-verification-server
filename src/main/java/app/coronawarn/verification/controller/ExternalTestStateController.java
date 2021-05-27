@@ -141,5 +141,4 @@ public class ExternalTestStateController {
   private TestResult generateReturnTestResult(Integer testResult, Long sc) {
     return new TestResult(testResult,sc, RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
   }
-
 }

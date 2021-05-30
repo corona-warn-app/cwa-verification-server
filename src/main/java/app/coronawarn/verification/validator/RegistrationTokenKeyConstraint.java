@@ -41,22 +41,16 @@ public @interface RegistrationTokenKeyConstraint {
 
   /**
    * The default key for creating error messages in case the constraint is violated.
-   *
-   * @return
    */
   String message() default "The key is not valid";
 
   /**
    * Allows the specification of validation groups, to which this constraint belongs.
-   *
-   * @return
    */
   Class<?>[] groups() default {};
 
   /**
    * Assigns custom payload objects to a constraint.
-   *
-   * @return
    */
   Class<? extends Payload>[] payload() default {};
 

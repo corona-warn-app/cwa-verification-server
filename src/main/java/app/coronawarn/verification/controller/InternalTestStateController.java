@@ -16,6 +16,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -80,8 +81,21 @@ public class InternalTestStateController {
 
       switch (sourceOfTrust) {
         case HASHED_GUID:
-          String hash = appSession.get().getHashedGuid();
-          TestResult testResult = testResultServerService.result(new HashedGuid(hash));
+          HashedGuid hash = new HashedGuid(appSession.get().getHashedGuid());
+          TestResult testResult = testResultServerService.result(hash);
+
+          // Check DOB Hash if present
+          if (appSession.get().getHashedGuidDob() != null) {
+            HashedGuid hashDob = new HashedGuid(appSession.get().getHashedGuidDob());
+            TestResult testResultDob = testResultServerService.result(hashDob);
+
+            // TRS will always respond with a TestResult so we have to check if both results are equal
+            if (testResultDob.getTestResult() != testResult.getTestResult()) {
+              // given DOB Hash is invalid
+              throw new VerificationServerException(HttpStatus.FORBIDDEN,
+                "TestResult of dob hash does not equal to TestResult of hash");
+            }
+          }
           log.debug("Result {}", testResult);
           log.info("The result for registration token based on hashed Guid will be returned.");
 

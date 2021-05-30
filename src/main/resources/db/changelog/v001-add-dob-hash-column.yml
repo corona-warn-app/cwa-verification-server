@@ -1,0 +1,12 @@
+databaseChangeLog:
+- changeSet:
+    id: add-dob-hash-column
+    author: f11h
+    changes:
+    - addColumn:
+        tableName: app_session
+        columns:
+          name: hashed_guid_dob
+          type: varchar(64)
+          constraints:
+            nullable: true

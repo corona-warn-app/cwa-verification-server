@@ -5,3 +5,6 @@ databaseChangeLog:
   - include:
       file: changelog/v000-create-tan-table.yml
       relativeToChangelogFile: true
+  - include:
+      file: changelog/v001-add-dob-hash-column.yml
+      relativeToChangelogFile: true

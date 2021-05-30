@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,6 +57,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * This is the test class for the verification application.
@@ -314,6 +316,34 @@ public class VerificationApplicationInternalTest {
       .secure(true)
       .content(TestUtils.getAsJsonFormat(new RegistrationToken("1ea6ce8a-9740-41ea-bb37-0242ac1aaaaa", null))))
       .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void callGetTestStateWithDobRegistrationToken() throws Exception {
+    TestUtils.prepareAppSessionTestDataDob(appSessionRepository);
+
+    given(this.testResultServerServiceMock.result(new HashedGuid(TestUtils.TEST_GUI_HASH))).willReturn(TestUtils.TEST_LAB_POSITIVE_RESULT);
+    given(this.testResultServerServiceMock.result(new HashedGuid(TestUtils.TEST_GUI_HASH_DOB))).willReturn(TestUtils.TEST_LAB_POSITIVE_RESULT);
+
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
+      .secure(true)
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK, null))))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("sc").exists())
+      .andExpect(jsonPath("$.labId", is(LAB_ID)));
+  }
+
+  @Test
+  public void callGetTestStateWithDobRegistrationTokenAndTrsRespondsWithDifferentResults() throws Exception {
+    TestUtils.prepareAppSessionTestDataDob(appSessionRepository);
+
+    given(this.testResultServerServiceMock.result(new HashedGuid(TestUtils.TEST_GUI_HASH))).willReturn(TestUtils.TEST_LAB_POSITIVE_RESULT);
+    given(this.testResultServerServiceMock.result(new HashedGuid(TestUtils.TEST_GUI_HASH_DOB))).willReturn(TestUtils.TEST_LAB_NEGATIVE_RESULT);
+
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
+      .secure(true)
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK, null))))
+      .andExpect(status().isForbidden());
   }
 
 }

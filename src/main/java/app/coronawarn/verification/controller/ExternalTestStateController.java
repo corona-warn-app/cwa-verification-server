@@ -83,7 +83,9 @@ public class ExternalTestStateController {
       + "If the RegistrationToken belongs to a TeleTan the result is always positive"
   )
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Testresult retrieved")})
+    @ApiResponse(responseCode = "200", description = "Testresult retrieved"),
+    @ApiResponse(responseCode = "403", description = "TestResult of dob hash does not equal to TestResult of hash")
+  })
   @PostMapping(value = TESTRESULT_ROUTE,
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE
@@ -104,9 +106,23 @@ public class ExternalTestStateController {
 
       switch (sourceOfTrust) {
         case HASHED_GUID:
-          String hash = appSession.get().getHashedGuid();
-          TestResult testResult = testResultServerService.result(new HashedGuid(hash));
+          HashedGuid hash = new HashedGuid(appSession.get().getHashedGuid());
+          TestResult testResult = testResultServerService.result(hash);
           testResult.setResponsePadding(RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
+
+          // Check DOB Hash if present
+          if (appSession.get().getHashedGuidDob() != null) {
+            HashedGuid hashDob = new HashedGuid(appSession.get().getHashedGuidDob());
+            TestResult testResultDob = testResultServerService.result(hashDob);
+
+            // TRS will always respond with a TestResult so we have to check if both results are equal
+            if (testResultDob.getTestResult() != testResult.getTestResult()) {
+              // given DOB Hash is invalid
+              throw new VerificationServerException(HttpStatus.FORBIDDEN,
+                "TestResult of dob hash does not equal to TestResult of hash");
+            }
+          }
+
           log.debug("Result {}", testResult);
           log.info("The result for registration token based on hashed Guid will be returned.");
           stopWatch.stop();

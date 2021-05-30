@@ -28,6 +28,9 @@ import org.springframework.stereotype.Component;
 public class TestUtils {
 
   static final String TEST_GUI_HASH = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
+  static final String TEST_GUI_HASH2 = "a1f7347308703928470938247903247903274903274903297041bea091d14d4d";
+  static final String TEST_GUI_HASH_DOB = "x0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
+  static final String TEST_GUI_HASH_DOB2 = "x1f7347308703928470938247903247903274903274903297041bea091d14d4d";
   static final String RESULT_PADDING = "";
   static final String LAB_ID = "l".repeat(64);
   static final String TEST_INVALID_GUI_HASH = "f0e4c2f76c58916ec2b";
@@ -61,14 +64,20 @@ public class TestUtils {
     appSessionRepository.save(getAppSessionTestData());
   }
 
-  static void prepareAppSessionTestDataSotTeleTan(VerificationAppSessionRepository appSessionRepository) {
+  static void prepareAppSessionTestDataDob(VerificationAppSessionRepository appSessionRepository) {
     appSessionRepository.deleteAll();
-    appSessionRepository.save(getAppSessionTestData(AppSessionSourceOfTrust.TELETAN));
+    appSessionRepository.save(getAppSessionTestData(AppSessionSourceOfTrust.HASHED_GUID, true));
   }
 
-  static VerificationAppSession getAppSessionTestData(AppSessionSourceOfTrust sot) {
+  static void prepareAppSessionTestDataSotTeleTan(VerificationAppSessionRepository appSessionRepository) {
+    appSessionRepository.deleteAll();
+    appSessionRepository.save(getAppSessionTestData(AppSessionSourceOfTrust.TELETAN, false));
+  }
+
+  static VerificationAppSession getAppSessionTestData(AppSessionSourceOfTrust sot, boolean dob) {
     VerificationAppSession cv = new VerificationAppSession();
     cv.setHashedGuid(TEST_GUI_HASH);
+    cv.setHashedGuidDob(dob ? TEST_GUI_HASH_DOB : null);
     cv.setCreatedAt(LocalDateTime.now());
     cv.setUpdatedAt(LocalDateTime.now());
     cv.setTanCounter(0);
@@ -78,7 +87,7 @@ public class TestUtils {
   }
 
   static VerificationAppSession getAppSessionTestData() {
-    return getAppSessionTestData(AppSessionSourceOfTrust.HASHED_GUID);
+    return getAppSessionTestData(AppSessionSourceOfTrust.HASHED_GUID, false);
   }
 
   static VerificationTan getTeleTanTestData() {

@@ -82,21 +82,31 @@ public class AppSessionService {
    * @param hashedGuid the hashed guid
    * @return an {@link ResponseEntity}
    */
-  public ResponseEntity<RegistrationToken> generateRegistrationTokenByGuid(String hashedGuid, String fake) {
+  public ResponseEntity<RegistrationToken> generateRegistrationTokenByGuid(String hashedGuid, String hashedGuidDob, String fake) {
+
     if (checkRegistrationTokenAlreadyExistsForGuid(hashedGuid)) {
       log.warn("The registration token already exists for the hashed guid.");
       return ResponseEntity.badRequest().build();
-    } else {
-      log.info("Start generating a new registration token for the given hashed guid.");
-      String registrationToken = generateRegistrationToken();
-      VerificationAppSession appSession = generateAppSession(registrationToken);
-      appSession.setHashedGuid(hashedGuid);
-      appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
-      saveAppSession(appSession);
-      log.info("Returning the successfully created registration token.");
-      return ResponseEntity.status(HttpStatus.CREATED).body(
-        getBackwardCompatibleRegistrationToken(registrationToken, fake));
     }
+
+    if (hashedGuidDob != null && checkRegistrationTokenAlreadyExistsForGuid(hashedGuidDob)) {
+      log.warn("The registration token already exists for the hashed guid dob.");
+      return ResponseEntity.badRequest().build();
+    }
+
+    log.info("Start generating a new registration token for the given hashed guid.");
+
+    String registrationToken = generateRegistrationToken();
+    VerificationAppSession appSession = generateAppSession(registrationToken);
+    appSession.setHashedGuid(hashedGuid);
+    appSession.setHashedGuidDob(hashedGuidDob);
+    appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
+    saveAppSession(appSession);
+
+    log.info("Returning the successfully created registration token.");
+    return ResponseEntity.status(HttpStatus.CREATED).body(
+      getBackwardCompatibleRegistrationToken(registrationToken, fake));
+
   }
 
   /**
@@ -151,7 +161,7 @@ public class AppSessionService {
    */
   public boolean checkRegistrationTokenAlreadyExistsForGuid(String hashedGuid) {
     log.info("Start checkRegistrationTokenAlreadyExistsForGuid.");
-    return appSessionRepository.findByHashedGuid(hashedGuid).isPresent();
+    return appSessionRepository.findByHashedGuidOrHashedGuidDob(hashedGuid, hashedGuid).isPresent();
   }
 
   /**
@@ -165,7 +175,7 @@ public class AppSessionService {
     return appSessionRepository.findByTeleTanHash(hashingService.hash(teleTan)).isPresent();
   }
 
-  private RegistrationToken getBackwardCompatibleRegistrationToken(String registrationToken,String fake) {
+  private RegistrationToken getBackwardCompatibleRegistrationToken(String registrationToken, String fake) {
     if (fake == null) {
       return new RegistrationToken(registrationToken);
     }

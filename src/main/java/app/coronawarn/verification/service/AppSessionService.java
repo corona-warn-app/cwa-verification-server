@@ -82,7 +82,8 @@ public class AppSessionService {
    * @param hashedGuid the hashed guid
    * @return an {@link ResponseEntity}
    */
-  public ResponseEntity<RegistrationToken> generateRegistrationTokenByGuid(String hashedGuid, String hashedGuidDob, String fake) {
+  public ResponseEntity<RegistrationToken> generateRegistrationTokenByGuid(
+    String hashedGuid, String hashedGuidDob, String fake) {
 
     if (checkRegistrationTokenAlreadyExistsForGuid(hashedGuid)) {
       log.warn("The registration token already exists for the hashed guid.");

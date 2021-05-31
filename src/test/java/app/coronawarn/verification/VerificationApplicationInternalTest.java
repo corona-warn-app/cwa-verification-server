@@ -22,11 +22,11 @@
 package app.coronawarn.verification;
 
 import static app.coronawarn.verification.TestUtils.LAB_ID;
+import static app.coronawarn.verification.TestUtils.TEST_GUI_HASH;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,7 +57,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * This is the test class for the verification application.
@@ -295,7 +294,9 @@ public class VerificationApplicationInternalTest {
       .secure(true)
       .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK, null))))
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.labId", is(LAB_ID)));
+      .andExpect(jsonPath("$.labId", is(LAB_ID)))
+      .andExpect(jsonPath("$.testId", is(TEST_GUI_HASH)));
+
   }
 
   @Test
@@ -330,7 +331,8 @@ public class VerificationApplicationInternalTest {
       .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK, null))))
       .andExpect(status().isOk())
       .andExpect(jsonPath("sc").exists())
-      .andExpect(jsonPath("$.labId", is(LAB_ID)));
+      .andExpect(jsonPath("$.labId", is(LAB_ID)))
+      .andExpect(jsonPath("$.testId", is(TEST_GUI_HASH)));
   }
 
   @Test

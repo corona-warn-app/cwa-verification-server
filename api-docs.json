@@ -317,6 +317,11 @@
           "key": {
             "type": "string"
           },
+          "keyDob": {
+            "type": "string",
+            "required": false,
+            "description": "Only used in conjunction with keyType == GUID. The hashed GUID consists of concat('x', substring(sha256_hex(concat(test-id-uuid, DateOfBirth.format(DDMMYYYY))), 1) - e.g. concat('x', substring(sha256_hex('7bb41672-7de4-44c3-b751-4258e59f3e2508051992')), 1)) --> x3712193bd35d40f03ee497ea7e4ea8278d8fcc8a2287843bb0ab36939d222b4"
+          },
           "keyType": {
             "type": "string",
             "enum": [

@@ -21,28 +21,33 @@
 
 package app.coronawarn.verification;
 
+import static app.coronawarn.verification.TestUtils.LAB_ID;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.AuthorizationRole;
+import app.coronawarn.verification.model.HashedGuid;
+import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.Tan;
+import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import app.coronawarn.verification.service.JwtService;
 import app.coronawarn.verification.service.TanService;
-
+import app.coronawarn.verification.service.TestResultServerService;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.time.LocalDateTime;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
-
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,9 +57,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * This is the test class for the verification application.
@@ -75,10 +78,11 @@ public class VerificationApplicationInternalTest {
   @MockBean
   private JwtService jwtService;
 
-  @BeforeEach
-  void setUp() {
-    MockitoAnnotations.initMocks(this);
-  }
+  @Autowired
+  private VerificationAppSessionRepository appSessionRepository;
+
+  @MockBean
+  private TestResultServerService testResultServerServiceMock;
 
   /**
    * Test the generation of a tele Tan.
@@ -135,7 +139,7 @@ public class VerificationApplicationInternalTest {
     given(this.tanService.getEntityByTan(TestUtils.TEST_TAN)).willReturn(Optional.of(TestUtils.getVerificationTANTestData()));
 
     Optional<VerificationTan> verificationTan = this.tanService.getEntityByTan(TestUtils.TEST_TAN);
-    Assertions.assertFalse(   verificationTan.map(VerificationTan::isRedeemed).orElse(true));
+    Assertions.assertFalse(verificationTan.map(VerificationTan::isRedeemed).orElse(true));
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + TestUtils.TAN_VERIFICATION_URI)
       .contentType(MediaType.APPLICATION_JSON)
@@ -260,17 +264,6 @@ public class VerificationApplicationInternalTest {
       .andExpect(status().isNotFound());
   }
 
-  /**
-   * Test that the endpoint for testresults is not reachable when internal profile is activated.
-   *
-   * @throws Exception if the test cannot be performed.
-   */
-  @Test
-  public void callGetTestState() throws Exception {
-    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").secure(true))
-      .andExpect(status().isNotFound());
-  }
-
   @Test
   public void shouldReturn429StatusCodeIfRateLimitIsExceeded() throws Exception {
     given(this.jwtService.isAuthorized(any())).willReturn(Boolean.TRUE);
@@ -283,6 +276,74 @@ public class VerificationApplicationInternalTest {
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, "").secure(true))
       .andExpect(status().isTooManyRequests());
+  }
+
+  /**
+   * Test getTestState.
+   *
+   * @throws Exception if the test cannot be performed.
+   */
+  @Test
+  public void callGetTestState() throws Exception {
+    log.info("process callGetTestState()");
+
+    TestUtils.prepareAppSessionTestData(appSessionRepository);
+
+    given(testResultServerServiceMock.result(new HashedGuid(TestUtils.TEST_GUI_HASH))).willReturn(TestUtils.TEST_LAB_POSITIVE_RESULT);
+
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
+      .secure(true)
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK, null))))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.labId", is(LAB_ID)));
+  }
+
+  @Test
+  public void callGetTestStateOfTeleTanTokenShouldFail() throws Exception {
+    TestUtils.prepareAppSessionTestDataSotTeleTan(appSessionRepository);
+
+    given(testResultServerServiceMock.result(new HashedGuid(TestUtils.TEST_GUI_HASH))).willReturn(TestUtils.TEST_LAB_POSITIVE_RESULT);
+
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
+      .secure(true)
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK, null))))
+      .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void callGetTestStateOfInvalidTokenShouldFail() throws Exception {
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
+      .secure(true)
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken("1ea6ce8a-9740-41ea-bb37-0242ac1aaaaa", null))))
+      .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void callGetTestStateWithDobRegistrationToken() throws Exception {
+    TestUtils.prepareAppSessionTestDataDob(appSessionRepository);
+
+    given(this.testResultServerServiceMock.result(new HashedGuid(TestUtils.TEST_GUI_HASH))).willReturn(TestUtils.TEST_LAB_POSITIVE_RESULT);
+    given(this.testResultServerServiceMock.result(new HashedGuid(TestUtils.TEST_GUI_HASH_DOB))).willReturn(TestUtils.TEST_LAB_POSITIVE_RESULT);
+
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
+      .secure(true)
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK, null))))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("sc").exists())
+      .andExpect(jsonPath("$.labId", is(LAB_ID)));
+  }
+
+  @Test
+  public void callGetTestStateWithDobRegistrationTokenAndTrsRespondsWithDifferentResults() throws Exception {
+    TestUtils.prepareAppSessionTestDataDob(appSessionRepository);
+
+    given(this.testResultServerServiceMock.result(new HashedGuid(TestUtils.TEST_GUI_HASH))).willReturn(TestUtils.TEST_LAB_POSITIVE_RESULT);
+    given(this.testResultServerServiceMock.result(new HashedGuid(TestUtils.TEST_GUI_HASH_DOB))).willReturn(TestUtils.TEST_LAB_NEGATIVE_RESULT);
+
+    mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/testresult").contentType(MediaType.APPLICATION_JSON)
+      .secure(true)
+      .content(TestUtils.getAsJsonFormat(new RegistrationToken(TestUtils.TEST_REG_TOK, null))))
+      .andExpect(status().isForbidden());
   }
 
 }

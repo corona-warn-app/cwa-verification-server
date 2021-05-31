@@ -28,16 +28,20 @@ import org.springframework.stereotype.Component;
 public class TestUtils {
 
   static final String TEST_GUI_HASH = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
+  static final String TEST_GUI_HASH2 = "a1f7347308703928470938247903247903274903274903297041bea091d14d4d";
+  static final String TEST_GUI_HASH_DOB = "x0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
+  static final String TEST_GUI_HASH_DOB2 = "x1f7347308703928470938247903247903274903274903297041bea091d14d4d";
   static final String RESULT_PADDING = "";
+  static final String LAB_ID = "l".repeat(64);
   static final String TEST_INVALID_GUI_HASH = "f0e4c2f76c58916ec2b";
   static final String TEST_TELE_TAN = "R3ZNUeV";
   static final String TEST_TELE_TAN_HASH = "eeaa54dc40aa84f587e3bc0cbbf18f7c05891558a5fe1348d52f3277794d8730";
   static final String TEST_INVALID_REG_TOK = "1234567890";
   static final String TEST_REG_TOK = "1ea6ce8a-9740-41ea-bb37-0242ac130002";
   static final String TEST_REG_TOK_HASH = "0199effab87800689c15c08e234db54f088cc365132ffc230e882b82cd3ecf95";
-  static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2,0);
-  static final TestResult QUICK_TEST_POSITIVE_RESULT = new TestResult(7,0);
-  static final TestResult TEST_LAB_NEGATIVE_RESULT = new TestResult(1,0);
+  static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2,0, LAB_ID, null);
+  static final TestResult QUICK_TEST_POSITIVE_RESULT = new TestResult(7,0, LAB_ID, null);
+  static final TestResult TEST_LAB_NEGATIVE_RESULT = new TestResult(1,0, LAB_ID, null);
   static final String TEST_TAN = "1819d933-45f6-4e3c-80c7-eeffd2d44ee6";
   static final String TEST_INVALID_TAN = "1ea6ce8a-9740-11ea-is-invalid";
   static final TanSourceOfTrust TEST_SOT = TanSourceOfTrust.CONNECTED_LAB;
@@ -60,15 +64,30 @@ public class TestUtils {
     appSessionRepository.save(getAppSessionTestData());
   }
 
-  static VerificationAppSession getAppSessionTestData() {
+  static void prepareAppSessionTestDataDob(VerificationAppSessionRepository appSessionRepository) {
+    appSessionRepository.deleteAll();
+    appSessionRepository.save(getAppSessionTestData(AppSessionSourceOfTrust.HASHED_GUID, true));
+  }
+
+  static void prepareAppSessionTestDataSotTeleTan(VerificationAppSessionRepository appSessionRepository) {
+    appSessionRepository.deleteAll();
+    appSessionRepository.save(getAppSessionTestData(AppSessionSourceOfTrust.TELETAN, false));
+  }
+
+  static VerificationAppSession getAppSessionTestData(AppSessionSourceOfTrust sot, boolean dob) {
     VerificationAppSession cv = new VerificationAppSession();
     cv.setHashedGuid(TEST_GUI_HASH);
+    cv.setHashedGuidDob(dob ? TEST_GUI_HASH_DOB : null);
     cv.setCreatedAt(LocalDateTime.now());
     cv.setUpdatedAt(LocalDateTime.now());
     cv.setTanCounter(0);
-    cv.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
+    cv.setSourceOfTrust(sot);
     cv.setRegistrationTokenHash(TEST_REG_TOK_HASH);
     return cv;
+  }
+
+  static VerificationAppSession getAppSessionTestData() {
+    return getAppSessionTestData(AppSessionSourceOfTrust.HASHED_GUID, false);
   }
 
   static VerificationTan getTeleTanTestData() {

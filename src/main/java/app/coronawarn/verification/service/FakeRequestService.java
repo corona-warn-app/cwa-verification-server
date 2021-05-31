@@ -111,7 +111,7 @@ public class FakeRequestService {
     DeferredResult<ResponseEntity<TestResult>> deferredResult = new DeferredResult<>();
     scheduledExecutor.schedule(() -> deferredResult.setResult(ResponseEntity
       .ok(new TestResult(LabTestResult.POSITIVE.getTestResult(), LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-        RandomStringUtils.randomAlphanumeric(TEST_RESPONSE_PADDING_LENGTH)))), delay, MILLISECONDS);
+        null, RandomStringUtils.randomAlphanumeric(TEST_RESPONSE_PADDING_LENGTH)))), delay, MILLISECONDS);
     return deferredResult;
   }
 

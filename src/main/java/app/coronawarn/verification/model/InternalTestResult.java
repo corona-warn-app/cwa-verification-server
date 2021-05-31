@@ -21,11 +21,8 @@
 
 package app.coronawarn.verification.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import javax.persistence.Transient;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
@@ -36,22 +33,16 @@ import lombok.RequiredArgsConstructor;
  * @see <a href="https://github.com/corona-warn-app/cwa-testresult-server/blob/master/docs/architecture-overview.md#core-entities">Core Entities</a>
  */
 @Schema(
-  description = "The test result model."
+  description = "The test result model for internal test result requests."
 )
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TestResult {
+public class InternalTestResult extends TestResult {
 
-  private int testResult;
+  private String testId;
 
-  private long sc;
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private String labId;
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @Transient
-  private String responsePadding;
-
+  public InternalTestResult(int testResult, long sc, String labId, String responsePadding, String testId) {
+    super(testResult, sc, labId, responsePadding);
+    this.testId = testId;
+  }
 }

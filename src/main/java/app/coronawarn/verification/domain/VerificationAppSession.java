@@ -67,6 +67,9 @@ public class VerificationAppSession implements Serializable {
   @Column(name = "hashed_guid")
   private String hashedGuid;
 
+  @Column(name = "hashed_guid_dob")
+  private String hashedGuidDob;
+
   @Column(name = "registration_token_hash")
   private String registrationTokenHash;
 

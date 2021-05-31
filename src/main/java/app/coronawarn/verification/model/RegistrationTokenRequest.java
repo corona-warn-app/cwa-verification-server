@@ -23,6 +23,8 @@ package app.coronawarn.verification.model;
 
 import app.coronawarn.verification.validator.RegistrationTokenKeyConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,10 +44,18 @@ public class RegistrationTokenRequest {
   /**
    * The key which can be a teletan or a hashed guid.
    */
+  @NotNull
   private String key;
+
+  /**
+   * The hashed GUID built with date of birth.
+   */
+  @Pattern(regexp = "^[XxA-Fa-f0-9]([A-Fa-f0-9]{63})$")
+  private String keyDob;
 
   /**
    * The type of key, which can be "GUID" or "TELETAN".
    */
+  @NotNull
   private RegistrationTokenKeyType keyType;
 }

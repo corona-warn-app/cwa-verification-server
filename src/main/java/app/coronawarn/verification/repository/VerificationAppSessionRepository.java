@@ -43,9 +43,10 @@ public interface VerificationAppSessionRepository extends JpaRepository<Verifica
    * This method looks in the Database for an Appsession with the given hashedGuid.
    *
    * @param hashedGuid hash to search for
+   * @param hashedGuidDob hash to search for
    * @return Optional VerificationAppSession the optional Appsession
    */
-  Optional<VerificationAppSession> findByHashedGuid(String hashedGuid);
+  Optional<VerificationAppSession> findByHashedGuidOrHashedGuidDob(String hashedGuid, String hashedGuidDob);
   
   /**
    * This method looks in the Database for an Appsession with the given teleTanHash.

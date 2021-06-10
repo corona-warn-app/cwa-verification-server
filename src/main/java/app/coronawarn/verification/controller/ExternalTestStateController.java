@@ -2,6 +2,7 @@ package app.coronawarn.verification.controller;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
@@ -16,13 +17,11 @@ import app.coronawarn.verification.service.TestResultServerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.validation.Valid;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -68,6 +67,8 @@ public class ExternalTestStateController {
 
   private final FakeDelayService fakeDelayService;
 
+  private final VerificationApplicationConfig config;
+
   /**
    * Returns the test status of the COVID-19 test with cwa-fake header.
    *
@@ -111,7 +112,7 @@ public class ExternalTestStateController {
           testResult.setResponsePadding(RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
 
           // Check DOB Hash if present
-          if (appSession.get().getHashedGuidDob() != null) {
+          if (!config.isDisableDobHashCheckForExternalTestResult() && appSession.get().getHashedGuidDob() != null) {
             HashedGuid hashDob = new HashedGuid(appSession.get().getHashedGuidDob());
             TestResult testResultDob = testResultServerService.result(hashDob);
 

@@ -63,7 +63,7 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(properties = "disable-dob-hash-check-for-external-test-result=true")
 @ContextConfiguration(classes = VerificationApplication.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("internal")

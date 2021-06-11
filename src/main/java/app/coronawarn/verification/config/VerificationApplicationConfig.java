@@ -43,6 +43,8 @@ public class VerificationApplicationConfig {
   private Jwt jwt = new Jwt();
   private Request request = new Request();
 
+  private boolean disableDobHashCheckForExternalTestResult;
+
   /**
    * Configure the Tan with build property values and return the configured parameters.
    */

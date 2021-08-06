@@ -23,6 +23,7 @@ package app.coronawarn.verification.domain;
 
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
+import app.coronawarn.verification.model.TeleTanType;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -35,13 +36,15 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * This class represents the TAN - entity.
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -84,6 +87,10 @@ public class VerificationTan implements Serializable {
   @Column(name = "type")
   @Enumerated(EnumType.STRING)
   private TanType type;
+
+  @Column(name = "teletan_type")
+  @Enumerated(EnumType.STRING)
+  private TeleTanType teleTanType;
 
   /**
    * Check if the tan can be redeemed by date.

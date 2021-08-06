@@ -24,6 +24,7 @@ package app.coronawarn.verification.service;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
 import app.coronawarn.verification.model.RegistrationToken;
+import app.coronawarn.verification.model.TeleTanType;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -116,7 +117,8 @@ public class AppSessionService {
    * @param teleTan the TeleTan
    * @return an {@link ResponseEntity}
    */
-  public ResponseEntity<RegistrationToken> generateRegistrationTokenByTeleTan(String teleTan, String fake) {
+  public ResponseEntity<RegistrationToken> generateRegistrationTokenByTeleTan(
+    String teleTan, String fake, TeleTanType teleTanType) {
     if (checkRegistrationTokenAlreadyExistForTeleTan(teleTan)) {
       log.warn("The registration token already exists for this TeleTAN.");
       return ResponseEntity.badRequest().build();
@@ -126,6 +128,7 @@ public class AppSessionService {
       VerificationAppSession appSession = generateAppSession(registrationToken);
       appSession.setTeleTanHash(hashingService.hash(teleTan));
       appSession.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
+      appSession.setTeleTanType(teleTanType);
       saveAppSession(appSession);
       log.info("Returning the successfully created registration token.");
       return ResponseEntity.status(HttpStatus.CREATED).body(

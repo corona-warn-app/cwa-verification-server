@@ -67,10 +67,16 @@ public class JwtServiceTest {
     Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
   }
 
-  private JwtService jwtService = new JwtService(new IamClientMock(), new VerificationApplicationConfig());
+  private final VerificationApplicationConfig config = new VerificationApplicationConfig();
+
+  private JwtService jwtService = new JwtService(new IamClientMock(), config);
 
   @BeforeEach
   public void setUp() throws NoSuchAlgorithmException {
+    VerificationApplicationConfig.Jwt jwtConfig = new VerificationApplicationConfig.Jwt();
+    jwtConfig.setEnabled(true);
+    config.setJwt(jwtConfig);
+
     KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(RSA);
     keyGenerator.initialize(2048);
     KeyPair kp = keyGenerator.genKeyPair();
@@ -85,7 +91,7 @@ public class JwtServiceTest {
 
   /**
    * Test to validate an valid Token, with the
-   * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
+   * {@link JwtService#validateToken(String, PublicKey, List)} method.
    *
    * @throws java.io.UnsupportedEncodingException if the test cannot be performed.
    * @throws java.security.NoSuchAlgorithmException if the test cannot be performed.
@@ -93,12 +99,15 @@ public class JwtServiceTest {
   @Test
   public void validateToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    Assertions.assertTrue(jwtService.validateToken(jwToken, publicKey));
+    Assertions.assertTrue(jwtService.validateToken(jwToken, publicKey, Collections.emptyList()));
+
+    jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
+    Assertions.assertFalse(jwtService.validateToken(jwToken, publicKey, List.of(AuthorizationRole.AUTH_C19_HOTLINE_EVENT)));
   }
 
   /**
    * Test the negative case by not given public key, with the
-   * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
+   * {@link JwtService#validateToken(String, PublicKey, List)} method.
    *
    * @throws java.io.UnsupportedEncodingException if the test cannot be performed.
    * @throws java.security.NoSuchAlgorithmException if the test cannot be performed.
@@ -106,11 +115,11 @@ public class JwtServiceTest {
   @Test
   public void validateTokenByPublicKeyIsNull() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    Assertions.assertFalse(jwtService.validateToken(jwToken, null));
+    Assertions.assertFalse(jwtService.validateToken(jwToken, null, Collections.emptyList()));
   }  
 
   /**
-   * Test is Token authorized, with the {@link JwtService#isAuthorized(java.lang.String)} method.
+   * Test is Token authorized, with the {@link JwtService#isAuthorized(String, List)} method.
    *
    * @throws java.io.UnsupportedEncodingException if the test cannot be performed.
    * @throws java.security.NoSuchAlgorithmException if the test cannot be performed.
@@ -119,13 +128,15 @@ public class JwtServiceTest {
   public void tokenIsAuthorized() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     IamClientMock clientMock = createIamClientMock();
-    jwtService = new JwtService(clientMock, new VerificationApplicationConfig());
-    Assertions.assertTrue(jwtService.isAuthorized(TOKEN_PREFIX + jwToken));
+    jwtService = new JwtService(clientMock, config);
+    Assertions.assertTrue(jwtService.isAuthorized(TOKEN_PREFIX + jwToken, Collections.emptyList()));
+
+    Assertions.assertFalse(jwtService.isAuthorized(TOKEN_PREFIX + getJwtTestData(3000, AuthorizationRole.AUTH_C19_HOTLINE), List.of(AuthorizationRole.AUTH_C19_HOTLINE_EVENT)));
   }
 
   /**
    * Test to validate an expired Token, with the
-   * {@link JwtService#validateToken(java.lang.String, java.security.PublicKey)} method.
+   * {@link JwtService#validateToken(String, PublicKey, List)} method.
    *
    * @throws java.io.UnsupportedEncodingException if the test cannot be performed.
    * @throws java.security.NoSuchAlgorithmException if the test cannot be performed.
@@ -133,7 +144,7 @@ public class JwtServiceTest {
   @Test
   public void validateExpiredToken() throws UnsupportedEncodingException, NoSuchAlgorithmException {
     String jwToken = getJwtTestData(0, AuthorizationRole.AUTH_C19_HOTLINE, AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
-    Assertions.assertFalse(jwtService.validateToken(jwToken, publicKey));
+    Assertions.assertFalse(jwtService.validateToken(jwToken, publicKey, Collections.emptyList()));
   }
 
   private String getJwtTestData(final long expirationSecondsToAdd, AuthorizationRole... roles) throws UnsupportedEncodingException, NoSuchAlgorithmException {

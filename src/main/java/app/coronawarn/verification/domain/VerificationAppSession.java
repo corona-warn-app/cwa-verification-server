@@ -22,6 +22,7 @@
 package app.coronawarn.verification.domain;
 
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
+import app.coronawarn.verification.model.TeleTanType;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -35,12 +36,15 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * This class represents the AppSession-entity.
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -82,6 +86,10 @@ public class VerificationAppSession implements Serializable {
   @Column(name = "sot")
   @Enumerated(EnumType.STRING)
   private AppSessionSourceOfTrust sourceOfTrust;
+
+  @Column(name = "teletan_type")
+  @Enumerated(EnumType.STRING)
+  private TeleTanType teleTanType;
 
   /**
    * This method increments the tan counter.

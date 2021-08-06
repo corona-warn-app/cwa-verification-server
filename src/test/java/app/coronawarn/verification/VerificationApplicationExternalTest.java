@@ -41,6 +41,7 @@ import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenKeyType;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
+import app.coronawarn.verification.model.TeleTanType;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import app.coronawarn.verification.service.TanService;
 import app.coronawarn.verification.service.TestResultServerService;
@@ -132,7 +133,7 @@ public class VerificationApplicationExternalTest {
 
     TestUtils.prepareAppSessionTestData(appSessionrepository);
     doReturn(TestUtils.TEST_LAB_POSITIVE_RESULT).when(testResultServerService).result(any());
-    doReturn(TestUtils.TEST_TAN).when(tanService).generateVerificationTan(any());
+    doReturn(TestUtils.TEST_TAN).when(tanService).generateVerificationTan(any(), any());
 
     MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .secure(true)
@@ -153,6 +154,7 @@ public class VerificationApplicationExternalTest {
     assertEquals(TestUtils.TEST_GUI_HASH, verificationList.get(0).getHashedGuid());
     assertEquals(AppSessionSourceOfTrust.HASHED_GUID, verificationList.get(0).getSourceOfTrust());
     assertEquals(TestUtils.TEST_REG_TOK_HASH, verificationList.get(0).getRegistrationTokenHash());
+    assertEquals(TeleTanType.EVENT, verificationList.get(0).getTeleTanType());
 
   }
 
@@ -162,7 +164,7 @@ public class VerificationApplicationExternalTest {
 
     TestUtils.prepareAppSessionTestData(appSessionrepository);
     doReturn(TestUtils.QUICK_TEST_POSITIVE_RESULT).when(testResultServerService).result(any());
-    doReturn(TestUtils.TEST_TAN).when(tanService).generateVerificationTan(any());
+    doReturn(TestUtils.TEST_TAN).when(tanService).generateVerificationTan(any(), any());
 
     MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .secure(true)
@@ -309,7 +311,7 @@ public class VerificationApplicationExternalTest {
     appSessionTestData.setSourceOfTrust(AppSessionSourceOfTrust.TELETAN);
     appSessionrepository.save(appSessionTestData);
     doReturn(TestUtils.TEST_LAB_NEGATIVE_RESULT).when(testResultServerService).result(any());
-    doReturn(TestUtils.TEST_TELE_TAN).when(tanService).generateVerificationTan(any());
+    doReturn(TestUtils.TEST_TELE_TAN).when(tanService).generateVerificationTan(any(), any());
 
     MvcResult result = mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan")
       .secure(true)
@@ -587,6 +589,7 @@ public class VerificationApplicationExternalTest {
     assertNull(verificationList.get(0).getHashedGuid());
     assertEquals(AppSessionSourceOfTrust.TELETAN, verificationList.get(0).getSourceOfTrust());
     assertNotNull(verificationList.get(0).getRegistrationTokenHash());
+    assertEquals(TeleTanType.EVENT, verificationList.get(0).getTeleTanType());
   }
 
   /**

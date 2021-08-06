@@ -25,6 +25,7 @@ import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
+import app.coronawarn.verification.model.TeleTanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
+import javax.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -157,10 +159,12 @@ public class TanService {
    *
    * @param tan     the TAN
    * @param tanType the TAN type
+   * @param teleTanType type of the teleTan
    * @return the persisted TAN
    */
-  private VerificationTan persistTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
-    VerificationTan newTan = generateVerificationTan(tan, tanType, sourceOfTrust);
+  private VerificationTan persistTan(
+    String tan, TanType tanType, TanSourceOfTrust sourceOfTrust, TeleTanType teleTanType) {
+    VerificationTan newTan = generateVerificationTan(tan, tanType, sourceOfTrust, teleTanType);
     return tanRepository.save(newTan);
   }
 
@@ -219,9 +223,9 @@ public class TanService {
    *
    * @return a valid teleTAN
    */
-  public String generateVerificationTeleTan() {
+  public String generateVerificationTeleTan(@NotNull TeleTanType teleTanType) {
     String teleTan = generateValidTan(this::createTeleTan);
-    persistTan(teleTan, TanType.TELETAN, TanSourceOfTrust.TELETAN);
+    persistTan(teleTan, TanType.TELETAN, TanSourceOfTrust.TELETAN, teleTanType);
     return teleTan;
   }
 
@@ -229,11 +233,12 @@ public class TanService {
    * This Method generates a valid TAN and persists it. Returns the generated TAN.
    *
    * @param sourceOfTrust sets the source of Trust for the Tan
+   * @param teleTanType type of the teleTan
    * @return a valid tan with given source of Trust
    */
-  public String generateVerificationTan(TanSourceOfTrust sourceOfTrust) {
+  public String generateVerificationTan(TanSourceOfTrust sourceOfTrust, TeleTanType teleTanType) {
     String tan = generateValidTan(this::createTanFromUuid);
-    persistTan(tan, TanType.TAN, sourceOfTrust);
+    persistTan(tan, TanType.TAN, sourceOfTrust, teleTanType);
     return tan;
   }
 
@@ -244,7 +249,9 @@ public class TanService {
    * @param sourceOfTrust source of trust of the tan
    * @return Tan object
    */
-  public VerificationTan generateVerificationTan(String tan, TanType tanType, TanSourceOfTrust sourceOfTrust) {
+  public VerificationTan generateVerificationTan(
+    String tan, TanType tanType, TanSourceOfTrust sourceOfTrust, TeleTanType teleTanType) {
+
     LocalDateTime from = LocalDateTime.now();
     LocalDateTime until;
     int tanValidInDays = verificationApplicationConfig.getTan().getValid().getDays();
@@ -264,6 +271,7 @@ public class TanService {
     verificationTan.setCreatedAt(LocalDateTime.now());
     verificationTan.setUpdatedAt(LocalDateTime.now());
     verificationTan.setType(tanType);
+    verificationTan.setTeleTanType(teleTanType);
     return verificationTan;
   }
 

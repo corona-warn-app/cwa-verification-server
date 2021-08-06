@@ -1,0 +1,19 @@
+databaseChangeLog:
+- changeSet:
+    id: add-teletan-type-column
+    author: f11h
+    changes:
+    - addColumn:
+        tableName: tan
+        columns:
+          name: teletan_type
+          type: varchar(10)
+          constraints:
+            nullable: true
+    - addColumn:
+        tableName: app_session
+        columns:
+          name: teletan_type
+          type: varchar(10)
+          constraints:
+            nullable: true

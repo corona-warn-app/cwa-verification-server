@@ -6,13 +6,13 @@ import app.coronawarn.verification.model.AppSessionSourceOfTrust;
 import app.coronawarn.verification.model.AuthorizationRole;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
+import app.coronawarn.verification.model.TeleTanType;
 import app.coronawarn.verification.model.TestResult;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.io.UnsupportedEncodingException;
 import java.security.PrivateKey;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -76,6 +76,7 @@ public class TestUtils {
 
   static VerificationAppSession getAppSessionTestData(AppSessionSourceOfTrust sot, boolean dob) {
     VerificationAppSession cv = new VerificationAppSession();
+    cv.setTeleTanType(TeleTanType.EVENT);
     cv.setHashedGuid(TEST_GUI_HASH);
     cv.setHashedGuidDob(dob ? TEST_GUI_HASH_DOB : null);
     cv.setCreatedAt(LocalDateTime.now());
@@ -92,6 +93,7 @@ public class TestUtils {
 
   static VerificationTan getTeleTanTestData() {
     VerificationTan cvtan = new VerificationTan();
+    cvtan.setTeleTanType(TeleTanType.EVENT);
     cvtan.setCreatedAt(LocalDateTime.now());
     cvtan.setUpdatedAt(LocalDateTime.now());
     cvtan.setRedeemed(false);
@@ -105,6 +107,7 @@ public class TestUtils {
 
   static VerificationTan getVerificationTANTestData() {
     VerificationTan cvtan = new VerificationTan();
+    cvtan.setTeleTanType(TeleTanType.EVENT);
     cvtan.setCreatedAt(LocalDateTime.now());
     cvtan.setUpdatedAt(LocalDateTime.now());
     cvtan.setRedeemed(false);
@@ -120,7 +123,7 @@ public class TestUtils {
     return objectMapper.writeValueAsString(o);
   }
 
-  static String getJwtTestData(final long expirationSecondsToAdd, PrivateKey privateKey, AuthorizationRole... roles) throws UnsupportedEncodingException {
+  static String getJwtTestData(final long expirationSecondsToAdd, PrivateKey privateKey, AuthorizationRole... roles) {
     final Map<String, List<String>> realmAccessMap = new HashMap<>();
     final List<String> roleNames = new ArrayList<>();
     for (AuthorizationRole role : roles) {

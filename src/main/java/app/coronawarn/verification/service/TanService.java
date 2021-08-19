@@ -256,8 +256,14 @@ public class TanService {
     LocalDateTime until;
     int tanValidInDays = verificationApplicationConfig.getTan().getValid().getDays();
     int teleTanValidInHours = verificationApplicationConfig.getTan().getTele().getValid().getHours();
+    int eventTeleTanValidInDays = verificationApplicationConfig.getTan().getTele().getValid().getEventDays();
+
     if (tanType == TanType.TELETAN) {
-      until = from.plusHours(teleTanValidInHours);
+      if (teleTanType == TeleTanType.TEST) {
+        until = from.plusHours(teleTanValidInHours);
+      } else {
+        until = from.plusDays(eventTeleTanValidInDays);
+      }
     } else {
       until = from.plusDays(tanValidInDays);
     }

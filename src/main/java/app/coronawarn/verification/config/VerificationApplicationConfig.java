@@ -76,6 +76,7 @@ public class VerificationApplicationConfig {
         private int length = 1;
         // Number of hours that teleTAN remains valid
         private int hours = 1;
+        private int eventDays = 2;
       }
 
       /**

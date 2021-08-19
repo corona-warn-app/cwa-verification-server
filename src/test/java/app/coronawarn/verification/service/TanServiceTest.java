@@ -230,6 +230,19 @@ public class TanServiceTest {
   }
 
   @Test
+  public void verifyExpiredEventTeleTan() {
+    String teleTan = tanService.generateVerificationTeleTan(TeleTanType.EVENT);
+    VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).orElse(null);
+    LocalDateTime validFrom = LocalDateTime.now().minusDays(2).minusMinutes(1);
+    if (teleTanFromDB != null) {
+      teleTanFromDB.setValidFrom(validFrom);
+      teleTanFromDB.setValidUntil(validFrom.plusDays(2));
+    }
+    tanService.saveTan(teleTanFromDB);
+    assertFalse(tanService.verifyTeleTan(teleTan));
+  }
+
+  @Test
   public void testTeleTANFormat() {
     assertThat(tanService.isTeleTanValid("29ABCZAE4E")).isTrue();
     assertThat(tanService.isTeleTanValid("29ABCzAE4O")).isFalse();

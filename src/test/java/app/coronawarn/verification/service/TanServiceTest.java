@@ -26,6 +26,7 @@ import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
+import app.coronawarn.verification.model.TeleTanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -107,7 +108,7 @@ public class TanServiceTest {
     tanService.saveTan(tan);
 
     Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
-    Assertions.assertEquals(tan, tanFromDB.get());
+    Assertions.assertEquals(tan, tanFromDB.orElseThrow());
     tanService.deleteTan(tan);
     tanFromDB = tanService.getEntityByTan(TEST_TAN);
     assertFalse(tanFromDB.isPresent());
@@ -126,6 +127,7 @@ public class TanServiceTest {
     tan.setValidFrom(LocalDateTime.now());
     tan.setValidUntil(TAN_VALID_UNTIL_IN_DAYS);
     tan.setType(TEST_TAN_TYPE);
+    tan.setTeleTanType(TeleTanType.TEST);
     tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
     VerificationTan retunedTan = tanService.saveTan(tan);
     Assertions.assertEquals(retunedTan, tan);
@@ -144,10 +146,11 @@ public class TanServiceTest {
     tan.setValidUntil(LocalDateTime.parse((TAN_VALID_UNTIL_IN_DAYS.format(FORMATTER))));
     tan.setType(TEST_TAN_TYPE);
     tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
+    tan.setTeleTanType(TeleTanType.TEST);
     tanService.saveTan(tan);
 
     Optional<VerificationTan> tanFromDB = tanService.getEntityByTan(TEST_TAN);
-    Assertions.assertEquals(tan, tanFromDB.get());
+    Assertions.assertEquals(tan, tanFromDB.orElseThrow());
   }
 
   @Test
@@ -161,6 +164,7 @@ public class TanServiceTest {
     tan.setValidFrom(start);
     tan.setValidUntil(LocalDateTime.parse((TELE_TAN_VALID_UNTIL_IN_HOURS.format(FORMATTER))));
     tan.setType(TanType.TELETAN);
+    tan.setTeleTanType(TeleTanType.TEST);
     tan.setSourceOfTrust(TEST_TELE_TAN_SOURCE_OF_TRUST);
     tanService.saveTan(tan);
     assertFalse(tanService.checkTanNotExist(TEST_TELE_TAN));
@@ -168,7 +172,7 @@ public class TanServiceTest {
 
   @Test
   public void generateVerificationTan() {
-    String tan = tanService.generateVerificationTan(TEST_TELE_TAN_SOURCE_OF_TRUST);
+    String tan = tanService.generateVerificationTan(TEST_TELE_TAN_SOURCE_OF_TRUST, null);
     assertTrue(syntaxTanVerification(tan));
     assertFalse(tan.isEmpty());
   }
@@ -189,16 +193,15 @@ public class TanServiceTest {
 
   @Test
   public void verifyTeletan() {
-    String teleTan = tanService.generateVerificationTeleTan();
+    String teleTan = tanService.generateVerificationTeleTan(TeleTanType.TEST);
     assertTrue(tanService.checkTanNotExist(TEST_TELE_TAN));
-    boolean value = tanService.verifyTeleTan(teleTan);
-    assertTrue(value);
+    assertTrue(tanService.verifyTeleTan(teleTan));
     assertFalse(tanService.verifyTeleTan("R3ZNUI0"));
   }
 
   @Test
   public void verifyAlreadyRedeemedTeleTan() {
-    String teleTan = tanService.generateVerificationTeleTan();
+    String teleTan = tanService.generateVerificationTeleTan(TeleTanType.TEST);
     VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).orElse(null);
     if (teleTanFromDB != null) {
       teleTanFromDB.setRedeemed(true);
@@ -215,12 +218,25 @@ public class TanServiceTest {
 
   @Test
   public void verifyExpiredTeleTan() {
-    String teleTan = tanService.generateVerificationTeleTan();
+    String teleTan = tanService.generateVerificationTeleTan(TeleTanType.TEST);
     VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).orElse(null);
     LocalDateTime validFrom = LocalDateTime.now().minusHours(1).minusMinutes(1);
     if (teleTanFromDB != null) {
       teleTanFromDB.setValidFrom(validFrom);
       teleTanFromDB.setValidUntil(validFrom.plusHours(1));
+    }
+    tanService.saveTan(teleTanFromDB);
+    assertFalse(tanService.verifyTeleTan(teleTan));
+  }
+
+  @Test
+  public void verifyExpiredEventTeleTan() {
+    String teleTan = tanService.generateVerificationTeleTan(TeleTanType.EVENT);
+    VerificationTan teleTanFromDB = tanService.getEntityByTan(teleTan).orElse(null);
+    LocalDateTime validFrom = LocalDateTime.now().minusDays(2).minusMinutes(1);
+    if (teleTanFromDB != null) {
+      teleTanFromDB.setValidFrom(validFrom);
+      teleTanFromDB.setValidUntil(validFrom.plusDays(2));
     }
     tanService.saveTan(teleTanFromDB);
     assertFalse(tanService.verifyTeleTan(teleTan));
@@ -248,11 +264,11 @@ public class TanServiceTest {
 
     assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
 
-    for (int i = 0; i < TELE_TAN_RATE_LIMIT_COUNT - 1; i++) tanService.generateVerificationTeleTan();
+    for (int i = 0; i < TELE_TAN_RATE_LIMIT_COUNT - 1; i++) tanService.generateVerificationTeleTan(TeleTanType.TEST);
 
     assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
 
-    tanService.generateVerificationTeleTan();
+    tanService.generateVerificationTeleTan(TeleTanType.TEST);
 
     assertThat(tanService.isTeleTanRateLimitNotExceeded()).isFalse();
   }
@@ -264,7 +280,7 @@ public class TanServiceTest {
 
     assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
 
-    for (int i = 0; i < TELE_TAN_RATE_LIMIT_COUNT + 1; i++) tanService.generateVerificationTan(TEST_TAN_SOURCE_OF_TRUST);
+    for (int i = 0; i < TELE_TAN_RATE_LIMIT_COUNT + 1; i++) tanService.generateVerificationTan(TEST_TAN_SOURCE_OF_TRUST, null);
 
     assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
   }
@@ -276,18 +292,18 @@ public class TanServiceTest {
 
     assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
 
-    VerificationTan tan1 = tanService.generateVerificationTan("tan1", TanType.TELETAN, TEST_TELE_TAN_SOURCE_OF_TRUST);
-    VerificationTan tan2 = tanService.generateVerificationTan("tan2", TanType.TELETAN, TEST_TELE_TAN_SOURCE_OF_TRUST);
+    VerificationTan tan1 = tanService.generateVerificationTan("tan1", TanType.TELETAN, TEST_TELE_TAN_SOURCE_OF_TRUST, TeleTanType.TEST);
+    VerificationTan tan2 = tanService.generateVerificationTan("tan2", TanType.TELETAN, TEST_TELE_TAN_SOURCE_OF_TRUST, TeleTanType.TEST);
     tan1.setCreatedAt(LocalDateTime.now().minusSeconds(TELE_TAN_RATE_LIMIT_SECONDS + 1));
     tan2.setCreatedAt(LocalDateTime.now().minusSeconds(TELE_TAN_RATE_LIMIT_SECONDS + 1));
     tanService.saveTan(tan1);
     tanService.saveTan(tan2);
 
-    for (int i = 0; i < TELE_TAN_RATE_LIMIT_COUNT - 1; i++) tanService.generateVerificationTeleTan();
+    for (int i = 0; i < TELE_TAN_RATE_LIMIT_COUNT - 1; i++) tanService.generateVerificationTeleTan(TeleTanType.TEST);
 
     assertThat(tanService.isTeleTanRateLimitNotExceeded()).isTrue();
 
-    tanService.generateVerificationTeleTan();
+    tanService.generateVerificationTeleTan(TeleTanType.TEST);
 
     assertThat(tanService.isTeleTanRateLimitNotExceeded()).isFalse();
   }
@@ -295,7 +311,7 @@ public class TanServiceTest {
   /**
    * Check Tele-TAN syntax constraints.
    *
-   * @param tan the Tele TAN
+   * @param teleTan the Tele TAN
    * @return Tele TAN verification flag
    */
   private boolean syntaxTanVerification(String teleTan) {

@@ -83,16 +83,17 @@ public class JwtService {
    * token is valid.
    *
    * @param authorizationToken The authorization token to validate
+   * @param mandatoryRoles list of roles which are required to pass
    * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
    */
-  public boolean isAuthorized(String authorizationToken) {
+  public boolean isAuthorized(String authorizationToken, List<AuthorizationRole> mandatoryRoles) {
     // check if the JWT is enabled
     if (!verificationApplicationConfig.getJwt().getEnabled()) {
       return true;
     }
     if (null != authorizationToken && authorizationToken.startsWith(TOKEN_PREFIX)) {
       String jwtToken = authorizationToken.substring(TOKEN_PREFIX.length());
-      return validateToken(jwtToken, getPublicKey());
+      return validateToken(jwtToken, getPublicKey(), mandatoryRoles);
     }
     return false;
   }
@@ -102,13 +103,23 @@ public class JwtService {
    *
    * @param token The authorization token to validate
    * @param publicKey the key from the IAM server
+   * @param mandatoryRoles List of roles which are required to pass.
    * @return <code>true</code>, if the token is valid, otherwise <code>false</code>
    */
-  public boolean validateToken(final String token, final PublicKey publicKey) {
+  public boolean validateToken(final String token, final PublicKey publicKey, List<AuthorizationRole> mandatoryRoles) {
     log.debug("process validateToken() by - token: {} PK: {}", token, publicKey);
     if (null != publicKey) {
       try {
         List<String> roleNames = getRoles(token, publicKey);
+
+        // Return false if one of the mandatory roles are not present
+        for (AuthorizationRole mandatoryRole : mandatoryRoles) {
+          if (!roleNames.contains(mandatoryRole.getRoleName())) {
+            return false;
+          }
+        }
+
+        // Return true if at least one of the authorization roles are present
         AuthorizationRole[] roles = AuthorizationRole.values();
         for (AuthorizationRole role : roles) {
           if (roleNames.contains(role.getRoleName())) {

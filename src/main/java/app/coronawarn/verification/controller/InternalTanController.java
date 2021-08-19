@@ -22,15 +22,20 @@
 package app.coronawarn.verification.controller;
 
 import app.coronawarn.verification.exception.VerificationServerException;
+import app.coronawarn.verification.model.AuthorizationRole;
 import app.coronawarn.verification.model.AuthorizationToken;
 import app.coronawarn.verification.model.Tan;
 import app.coronawarn.verification.model.TeleTan;
+import app.coronawarn.verification.model.TeleTanType;
 import app.coronawarn.verification.service.JwtService;
 import app.coronawarn.verification.service.TanService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -66,6 +71,8 @@ public class InternalTanController {
    */
   public static final String TELE_TAN_ROUTE = "/tan/teletan";
 
+  public static final String TELE_TAN_TYPE_HEADER = "X-CWA-TELETAN-TYPE";
+
   @NonNull
   private final TanService tanService;
 
@@ -83,7 +90,12 @@ public class InternalTanController {
     description = "The provided Tan is verified to be formerly issued by the verification server"
   )
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Tan is valid an formerly issued by the verification server"),
+    @ApiResponse(
+      responseCode = "200",
+      description = "Tan is valid an formerly issued by the verification server",
+      headers = {
+        @Header(name = TELE_TAN_TYPE_HEADER, description = "Type of the TeleTan (TEST or EVENT)")
+      }),
     @ApiResponse(responseCode = "404", description = "Tan could not be verified")})
   @PostMapping(value = TAN_VERIFY_ROUTE,
     consumes = MediaType.APPLICATION_JSON_VALUE
@@ -96,7 +108,15 @@ public class InternalTanController {
         log.info("The Tan is valid.");
         return t;
       })
-      .map(t -> ResponseEntity.ok().build())
+      .map(t -> {
+        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.ok();
+
+        if (t.getTeleTanType() != null) {
+          responseBuilder.header(TELE_TAN_TYPE_HEADER, t.getTeleTanType().toString());
+        }
+
+        return responseBuilder.build();
+      })
       .orElseGet(() -> {
         log.info("The Tan is invalid.");
         throw new VerificationServerException(HttpStatus.NOT_FOUND, "No Tan found or Tan is invalid");
@@ -119,10 +139,21 @@ public class InternalTanController {
     produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<TeleTan> createTeleTan(
-    @RequestHeader(JwtService.HEADER_NAME_AUTHORIZATION) @Valid AuthorizationToken authorization) {
-    if (jwtService.isAuthorized(authorization.getToken())) {
+    @RequestHeader(JwtService.HEADER_NAME_AUTHORIZATION) @Valid AuthorizationToken authorization,
+    @RequestHeader(value = TELE_TAN_TYPE_HEADER, required = false) @Valid TeleTanType teleTanType) {
+
+    List<AuthorizationRole> requiredRoles = new ArrayList<>();
+
+    if (teleTanType == null) {
+      teleTanType = TeleTanType.TEST;
+      requiredRoles.add(AuthorizationRole.AUTH_C19_HOTLINE);
+    } else if (teleTanType == TeleTanType.EVENT) {
+      requiredRoles.add(AuthorizationRole.AUTH_C19_HOTLINE_EVENT);
+    }
+
+    if (jwtService.isAuthorized(authorization.getToken(), requiredRoles)) {
       if (tanService.isTeleTanRateLimitNotExceeded()) {
-        String teleTan = tanService.generateVerificationTeleTan();
+        String teleTan = tanService.generateVerificationTeleTan(teleTanType);
         log.info("The teleTAN is generated.");
         return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));
       } else {

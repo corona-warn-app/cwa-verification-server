@@ -33,7 +33,8 @@ import lombok.Getter;
 @Getter
 public enum AuthorizationRole {
   AUTH_C19_HOTLINE("c19hotline"),
-  AUTH_C19_HEALTHAUTHORITY("c19healthauthority");
+  AUTH_C19_HEALTHAUTHORITY("c19healthauthority"),
+  AUTH_C19_HOTLINE_EVENT("c19hotline_event");
 
   private final String roleName;
 

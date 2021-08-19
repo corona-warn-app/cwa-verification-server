@@ -8,3 +8,6 @@ databaseChangeLog:
   - include:
       file: changelog/v001-add-dob-hash-column.yml
       relativeToChangelogFile: true
+  - include:
+      file: changelog/v002-add-teletan-type-column.yml
+      relativeToChangelogFile: true

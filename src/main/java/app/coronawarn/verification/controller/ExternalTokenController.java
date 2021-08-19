@@ -52,16 +52,12 @@ public class ExternalTokenController {
 
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
-  @NonNull
   private final FakeRequestService fakeRequestController;
 
-  @NonNull
   private final AppSessionService appSessionService;
 
-  @NonNull
   private final TanService tanService;
 
-  @NonNull
   private final FakeDelayService fakeDelayService;
 
   /**
@@ -102,8 +98,13 @@ public class ExternalTokenController {
         log.info("Returning the successfully generated RegistrationToken.");
         return deferredResult;
       case TELETAN:
-        ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(key, fake);
         Optional<VerificationTan> optional = tanService.getEntityByTan(key);
+
+        ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(
+          key,
+          fake,
+          optional.map(VerificationTan::getTeleTanType).orElse(null));
+
         if (optional.isPresent()) {
           VerificationTan teleTan = optional.get();
           teleTan.setRedeemed(true);

@@ -67,6 +67,7 @@ tan:
     valid:
       length: 9
       hours: 1
+      eventDays: 2
   valid:
     days: 14
 appsession:

@@ -28,14 +28,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import app.coronawarn.verification.controller.InternalTanController;
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.model.AuthorizationRole;
 import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.Tan;
+import app.coronawarn.verification.model.TeleTanType;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import app.coronawarn.verification.service.JwtService;
 import app.coronawarn.verification.service.TanService;
@@ -43,6 +46,7 @@ import app.coronawarn.verification.service.TestResultServerService;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -98,9 +102,9 @@ public class VerificationApplicationInternalTest {
     String jwtString = TestUtils.getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
 
     given(this.tanService.isTeleTanRateLimitNotExceeded()).willReturn(Boolean.TRUE);
-    given(this.jwtService.isAuthorized(any())).willReturn(Boolean.TRUE);
+    given(this.jwtService.isAuthorized(any(), any())).willReturn(Boolean.TRUE);
     given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
-    when(this.jwtService.validateToken(jwtString, kp.getPublic())).thenCallRealMethod();
+    when(this.jwtService.validateToken(jwtString, kp.getPublic(), Collections.emptyList())).thenCallRealMethod();
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, JwtService.TOKEN_PREFIX + jwtString).secure(true))
       .andExpect(status().isCreated());
@@ -118,7 +122,7 @@ public class VerificationApplicationInternalTest {
     KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
     keyGenerator.initialize(2048);
     KeyPair kp = keyGenerator.genKeyPair();
-    given(this.jwtService.isAuthorized(any())).willReturn(false);
+    given(this.jwtService.isAuthorized(any(), any())).willReturn(false);
     given(this.jwtService.getPublicKey()).willReturn(kp.getPublic());
     String jwtString = TestUtils.getJwtTestData(3000, kp.getPrivate(), AuthorizationRole.AUTH_C19_HEALTHAUTHORITY);
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION,
@@ -144,7 +148,8 @@ public class VerificationApplicationInternalTest {
       .contentType(MediaType.APPLICATION_JSON)
       .secure(true)
       .content(TestUtils.getAsJsonFormat(new Tan(TestUtils.TEST_TAN, TAN_PADDING))))
-      .andExpect(status().isOk());
+      .andExpect(status().isOk())
+      .andExpect(header().string(InternalTanController.TELE_TAN_TYPE_HEADER, TeleTanType.EVENT.toString()));
   }
 
   /**
@@ -265,7 +270,7 @@ public class VerificationApplicationInternalTest {
 
   @Test
   public void shouldReturn429StatusCodeIfRateLimitIsExceeded() throws Exception {
-    given(this.jwtService.isAuthorized(any())).willReturn(Boolean.TRUE);
+    given(this.jwtService.isAuthorized(any(), any())).willReturn(Boolean.TRUE);
     given(this.tanService.isTeleTanRateLimitNotExceeded()).willReturn(Boolean.TRUE);
 
     mockMvc.perform(post(TestUtils.PREFIX_API_VERSION + "/tan/teletan").header(JwtService.HEADER_NAME_AUTHORIZATION, "").secure(true))

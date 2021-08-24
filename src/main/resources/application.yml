@@ -1,0 +1,86 @@
+spring:
+  application:
+    name: cwa-verification-server
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:verification
+    username: sa
+    password: ''
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog.yml
+server:
+  max-post-size: 10000
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 5000
+        read-timeout: 5000
+        logger-level: basic
+jwt:
+  server: http://localhost:8080
+  enabled: false
+springdoc:
+  api-docs:
+    path: /api/docs
+  swagger-ui:
+    path: /api/swagger
+management:
+  server:
+    ssl:
+      enabled: false
+    port: 8081
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        include: info,health,metrics,prometheus
+    jmx:
+      exposure:
+        include: info,health,metrics,prometheus
+  health:
+    probes:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+tan:
+  tele:
+    ratelimiting:
+      count: 1000
+      seconds: 3600
+      threshold-in-percent: 80
+    valid:
+      length: 9
+      hours: 1
+      eventDays: 2
+  valid:
+    days: 14
+appsession:
+  tancountermax: 1
+entities:
+  cleanup:
+    days: 21
+    rate: 3600000
+initialFakeDelayMilliseconds: 10
+fakeDelayMovingAverageSamples: 5
+request:
+  sizelimit: 10000
+
+cwa-testresult-server:
+  url: http://localhost:8088
+  

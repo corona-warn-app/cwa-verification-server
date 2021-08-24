@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -51,8 +52,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles("local")
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
+
 public class TanServiceTest {
 
   public static final String TEST_TAN = "1ea6ce8a-9740-11ea-bb37-0242ac130002";

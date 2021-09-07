@@ -50,7 +50,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest(properties = "disable-dob-hash-check-for-external-test-result=true")
 @ContextConfiguration(classes = VerificationApplication.class)
 @AutoConfigureMockMvc
-@ActiveProfiles("external")
+@ActiveProfiles({"external","local"})
 public class VerificationApplicationExternalTestWorkaround {
 
   private static final String TOKEN_PADDING = "1";

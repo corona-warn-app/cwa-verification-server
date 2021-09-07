@@ -1,0 +1,11 @@
+cwa-testresult-server:
+  url: http://localhost:8088
+  ssl:
+    enabled: false
+    one-way: false
+    two-way: false
+    hostname-verify: false
+    key-store: classpath:keystore.jks
+    key-store-password: changeit
+    trust-store: classpath:truststore.jks
+    trust-store-password: changeit

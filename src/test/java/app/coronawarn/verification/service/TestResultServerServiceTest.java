@@ -28,7 +28,9 @@ import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.TestResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("local")
 public class TestResultServerServiceTest {
 
   public static final String TEST_GUI_HASH_1 = "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b";
@@ -37,7 +39,7 @@ public class TestResultServerServiceTest {
   public static final TestResult TEST_LAB_POSITIVE_RESULT = new TestResult(2, 0, null, null);
   public static final TestResult TEST_LAB_REDEEMED_RESULT = new TestResult(4, 0, null, null);
   private TestResultServerService testResultServerService;
-
+ 
   @BeforeEach
   public void setUp() {
     testResultServerService = new TestResultServerService(new TestResultServerClientMock());

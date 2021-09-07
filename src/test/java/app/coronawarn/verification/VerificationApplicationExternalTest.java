@@ -71,7 +71,7 @@ import org.springframework.test.web.servlet.MvcResult;
 @SpringBootTest
 @ContextConfiguration(classes = VerificationApplication.class)
 @AutoConfigureMockMvc
-@ActiveProfiles("external")
+@ActiveProfiles({"external","local"})
 public class VerificationApplicationExternalTest {
 
   private static final String TOKEN_PADDING = "1";

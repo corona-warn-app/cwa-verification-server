@@ -65,12 +65,13 @@ import org.springframework.test.web.servlet.MockMvc;
 /**
  * This is the test class for the verification application.
  */
+@ActiveProfiles({"internal","local"})
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = "disable-dob-hash-check-for-external-test-result=true")
 @ContextConfiguration(classes = VerificationApplication.class)
 @AutoConfigureMockMvc
-@ActiveProfiles("internal")
+
 public class VerificationApplicationInternalTest {
 
   private static final String TAN_PADDING = "";

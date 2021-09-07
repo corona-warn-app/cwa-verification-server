@@ -41,6 +41,7 @@ import org.springframework.util.ResourceUtils;
 
 @Configuration
 @RequiredArgsConstructor
+
 public class TestResultServerClientConfig {
 
   @Value("${cwa-testresult-server.ssl.enabled}")

@@ -15,6 +15,9 @@ server:
     trust-store-password: ${SSL_VERIFICATION_TRUSTSTORE_PASSWORD}
 cwa-testresult-server:
   ssl:
+    enabled: true
+    one-way: true
+    two-way: true
     hostname-verify: false
     key-store: ${SSL_VERIFICATION_KEYSTORE_PATH}
     key-store-password: ${SSL_VERIFICATION_KEYSTORE_PASSWORD}

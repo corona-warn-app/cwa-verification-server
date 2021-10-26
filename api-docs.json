@@ -6,7 +6,7 @@
       "name": "Apache 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0"
     },
-    "version": "1.2.0-SNAPSHOT"
+    "version": "1.5.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -15,54 +15,6 @@
     }
   ],
   "paths": {
-    "/version/v1/tan": {
-      "post": {
-        "tags": [
-          "external-tan-controller"
-        ],
-        "summary": "Generates a Tan",
-        "description": "Generates a TAN on input of Registration Token. With the TAN one can submit his Diagnosis keys",
-        "operationId": "generateTan",
-        "parameters": [
-          {
-            "name": "cwa-fake",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegistrationToken"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Registration Token is valid",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DeferredResultResponseEntityTan"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Registration Token does not exist"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
     "/version/v1/testresult": {
       "post": {
         "tags": [
@@ -92,21 +44,208 @@
           "required": true
         },
         "responses": {
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
           "200": {
             "description": "Testresult retrieved",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeferredResultResponseEntityTestResult"
+                  "$ref": "#/components/schemas/TestResult"
                 }
               }
             }
           },
+          "403": {
+            "description": "TestResult of dob hash does not equal to TestResult of hash",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/version/v1/tan": {
+      "post": {
+        "tags": [
+          "external-tan-controller"
+        ],
+        "summary": "Generates a Tan",
+        "description": "Generates a TAN on input of Registration Token. With the TAN one can submit his Diagnosis keys",
+        "operationId": "generateTan",
+        "parameters": [
+          {
+            "name": "cwa-fake",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationToken"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "400": {
+            "description": "Registration Token does not exist"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "201": {
+            "description": "Registration Token is valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tan"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/version/v1/tan/verify": {
+      "post": {
+        "tags": [
+          "internal-tan-controller"
+        ],
+        "summary": "Verify provided Tan",
+        "description": "The provided Tan is verified to be formerly issued by the verification server",
+        "operationId": "verifyTan",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Tan"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "500": {
+            "description": "Internal Server Error"
+          },
           "400": {
             "description": "Bad Request"
           },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "200": {
+            "description": "Tan is valid an formerly issued by the verification server",
+            "headers": {
+              "X-CWA-TELETAN-TYPE": {
+                "description": "Type of the TeleTan (TEST or EVENT)",
+                "style": "simple"
+              }
+            },
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tan could not be verified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/version/v1/tan/teletan": {
+      "post": {
+        "tags": [
+          "internal-tan-controller"
+        ],
+        "summary": "Request generation of a teleTAN",
+        "description": "A teleTAN is a human readable TAN with 7 characters which is supposed to be issued via call line",
+        "operationId": "createTeleTan",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AuthorizationToken"
+            }
+          },
+          {
+            "name": "X-CWA-TELETAN-TYPE",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "The TeleTan Type model.",
+              "enum": [
+                "TEST",
+                "EVENT"
+              ]
+            }
+          }
+        ],
+        "responses": {
           "500": {
             "description": "Internal Server Error"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "201": {
+            "description": "TeleTan created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeleTan"
+                }
+              }
+            }
           }
         }
       }
@@ -140,107 +279,27 @@
           "required": true
         },
         "responses": {
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "400": {
+            "description": "GUID/TeleTAN already exists."
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
           "201": {
             "description": "registration token generated.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeferredResultResponseEntityRegistrationToken"
+                  "$ref": "#/components/schemas/RegistrationToken"
                 }
               }
             }
-          },
-          "400": {
-            "description": "GUID/TeleTAN already exists."
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/version/v1/tan/teletan": {
-      "post": {
-        "tags": [
-          "internal-tan-controller"
-        ],
-        "summary": "Request generation of a teleTAN",
-        "description": "A teleTAN is a human readable TAN with 7 characters which is supposed to be issued via call line",
-        "operationId": "createTeleTan",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/AuthorizationToken"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "TeleTan created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TeleTan"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/version/v1/tan/verify": {
-      "post": {
-        "tags": [
-          "internal-tan-controller"
-        ],
-        "summary": "Verify provided Tan",
-        "description": "The provided Tan is verified to be formerly issued by the verification server",
-        "operationId": "verifyTan",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Tan"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Tan is valid an formerly issued by the verification server",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Tan could not be verified",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         }
       }
@@ -264,95 +323,41 @@
         },
         "description": "The registration token model."
       },
-      "DeferredResultHandler": {
-        "type": "object"
-      },
-      "DeferredResultResponseEntityTan": {
+      "TestResult": {
         "type": "object",
         "properties": {
-          "resultHandler": {
-            "$ref": "#/components/schemas/DeferredResultHandler"
+          "testResult": {
+            "type": "integer",
+            "format": "int32"
           },
-          "result": {
-            "type": "object"
+          "sc": {
+            "type": "integer",
+            "format": "int64"
           },
-          "resultInternal": {
-            "type": "boolean",
-            "writeOnly": true
-          },
-          "setOrExpired": {
-            "type": "boolean"
-          },
-          "errorResult": {
-            "type": "boolean",
-            "writeOnly": true
-          }
-        }
-      },
-      "DeferredResultResponseEntityTestResult": {
-        "type": "object",
-        "properties": {
-          "resultHandler": {
-            "$ref": "#/components/schemas/DeferredResultHandler"
-          },
-          "result": {
-            "type": "object"
-          },
-          "resultInternal": {
-            "type": "boolean",
-            "writeOnly": true
-          },
-          "setOrExpired": {
-            "type": "boolean"
-          },
-          "errorResult": {
-            "type": "boolean",
-            "writeOnly": true
-          }
-        }
-      },
-      "RegistrationTokenRequest": {
-        "type": "object",
-        "properties": {
-          "key": {
+          "labId": {
             "type": "string"
           },
-          "keyDob": {
-            "type": "string",
-            "required": false,
-            "description": "Only used in conjunction with keyType == GUID. The hashed GUID consists of concat('x', substring(sha256_hex(concat(test-id-uuid, DateOfBirth.format(DDMMYYYY))), 1) - e.g. concat('x', substring(sha256_hex('7bb41672-7de4-44c3-b751-4258e59f3e2508051992')), 1)) --> x3712193bd35d40f03ee497ea7e4ea8278d8fcc8a2287843bb0ab36939d222b4"
-          },
-          "keyType": {
-            "type": "string",
-            "enum": [
-              "GUID",
-              "TELETAN"
-            ]
+          "responsePadding": {
+            "type": "string"
           }
         },
-        "description": "The registration token request model."
+        "description": "The test result model."
       },
-      "DeferredResultResponseEntityRegistrationToken": {
+      "Tan": {
+        "required": [
+          "tan"
+        ],
         "type": "object",
         "properties": {
-          "resultHandler": {
-            "$ref": "#/components/schemas/DeferredResultHandler"
+          "tan": {
+            "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$",
+            "type": "string"
           },
-          "result": {
-            "type": "object"
-          },
-          "resultInternal": {
-            "type": "boolean",
-            "writeOnly": true
-          },
-          "setOrExpired": {
-            "type": "boolean"
-          },
-          "errorResult": {
-            "type": "boolean",
-            "writeOnly": true
+          "responsePadding": {
+            "type": "string"
           }
-        }
+        },
+        "description": "The transaction number model."
       },
       "AuthorizationToken": {
         "required": [
@@ -375,21 +380,29 @@
         },
         "description": "The teleTAN model."
       },
-      "Tan": {
+      "RegistrationTokenRequest": {
         "required": [
-          "tan"
+          "key",
+          "keyType"
         ],
         "type": "object",
         "properties": {
-          "tan": {
-            "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$",
+          "key": {
             "type": "string"
           },
-          "responsePadding": {
+          "keyDob": {
+            "pattern": "^[XxA-Fa-f0-9]([A-Fa-f0-9]{63})$",
             "type": "string"
+          },
+          "keyType": {
+            "type": "string",
+            "enum": [
+              "GUID",
+              "TELETAN"
+            ]
           }
         },
-        "description": "The transaction number model."
+        "description": "The registration token request model."
       }
     }
   }

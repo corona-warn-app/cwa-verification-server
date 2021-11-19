@@ -29,6 +29,10 @@ import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.repository.VerificationAppSessionRepository;
 import app.coronawarn.verification.repository.VerificationTanRepository;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,13 +42,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 import rx.Single;
-
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("local")

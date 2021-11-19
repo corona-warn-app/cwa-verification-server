@@ -22,6 +22,7 @@
 package app.coronawarn.verification.service;
 
 import app.coronawarn.verification.domain.VerificationAppSession;
+import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.TeleTanType;
@@ -33,6 +34,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -103,7 +105,14 @@ public class AppSessionService {
     appSession.setHashedGuid(hashedGuid);
     appSession.setHashedGuidDob(hashedGuidDob);
     appSession.setSourceOfTrust(AppSessionSourceOfTrust.HASHED_GUID);
-    saveAppSession(appSession);
+
+    try {
+      saveAppSession(appSession);
+    } catch (DataIntegrityViolationException e) {
+      log.error("Failed to save RegistrationToken because of Hashed GUID Conflict: {}", hashedGuid);
+      throw new VerificationServerException(
+        HttpStatus.BAD_REQUEST, "Failed to save RegistrationToken because of Hashed GUID Conflict");
+    }
 
     log.info("Returning the successfully created registration token.");
     return ResponseEntity.status(HttpStatus.CREATED).body(

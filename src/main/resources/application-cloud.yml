@@ -24,3 +24,4 @@ cwa-testresult-server:
     trust-store:  ${SSL_VERIFICATION_TRUSTSTORE_PATH}
     trust-store-password: ${SSL_VERIFICATION_TRUSTSTORE_PASSWORD}
 disable-dob-hash-check-for-external-test-result: ${DISABLE_DOB_EXTERNAL_TR}
+allowed-client-certificates: ${VERIFICATION_ALLOWEDCLIENTCERTIFICATES}

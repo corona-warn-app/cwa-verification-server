@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-unique-hashed-guid
+      author: f11h
+      changes:
+        - addUniqueConstraint:
+            tableName: app_session
+            columnNames: hashed_guid, hashed_guid_dob

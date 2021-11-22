@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-unique-registration-token-teletan
+      author: f11h
+      changes:
+        - addUniqueConstraint:
+            tableName: app_session
+            columnNames: registration_token_hash, tele_tan_hash

@@ -136,6 +136,8 @@ public class VerificationApplicationConfig {
     public static class Cleanup {
 
       private Integer days = 21;
+      private String cron = "0 1 * * * *";
+      private Integer locklimit = 60;
     }
 
   }

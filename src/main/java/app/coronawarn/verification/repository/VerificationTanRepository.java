@@ -26,6 +26,8 @@ import app.coronawarn.verification.model.TanType;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  * This class represents the Tan repository.
@@ -53,6 +55,8 @@ public interface VerificationTanRepository extends JpaRepository<VerificationTan
    *
    * @param before LocalDateTime to delete older entities
    */
+  @Modifying
+  @Query("delete from VerificationTan a where a.createdAt < ?1")
   void deleteByCreatedAtBefore(LocalDateTime before);
 
   /**

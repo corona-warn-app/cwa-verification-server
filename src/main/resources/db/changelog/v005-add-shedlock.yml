@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-shedlock
+      author: mschulte-tsi
+      changes:
+        - createTable:
+            tableName: shedlock
+            columns:
+              - column:
+                  name: name
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: lock_until
+                  type: datetime(2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: locked_at
+                  type: datetime(2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: locked_by
+                  type: varchar(255)
+                  constraints:
+                    nullable: false

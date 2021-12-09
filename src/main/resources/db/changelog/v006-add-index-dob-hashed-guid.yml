@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-unique-hashed-guid
+      author: mschulte-tsi
+      changes:
+        - createIndex:
+            tableName: app_session
+            indexName: idx_app_session_hashed_guid_dob
+            columns:
+              - column:
+                  name: hashed_guid_dob
+                  type: varchar(64)

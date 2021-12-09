@@ -48,7 +48,6 @@ import rx.Single;
 @ActiveProfiles("local")
 @SpringBootTest(
   properties = {
-    "entities.cleanup.rate=1000",
     "entities.cleanup.cron=* * * * * *"
   }
 )

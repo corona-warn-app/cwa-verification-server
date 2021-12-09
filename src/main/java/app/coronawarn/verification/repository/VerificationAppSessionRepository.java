@@ -25,6 +25,8 @@ import app.coronawarn.verification.domain.VerificationAppSession;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  * This class represents the AppSession repository.
@@ -61,5 +63,7 @@ public interface VerificationAppSessionRepository extends JpaRepository<Verifica
    *
    * @param before the Date to delete by
    */
+  @Modifying
+  @Query("delete from VerificationAppSession a where a.createdAt < ?1")
   void deleteByCreatedAtBefore(LocalDateTime before);
 }

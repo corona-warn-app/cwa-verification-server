@@ -17,3 +17,9 @@ databaseChangeLog:
   - include:
       file: changelog/v004-add-unique-registration-token-teletan.yml
       relativeToChangelogFile: true
+  - include:
+      file: changelog/v005-add-shedlock.yml
+      relativeToChangelogFile: true
+  - include:
+      file: changelog/v006-add-index-dob-hashed-guid.yml
+      relativeToChangelogFile: true

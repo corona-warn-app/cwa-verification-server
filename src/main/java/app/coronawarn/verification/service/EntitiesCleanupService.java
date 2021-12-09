@@ -29,6 +29,7 @@ import java.time.Period;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -48,8 +49,10 @@ public class EntitiesCleanupService {
    * All entities that are older than configured days get deleted.
    */
   @Scheduled(
-    fixedDelayString = "${entities.cleanup.rate}"
+    cron = "${entities.cleanup.cron}"
   )
+  @SchedulerLock(name = "VerificationCleanupService_cleanup", lockAtLeastFor = "PT0S",
+    lockAtMostFor = "${entities.cleanup.locklimit}")
   @Transactional
   public void cleanup() {
     log.info("cleanup execution");

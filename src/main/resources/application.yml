@@ -74,8 +74,8 @@ appsession:
   tancountermax: 1
 entities:
   cleanup:
+    cron: "0 1 * * * *"
     days: 21
-    rate: 3600000
 initialFakeDelayMilliseconds: 10
 fakeDelayMovingAverageSamples: 5
 request:

@@ -21,8 +21,6 @@
 
 package app.coronawarn.verification.config;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -30,17 +28,16 @@ import java.util.Collections;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.codec.Hex;
 import org.springframework.security.web.authentication.preauth.x509.X509PrincipalExtractor;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
@@ -98,16 +95,13 @@ public class MtlsSecurityConfig extends WebSecurityConfigurerAdapter {
 
   private static class ThumbprintX509PrincipalExtractor implements X509PrincipalExtractor {
 
-    MessageDigest messageDigest;
-
-    private ThumbprintX509PrincipalExtractor() throws NoSuchAlgorithmException {
-      messageDigest = MessageDigest.getInstance("SHA-256");
-    }
-
     @Override
     public Object extractPrincipal(X509Certificate x509Certificate) {
+
       try {
-        return String.valueOf(Hex.encode(messageDigest.digest(x509Certificate.getEncoded())));
+        String hash = DigestUtils.sha256Hex(x509Certificate.getEncoded());
+        log.debug("Accessed by Subject {} Hash {}", x509Certificate.getSubjectDN().getName(), hash);
+        return hash;
       } catch (CertificateEncodingException e) {
         log.error("Failed to extract bytes from certificate");
         return null;

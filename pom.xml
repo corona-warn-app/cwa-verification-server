@@ -5,7 +5,7 @@
 
   <groupId>app.coronawarn.verification</groupId>
   <artifactId>cwa-verification-server</artifactId>
-  <version>1.5.3-SNAPSHOT</version>
+  <version>1.5.4-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>cwa-verification-server</name>
@@ -34,7 +34,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <!-- dependencies -->
-    <spring.boot.version>2.5.4</spring.boot.version>
+    <spring.boot.version>2.5.7</spring.boot.version>
     <spring-security.version>5.3.10.RELEASE</spring-security.version>
     <spring.cloud.version>2020.0.4</spring.cloud.version>
     <lombok.version>1.18.16</lombok.version>
@@ -90,6 +90,12 @@
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
         <version>${liquibase.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-bom</artifactId>
+        <version>2.16.0</version>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>

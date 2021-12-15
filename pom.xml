@@ -51,6 +51,7 @@
     <license.projectName>Corona-Warn-App / cwa-verification</license.projectName>
     <license.inceptionYear>2020</license.inceptionYear>
     <license.licenseName>apache_v2</license.licenseName>
+    <log4j2.version>2.16.0</log4j2.version>
     <sonar.coverage.exclusions>
       **/VerificationApplication.java,
       **/model/*,

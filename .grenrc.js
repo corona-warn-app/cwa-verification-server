@@ -19,13 +19,13 @@ module.exports = {
       "documentation"
     ],
     "Others": [
-      "other"
+      "other",
+      "chore"
     ]
   },
   "ignoreIssuesWith": [
     "wontfix",
-    "duplicate",
-    "chore"
+    "duplicate"
 ],
   "changelogFilename": "CHANGELOG.md",
   "template": {

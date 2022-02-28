@@ -24,7 +24,7 @@ import app.coronawarn.verification.model.RegistrationTokenRequest;
 
 public class CovidTestIdentifierFactoryImpl implements CovidTestIdentifierFactory {
   @Override
-  public CovidTestIdentifier makeCOVIDTestIdentifier(RegistrationTokenRequest request) {
+  public CovidTestIdentifier makeCovidTestIdentifier(RegistrationTokenRequest request) {
     switch (request.getKeyType()) {
       case GUID:
         return new GuidCovidTestIdentifier();

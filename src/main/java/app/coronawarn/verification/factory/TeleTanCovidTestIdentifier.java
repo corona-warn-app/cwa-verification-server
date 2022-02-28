@@ -20,6 +20,8 @@
 
 package app.coronawarn.verification.factory;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.RegistrationToken;
@@ -36,7 +38,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
 import org.springframework.web.context.request.async.DeferredResult;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @RequiredArgsConstructor
 @Slf4j

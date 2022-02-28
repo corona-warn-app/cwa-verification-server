@@ -102,9 +102,9 @@ public class ExternalTokenController {
 
     CovidTestIdentifierFactory covidTestIdentifierFactory = new CovidTestIdentifierFactoryImpl();
 
-    CovidTestIdentifier testIdentifier = covidTestIdentifierFactory.makeCOVIDTestIdentifier(request);
+    CovidTestIdentifier testIdentifier = covidTestIdentifierFactory.makeCovidTestIdentifier(request);
 
-    return testIdentifier.generateRegistrationToken
-      (request, scheduledExecutor, stopWatch, fake, appSessionService, fakeDelayService, tanService);
+    return testIdentifier.generateRegistrationToken(
+      request, scheduledExecutor, stopWatch, fake, appSessionService, fakeDelayService, tanService);
   }
 }

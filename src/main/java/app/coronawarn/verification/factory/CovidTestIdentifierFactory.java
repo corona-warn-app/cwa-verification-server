@@ -24,6 +24,6 @@ import app.coronawarn.verification.model.RegistrationTokenRequest;
 
 public interface CovidTestIdentifierFactory {
 
-  public CovidTestIdentifier makeCOVIDTestIdentifier(RegistrationTokenRequest request);
+  public CovidTestIdentifier makeCovidTestIdentifier(RegistrationTokenRequest request);
 
 }

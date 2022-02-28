@@ -18,19 +18,42 @@
  * ---license-end
  */
 
-package app.coronawarn.verification.covid_test_identifier_factory;
+package app.coronawarn.verification.factory;
 
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.FakeDelayService;
 import app.coronawarn.verification.service.TanService;
+import java.util.concurrent.ScheduledExecutorService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import java.util.concurrent.ScheduledExecutorService;
+@RequiredArgsConstructor
+@Slf4j
+public class GuidCovidTestIdentifier extends CovidTestIdentifier {
 
-public abstract class COVIDTestIdentifier {
-  public abstract DeferredResult<ResponseEntity<RegistrationToken>> generateRegistrationToken(RegistrationTokenRequest request, ScheduledExecutorService scheduledExecutor, StopWatch stopWatch, String fake, AppSessionService appSessionService, FakeDelayService fakeDelayService, TanService tanService);
+
+  @Override
+  public DeferredResult<ResponseEntity<RegistrationToken>> generateRegistrationToken(
+    RegistrationTokenRequest request,
+    ScheduledExecutorService scheduledExecutor,
+    StopWatch stopWatch,
+    String fake,
+    AppSessionService appSessionService,
+    FakeDelayService fakeDelayService,
+    TanService tanService) {
+
+    ResponseEntity<RegistrationToken> responseEntity =
+      appSessionService.generateRegistrationTokenByGuid(request.getKey(), request.getKeyDob(), fake);
+    stopWatch.stop();
+    fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
+    DeferredResult<ResponseEntity<RegistrationToken>> deferredResult = new DeferredResult<>();
+    deferredResult.setResult(responseEntity);
+    log.info("Returning the successfully generated RegistrationToken.");
+    return deferredResult;
+  }
 }

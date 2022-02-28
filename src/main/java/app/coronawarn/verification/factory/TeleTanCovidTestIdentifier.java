@@ -18,7 +18,7 @@
  * ---license-end
  */
 
-package app.coronawarn.verification.covid_test_identifier_factory;
+package app.coronawarn.verification.factory;
 
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.exception.VerificationServerException;
@@ -27,27 +27,33 @@ import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.FakeDelayService;
 import app.coronawarn.verification.service.TanService;
+import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
 import org.springframework.web.context.request.async.DeferredResult;
-
-import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @RequiredArgsConstructor
 @Slf4j
-public class TeleTANCOVIDTestIdentifier extends COVIDTestIdentifier {
+public class TeleTanCovidTestIdentifier extends CovidTestIdentifier {
 
   private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
 
   @Override
-  public DeferredResult<ResponseEntity<RegistrationToken>> generateRegistrationToken(RegistrationTokenRequest request, ScheduledExecutorService scheduledExecutor, StopWatch stopWatch, String fake, AppSessionService appSessionService, FakeDelayService fakeDelayService, TanService tanService) {
+  public DeferredResult<ResponseEntity<RegistrationToken>> generateRegistrationToken(
+    RegistrationTokenRequest request,
+    ScheduledExecutorService scheduledExecutor,
+    StopWatch stopWatch,
+    String fake,
+    AppSessionService appSessionService,
+    FakeDelayService fakeDelayService,
+    TanService tanService) {
+
     Optional<VerificationTan> optional = tanService.getEntityByTan(request.getKey());
 
     ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(

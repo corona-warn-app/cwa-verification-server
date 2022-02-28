@@ -18,20 +18,12 @@
  * ---license-end
  */
 
-package app.coronawarn.verification.covid_test_identifier_factory;
+package app.coronawarn.verification.factory;
 
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 
-public class COVIDTestIdentifierFactoryImpl implements COVIDTestIdentifierFactory{
-  @Override
-  public COVIDTestIdentifier makeCOVIDTestIdentifier(RegistrationTokenRequest request) {
-    switch (request.getKeyType()) {
-      case GUID:
-        return new GUIDCOVIDTestIdentifier();
-      case TELETAN:
-        return new TeleTANCOVIDTestIdentifier();
-      default:
-        return new UnknownCOVIDTestIdentifier();
-    }
-  }
+public interface CovidTestIdentifierFactory {
+
+  public CovidTestIdentifier makeCOVIDTestIdentifier(RegistrationTokenRequest request);
+
 }

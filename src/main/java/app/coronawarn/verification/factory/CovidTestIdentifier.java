@@ -18,29 +18,25 @@
  * ---license-end
  */
 
-package app.coronawarn.verification.covid_test_identifier_factory;
+package app.coronawarn.verification.factory;
 
-import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.FakeDelayService;
 import app.coronawarn.verification.service.TanService;
-import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
+import java.util.concurrent.ScheduledExecutorService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import java.util.concurrent.ScheduledExecutorService;
-
-@NoArgsConstructor
-public class UnknownCOVIDTestIdentifier extends COVIDTestIdentifier {
-
-  @Override
-  public DeferredResult<ResponseEntity<RegistrationToken>> generateRegistrationToken(RegistrationTokenRequest request, ScheduledExecutorService scheduledExecutor, StopWatch stopWatch, String fake, AppSessionService appSessionService, FakeDelayService fakeDelayService, TanService tanService) {
-    stopWatch.stop();
-    throw new VerificationServerException(HttpStatus.BAD_REQUEST,
-      "Unknown registration key type for registration token");
-  }
+public abstract class CovidTestIdentifier {
+  public abstract DeferredResult<ResponseEntity<RegistrationToken>> generateRegistrationToken(
+    RegistrationTokenRequest request,
+    ScheduledExecutorService scheduledExecutor,
+    StopWatch stopWatch,
+    String fake,
+    AppSessionService appSessionService,
+    FakeDelayService fakeDelayService,
+    TanService tanService);
 }

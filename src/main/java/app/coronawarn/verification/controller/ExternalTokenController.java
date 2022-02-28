@@ -20,9 +20,9 @@
 
 package app.coronawarn.verification.controller;
 
-import app.coronawarn.verification.covid_test_identifier_factory.COVIDTestIdentifier;
-import app.coronawarn.verification.covid_test_identifier_factory.COVIDTestIdentifierFactory;
-import app.coronawarn.verification.covid_test_identifier_factory.COVIDTestIdentifierFactoryImpl;
+import app.coronawarn.verification.factory.CovidTestIdentifier;
+import app.coronawarn.verification.factory.CovidTestIdentifierFactory;
+import app.coronawarn.verification.factory.CovidTestIdentifierFactoryImpl;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.service.AppSessionService;
@@ -32,7 +32,6 @@ import app.coronawarn.verification.service.TanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.validation.Valid;
@@ -101,10 +100,11 @@ public class ExternalTokenController {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
 
-    COVIDTestIdentifierFactory covidTestIdentifierFactory = new COVIDTestIdentifierFactoryImpl();
+    CovidTestIdentifierFactory covidTestIdentifierFactory = new CovidTestIdentifierFactoryImpl();
 
-    COVIDTestIdentifier testIdentifier = covidTestIdentifierFactory.makeCOVIDTestIdentifier(request);
+    CovidTestIdentifier testIdentifier = covidTestIdentifierFactory.makeCOVIDTestIdentifier(request);
 
-    return testIdentifier.generateRegistrationToken(request, scheduledExecutor, stopWatch, fake, appSessionService, fakeDelayService, tanService);
+    return testIdentifier.generateRegistrationToken
+      (request, scheduledExecutor, stopWatch, fake, appSessionService, fakeDelayService, tanService);
   }
 }

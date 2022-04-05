@@ -5,7 +5,7 @@
 
   <groupId>app.coronawarn.verification</groupId>
   <artifactId>cwa-verification-server</artifactId>
-  <version>1.5.8-SNAPSHOT</version>
+  <version>1.5.9-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>cwa-verification-server</name>

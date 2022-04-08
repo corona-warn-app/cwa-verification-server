@@ -18,32 +18,23 @@
  * ---license-end
  */
 
-package app.coronawarn.verification.factory;
+package app.coronawarn.verification.factories.test.identifier;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
-import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.FakeDelayService;
 import app.coronawarn.verification.service.TanService;
-import java.util.Optional;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
 import org.springframework.web.context.request.async.DeferredResult;
 
-@RequiredArgsConstructor
-@Slf4j
-public class TeleTanCovidTestIdentifier extends CovidTestIdentifier {
-
-  private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(4);
+@NoArgsConstructor
+public class UnknownCovidTestIdentifier extends CovidTestIdentifier {
 
   @Override
   public DeferredResult<ResponseEntity<RegistrationToken>> generateRegistrationToken(
@@ -55,26 +46,8 @@ public class TeleTanCovidTestIdentifier extends CovidTestIdentifier {
     FakeDelayService fakeDelayService,
     TanService tanService) {
 
-    Optional<VerificationTan> optional = tanService.getEntityByTan(request.getKey());
-
-    ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(
-      request.getKey(),
-      fake,
-      optional.map(VerificationTan::getTeleTanType).orElse(null));
-
-    if (optional.isPresent()) {
-      VerificationTan teleTan = optional.get();
-      teleTan.setRedeemed(true);
-      tanService.saveTan(teleTan);
-      stopWatch.stop();
-      fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
-      DeferredResult<ResponseEntity<RegistrationToken>> deferredResult = new DeferredResult<>();
-      scheduledExecutor.schedule(() -> deferredResult.setResult(response), fakeDelayService.realDelayToken(),
-        MILLISECONDS);
-      log.info("Returning the successfully generated RegistrationToken.");
-      return deferredResult;
-    }
     stopWatch.stop();
-    throw new VerificationServerException(HttpStatus.BAD_REQUEST, "The teleTAN verification failed");
+    throw new VerificationServerException(HttpStatus.BAD_REQUEST,
+      "Unknown registration key type for registration token");
   }
 }

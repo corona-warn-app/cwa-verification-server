@@ -18,7 +18,7 @@
  * ---license-end
  */
 
-package app.coronawarn.verification.factory;
+package app.coronawarn.verification.factories.test.identifier;
 
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenRequest;

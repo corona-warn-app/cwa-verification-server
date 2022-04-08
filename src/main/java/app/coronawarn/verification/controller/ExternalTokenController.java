@@ -20,9 +20,9 @@
 
 package app.coronawarn.verification.controller;
 
-import app.coronawarn.verification.factory.CovidTestIdentifier;
-import app.coronawarn.verification.factory.CovidTestIdentifierFactory;
-import app.coronawarn.verification.factory.CovidTestIdentifierFactoryImpl;
+import app.coronawarn.verification.factories.test.identifier.CovidTestIdentifier;
+import app.coronawarn.verification.factories.test.identifier.CovidTestIdentifierFactory;
+import app.coronawarn.verification.factories.test.identifier.CovidTestIdentifierFactoryImpl;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.service.AppSessionService;

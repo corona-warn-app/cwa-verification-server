@@ -18,23 +18,24 @@
  * ---license-end
  */
 
-package app.coronawarn.verification.factory;
+package app.coronawarn.verification.factories.test.identifier;
 
-import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.service.AppSessionService;
 import app.coronawarn.verification.service.FakeDelayService;
 import app.coronawarn.verification.service.TanService;
 import java.util.concurrent.ScheduledExecutorService;
-import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
 import org.springframework.web.context.request.async.DeferredResult;
 
-@NoArgsConstructor
-public class UnknownCovidTestIdentifier extends CovidTestIdentifier {
+@RequiredArgsConstructor
+@Slf4j
+public class GuidCovidTestIdentifier extends CovidTestIdentifier {
+
 
   @Override
   public DeferredResult<ResponseEntity<RegistrationToken>> generateRegistrationToken(
@@ -46,8 +47,13 @@ public class UnknownCovidTestIdentifier extends CovidTestIdentifier {
     FakeDelayService fakeDelayService,
     TanService tanService) {
 
+    ResponseEntity<RegistrationToken> responseEntity =
+      appSessionService.generateRegistrationTokenByGuid(request.getKey(), request.getKeyDob(), fake);
     stopWatch.stop();
-    throw new VerificationServerException(HttpStatus.BAD_REQUEST,
-      "Unknown registration key type for registration token");
+    fakeDelayService.updateFakeTokenRequestDelay(stopWatch.getTotalTimeMillis());
+    DeferredResult<ResponseEntity<RegistrationToken>> deferredResult = new DeferredResult<>();
+    deferredResult.setResult(responseEntity);
+    log.info("Returning the successfully generated RegistrationToken.");
+    return deferredResult;
   }
 }

@@ -7,11 +7,11 @@ public class TanVerifierFactoryImpl implements TanVerifierFactory {
   public TanVerifier makeTanVerifier(AppSessionSourceOfTrust appSessionSourceOfTrust) {
     switch (appSessionSourceOfTrust) {
       case HASHED_GUID:
-        return null;
+        return new HashedGuidTanVerifier();
       case TELETAN:
-        return null;
+        return new TeletanTanVerifier();
       default:
-        return null;
+        return new UnknownTanVerifier();
     }
   }
 }

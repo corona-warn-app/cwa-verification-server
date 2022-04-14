@@ -23,6 +23,7 @@ package app.coronawarn.verification.controller;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.AuthorizationRole;
 import app.coronawarn.verification.model.AuthorizationToken;
+import app.coronawarn.verification.model.ErrorMessageEnum;
 import app.coronawarn.verification.model.Tan;
 import app.coronawarn.verification.model.TeleTan;
 import app.coronawarn.verification.model.TeleTanType;
@@ -118,7 +119,8 @@ public class InternalTanController {
       })
       .orElseGet(() -> {
         log.info("The Tan is invalid.");
-        throw new VerificationServerException(HttpStatus.NOT_FOUND, "No Tan found or Tan is invalid");
+        throw new VerificationServerException(HttpStatus.NOT_FOUND,
+          ErrorMessageEnum.TAN_NOT_FOUND_OR_INVALID.getMessage());
       });
   }
 
@@ -156,10 +158,12 @@ public class InternalTanController {
         log.info("The teleTAN is generated.");
         return ResponseEntity.status(HttpStatus.CREATED).body(new TeleTan(teleTan));
       } else {
-        throw new VerificationServerException(HttpStatus.TOO_MANY_REQUESTS, "Rate Limit exceed. Try again later.");
+        throw new VerificationServerException(HttpStatus.TOO_MANY_REQUESTS,
+          ErrorMessageEnum.RATE_LIMIT_EXCEEDED.getMessage());
       }
     }
-    throw new VerificationServerException(HttpStatus.UNAUTHORIZED, "JWT is invalid.");
+    throw new VerificationServerException(HttpStatus.UNAUTHORIZED,
+      ErrorMessageEnum.INVALID_JWT.getMessage());
   }
 
 }

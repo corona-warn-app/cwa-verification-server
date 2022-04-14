@@ -21,6 +21,7 @@
 package app.coronawarn.verification.client;
 
 import app.coronawarn.verification.exception.VerificationServerException;
+import app.coronawarn.verification.model.ErrorMessageEnum;
 import feign.Client;
 import feign.httpclient.ApacheHttpClient;
 import java.io.IOException;
@@ -96,7 +97,8 @@ public class TestResultServerClientConfig {
       }
       return builder.build();
     } catch (IOException | GeneralSecurityException e) {
-      throw new VerificationServerException(HttpStatus.INTERNAL_SERVER_ERROR, "The SSL context could not be loaded.");
+      throw new VerificationServerException(HttpStatus.INTERNAL_SERVER_ERROR,
+        ErrorMessageEnum.SSL_CONTEXT_COULD_NOT_LOAD.getMessage());
     }
   }
 

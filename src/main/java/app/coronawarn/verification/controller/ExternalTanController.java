@@ -26,6 +26,7 @@ import app.coronawarn.verification.config.VerificationApplicationConfig;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
+import app.coronawarn.verification.model.ErrorMessageEnum;
 import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.LabTestResult;
 import app.coronawarn.verification.model.RegistrationToken;
@@ -141,7 +142,7 @@ public class ExternalTanController {
             ) {
               stopWatch.stop();
               throw new VerificationServerException(HttpStatus.BAD_REQUEST,
-                "Tan cannot be created, caused by the non positive result of the labserver");
+                ErrorMessageEnum.TAN_NOT_CREATED_POSITIVE_RESULT.getMessage());
             }
             break;
           case TELETAN:
@@ -150,7 +151,7 @@ public class ExternalTanController {
           default:
             stopWatch.stop();
             throw new VerificationServerException(HttpStatus.BAD_REQUEST,
-              "Unknown source of trust inside the appsession for the registration token");
+              ErrorMessageEnum.UNKNOWN_SOURCE_FOR_REGISTRATION_TOKEN.getMessage());
         }
         appSession.incrementTanCounter();
         appSession.setUpdatedAt(LocalDateTime.now());
@@ -165,14 +166,14 @@ public class ExternalTanController {
         scheduledExecutor.schedule(() -> deferredResult.setResult(
             ResponseEntity.status(HttpStatus.CREATED).body(returnTan)),
           fakeDelayService.realDelayTan(), MILLISECONDS);
-        log.info("Returning the successfully generated tan.");
+        log.info(ErrorMessageEnum.RETURN_SUCCESS_TAN.getMessage());
         return deferredResult;
       }
       throw new VerificationServerException(HttpStatus.BAD_REQUEST,
-        "The maximum of generating tans for this registration token is reached");
+        ErrorMessageEnum.MAXIMUM_TAN_GENERATION.getMessage());
     }
     throw new VerificationServerException(HttpStatus.BAD_REQUEST,
-      "VerificationAppSession not found for the registration token");
+      ErrorMessageEnum.VERIFICATIONAPPSESSION_NOT_FOUND.getMessage());
   }
 
   private Tan generateReturnTan(String tan, String fake) {

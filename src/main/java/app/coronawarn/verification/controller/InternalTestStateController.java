@@ -23,6 +23,7 @@ package app.coronawarn.verification.controller;
 import app.coronawarn.verification.domain.VerificationAppSession;
 import app.coronawarn.verification.exception.VerificationServerException;
 import app.coronawarn.verification.model.AppSessionSourceOfTrust;
+import app.coronawarn.verification.model.ErrorMessageEnum;
 import app.coronawarn.verification.model.HashedGuid;
 import app.coronawarn.verification.model.InternalTestResult;
 import app.coronawarn.verification.model.RegistrationToken;
@@ -111,7 +112,7 @@ public class InternalTestStateController {
             if (testResultDob.getTestResult() != testResult.getTestResult()) {
               // given DOB Hash is invalid
               throw new VerificationServerException(HttpStatus.FORBIDDEN,
-                "TestResult of dob hash does not equal to TestResult of hash");
+                ErrorMessageEnum.TEST_RESULT_INCONSISTENT.getMessage());
             }
           }
           log.debug("Result {}", testResult);
@@ -125,16 +126,16 @@ public class InternalTestStateController {
             appSession.get().getHashedGuid()));
 
         case TELETAN:
-          log.info("Internal TestState is not allowed for TeleTan Token.");
+          log.info(ErrorMessageEnum.INTERNAL_TESTSTATE_NOT_ALLOWED.getMessage());
           throw new VerificationServerException(HttpStatus.FORBIDDEN,
-            "Internal TestState is not allowed for TeleTan Token.");
+            ErrorMessageEnum.INTERNAL_TESTSTATE_NOT_ALLOWED.getMessage());
         default:
           throw new VerificationServerException(HttpStatus.BAD_REQUEST,
-            "Unknown source of trust inside the appsession for the registration token");
+            ErrorMessageEnum.UNKNOWN_SOURCE_FOR_REGISTRATION_TOKEN.getMessage());
       }
     }
-    log.info("The registration token doesn't exist.");
+    log.info(ErrorMessageEnum.REGISTRATION_TOKEN_NOT_EXIST.getMessage());
     throw new VerificationServerException(HttpStatus.NOT_FOUND,
-      "Registration Token not found");
+      ErrorMessageEnum.REGISTRATION_TOKEN_NOT_FOUND.getMessage());
   }
 }

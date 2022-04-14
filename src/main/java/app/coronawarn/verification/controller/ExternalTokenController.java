@@ -24,6 +24,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import app.coronawarn.verification.domain.VerificationTan;
 import app.coronawarn.verification.exception.VerificationServerException;
+import app.coronawarn.verification.model.ErrorMessageEnum;
 import app.coronawarn.verification.model.RegistrationToken;
 import app.coronawarn.verification.model.RegistrationTokenKeyType;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
@@ -136,11 +137,12 @@ public class ExternalTokenController {
           return deferredResult;
         }
         stopWatch.stop();
-        throw new VerificationServerException(HttpStatus.BAD_REQUEST, "The teleTAN verification failed");
+        throw new VerificationServerException(HttpStatus.BAD_REQUEST,
+          ErrorMessageEnum.TELETAN_VERIFICATION_FAILED.getMessage());
       default:
         stopWatch.stop();
         throw new VerificationServerException(HttpStatus.BAD_REQUEST,
-          "Unknown registration key type for registration token");
+          ErrorMessageEnum.UNKNOWN_REGISTRATION_KEY_TYPE.getMessage());
     }
   }
 }

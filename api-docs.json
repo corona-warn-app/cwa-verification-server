@@ -67,7 +67,7 @@
             }
           },
           "403": {
-            "description": ErrorMessageEnum.TEST_RESULT_INCONSISTENT.getMessage(),
+            "description": "TestResult of dob hash does not equal to TestResult of hash",
             "content": {
               "application/json": {
                 "schema": {

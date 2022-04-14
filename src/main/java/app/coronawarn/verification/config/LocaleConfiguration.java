@@ -42,7 +42,7 @@ public abstract class LocaleConfiguration extends AcceptHeaderLocaleResolver imp
   public MessageSource messageSource() {
     ResourceBundleMessageSource rs = new ResourceBundleMessageSource();
     rs.setBasename("messages");
-    rs.setDefaultEncoding("UTF-8");
+    rs.setDefaultEncoding("ISO-8859-1");
     rs.setUseCodeAsDefaultMessage(true);
     return rs;
   }

@@ -98,6 +98,9 @@ public class ExternalTanController {
   @NonNull
   private final FakeRequestService fakeRequestService;
 
+  @NonNull
+  private final TanVerifierFactory tanVerifierFactory;
+
   /**
    * This method generates a transaction number by a Registration Token, if the state of the COVID-19 lab-test is
    * positive.
@@ -133,8 +136,6 @@ public class ExternalTanController {
       if (appSession.getTanCounter() < tancountermax) {
         AppSessionSourceOfTrust appSessionSourceOfTrust = appSession.getSourceOfTrust();
         TanSourceOfTrust tanSourceOfTrust = TanSourceOfTrust.CONNECTED_LAB;
-
-        TanVerifierFactory tanVerifierFactory = new TanVerifierFactoryImpl();
 
         TanVerifier tanVerifier = tanVerifierFactory.makeTanVerifier(appSessionSourceOfTrust);
 

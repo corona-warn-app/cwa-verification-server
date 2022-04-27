@@ -45,12 +45,12 @@
     <shedlock.version>4.34.0</shedlock.version>
     <reactivex.version>1.3.8</reactivex.version>
     <h2.version>2.1.212</h2.version>
+    <commons-io.version>2.11.0</commons-io.version>
     <!-- plugins -->
     <plugin.checkstyle.version>3.1.2</plugin.checkstyle.version>
     <plugin.sonar.version>3.9.1.2184</plugin.sonar.version>
     <plugin.jacoco.version>0.8.8</plugin.jacoco.version>
     <plugin.surefire.version>3.0.0-M5</plugin.surefire.version>
-    <guava.version>31.1-jre</guava.version>
     <license.projectName>Corona-Warn-App / cwa-verification</license.projectName>
     <license.inceptionYear>2020</license.inceptionYear>
     <license.licenseName>apache_v2</license.licenseName>
@@ -146,10 +146,15 @@
       <artifactId>spring-cloud-starter-openfeign</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons-io.version}</version>
     </dependency>
     <dependency>
       <groupId>io.github.openfeign</groupId>
@@ -170,11 +175,6 @@
       <artifactId>jjwt-jackson</artifactId>
       <version>${jsonwebtoken.version}</version>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>${guava.version}</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>

@@ -51,6 +51,13 @@
     </repository>
   </distributionManagement>
 
+  <repositories>
+    <repository>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/corona-warn-app/cwa-verification-server</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>app.coronawarn</groupId>

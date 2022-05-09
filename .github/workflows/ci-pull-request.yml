@@ -24,5 +24,7 @@ jobs:
         java-version: 11
     - name: mvn package
       run: mvn --batch-mode package
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: docker build
       run: docker build .

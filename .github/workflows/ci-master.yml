@@ -31,6 +31,8 @@ jobs:
         echo "VERSION=${VERSION}" >> $GITHUB_ENV
     - name: mvn version
       run: mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=${VERSION}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: mvn deploy
       run: mvn --batch-mode deploy
       env:

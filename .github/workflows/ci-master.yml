@@ -90,14 +90,14 @@ jobs:
           TRUSTED_REPOSITORY: ${{ secrets.TRUSTED_REPOSITORY }}
           TRUSTED_USER: ${{ secrets.TRUSTED_USER }}
           TRUSTED_TOKEN: ${{ secrets.TRUSTED_TOKEN }}
-            - name: docker push new mtr
-              run: |
-                echo ${MTR_TOKEN} | docker login ${MTR_REPOSITORY} -u ${MTR_USER} --password-stdin
-                docker push ${MTR_REPOSITORY}/cwa-verification-server:${VERSION}
-                cosign sign --key env://MTR_PRIVATE_KEY ${MTR_REPOSITORY}/cwa-verification-server:${VERSION}
-              env:
-                MTR_REPOSITORY: ${{ secrets.MTR_REPOSITORY }}
-                MTR_USER: ${{ secrets.MTR_USER }}
-                MTR_TOKEN: ${{ secrets.MTR_TOKEN }}
-                MTR_PRIVATE_KEY: ${{ secrets.MTR_PRIVATE_KEY }}
-                COSIGN_PASSWORD: ${{ secrets.MTR_PRIVATE_KEY_PASSWORD }}
+      - name: docker push new mtr
+        run: |
+          echo ${MTR_TOKEN} | docker login ${MTR_REPOSITORY} -u ${MTR_USER} --password-stdin
+          docker push ${MTR_REPOSITORY}/cwa-verification-server:${VERSION}
+          cosign sign --key env://MTR_PRIVATE_KEY ${MTR_REPOSITORY}/cwa-verification-server:${VERSION}
+        env:
+          MTR_REPOSITORY: ${{ secrets.MTR_REPOSITORY }}
+          MTR_USER: ${{ secrets.MTR_USER }}
+          MTR_TOKEN: ${{ secrets.MTR_TOKEN }}
+          MTR_PRIVATE_KEY: ${{ secrets.MTR_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.MTR_PRIVATE_KEY_PASSWORD }}

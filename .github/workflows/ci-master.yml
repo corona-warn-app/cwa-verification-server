@@ -3,87 +3,101 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - master
+      - master
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - uses: actions/cache@v1
-      env:
-        cache-name: m2
-      with:
-        path: ~/.m2/repository
-        key: ${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ env.cache-name }}-
-    - uses: actions/setup-java@v1
-      with:
-        java-version: 11
-    - name: environment
-      run: |
-        sudo apt-get install --yes --no-install-recommends libxml-xpath-perl
-        export ARTIFACT_ID=$(xpath -q -e "/project/artifactId/text()" pom.xml)
-        echo "ARTIFACT_ID=${ARTIFACT_ID}" >> $GITHUB_ENV
-        export VERSION=$(xpath -q -e "/project/version/text()" pom.xml)
-        export VERSION=${VERSION//-SNAPSHOT}-$(git rev-parse --short ${GITHUB_SHA})
-        echo "VERSION=${VERSION}" >> $GITHUB_ENV
-    - name: mvn version
-      run: mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=${VERSION}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: mvn deploy
-      run: mvn --batch-mode deploy
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: mvn sonar
-      run: |
-        mvn --batch-mode verify sonar:sonar \
-        -Dsonar.login=${SONAR_TOKEN} \
-        -Dsonar.host.url=${SONAR_URL} \
-        -Dsonar.organization=${GITHUB_REPOSITORY_OWNER} \
-        -Dsonar.projectKey=${GITHUB_REPOSITORY/\//_}
-      env:
-        SONAR_URL: https://sonarcloud.io
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - uses: actions/upload-artifact@v1
-      with:
-        name: target
-        path: target
-    - name: docker build
-      run: |
-        docker build \
-        --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION} \
-        --tag ${TRUSTED_URL}/${TRUSTED_REPOSITORY}/${ARTIFACT_ID}:${VERSION} \
-        .
-      env:
-        TRUSTED_URL: ${{ secrets.TRUSTED_URL }}
-        TRUSTED_REPOSITORY: ${{ secrets.TRUSTED_REPOSITORY }}
-    - name: docker push github
-      run: |
-        echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY_OWNER} --password-stdin
-        docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: docker push trusted
-      run: |
-        echo ${TRUSTED_TOKEN} | docker login ${TRUSTED_URL} -u ${TRUSTED_USER} --password-stdin
-        export DOCKER_CONTENT_TRUST=1
-        export DOCKER_CONTENT_TRUST_SERVER=${TRUSTED_SERVER_URL}
-        export DOCKER_CONTENT_TRUST_ROOT_PASSPHRASE=${TRUSTED_TOKEN}
-        export DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE=${TRUSTED_TOKEN}
-        gpg --quiet --batch --yes --decrypt --passphrase=${TRUSTED_KEY} \
-        --output trusted.key trusted.key.gpg
-        chmod 600 trusted.key
-        docker trust key load trusted.key --name user
-        docker trust sign ${TRUSTED_URL}/${TRUSTED_REPOSITORY}/${ARTIFACT_ID}:${VERSION}
-        docker push ${TRUSTED_URL}/${TRUSTED_REPOSITORY}/${ARTIFACT_ID}:${VERSION}
-      env:
-        TRUSTED_KEY: ${{ secrets.TRUSTED_KEY }}
-        TRUSTED_URL: ${{ secrets.TRUSTED_URL }}
-        TRUSTED_SERVER_URL: ${{ secrets.TRUSTED_SERVER_URL }}
-        TRUSTED_REPOSITORY: ${{ secrets.TRUSTED_REPOSITORY }}
-        TRUSTED_USER: ${{ secrets.TRUSTED_USER }}
-        TRUSTED_TOKEN: ${{ secrets.TRUSTED_TOKEN }}
+      - uses: sigstore/cosign-installer@main
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/cache@v1
+        env:
+          cache-name: m2
+        with:
+          path: ~/.m2/repository
+          key: ${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ env.cache-name }}-
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: environment
+        run: |
+          sudo apt-get install --yes --no-install-recommends libxml-xpath-perl
+          export ARTIFACT_ID=$(xpath -q -e "/project/artifactId/text()" pom.xml)
+          echo "ARTIFACT_ID=${ARTIFACT_ID}" >> $GITHUB_ENV
+          export VERSION=$(xpath -q -e "/project/version/text()" pom.xml)
+          export VERSION=${VERSION//-SNAPSHOT}-$(git rev-parse --short ${GITHUB_SHA})
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+      - name: mvn version
+        run: mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=${VERSION}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: mvn deploy
+        run: mvn --batch-mode deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: mvn sonar
+        run: |
+          mvn --batch-mode verify sonar:sonar \
+          -Dsonar.login=${SONAR_TOKEN} \
+          -Dsonar.host.url=${SONAR_URL} \
+          -Dsonar.organization=${GITHUB_REPOSITORY_OWNER} \
+          -Dsonar.projectKey=${GITHUB_REPOSITORY/\//_}
+        env:
+          SONAR_URL: https://sonarcloud.io
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v1
+        with:
+          name: target
+          path: target
+      - name: docker build
+        run: |
+          docker build \
+          --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION} \
+          --tag ${TRUSTED_URL}/${TRUSTED_REPOSITORY}/${ARTIFACT_ID}:${VERSION} \
+          --tag ${MTR_REPOSITORY}/cwa-verification-server:${VERSION} \
+          .
+        env:
+          TRUSTED_URL: ${{ secrets.TRUSTED_URL }}
+          TRUSTED_REPOSITORY: ${{ secrets.TRUSTED_REPOSITORY }}
+          MTR_REPOSITORY: ${{ secrets.MTR_REPOSITORY }}
+      - name: docker push github
+        run: |
+          echo ${GITHUB_TOKEN} | docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY_OWNER} --password-stdin
+          docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: docker push trusted
+        run: |
+          echo ${TRUSTED_TOKEN} | docker login ${TRUSTED_URL} -u ${TRUSTED_USER} --password-stdin
+          export DOCKER_CONTENT_TRUST=1
+          export DOCKER_CONTENT_TRUST_SERVER=${TRUSTED_SERVER_URL}
+          export DOCKER_CONTENT_TRUST_ROOT_PASSPHRASE=${TRUSTED_TOKEN}
+          export DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE=${TRUSTED_TOKEN}
+          gpg --quiet --batch --yes --decrypt --passphrase=${TRUSTED_KEY} \
+          --output trusted.key trusted.key.gpg
+          chmod 600 trusted.key
+          docker trust key load trusted.key --name user
+          docker trust sign ${TRUSTED_URL}/${TRUSTED_REPOSITORY}/${ARTIFACT_ID}:${VERSION}
+          docker push ${TRUSTED_URL}/${TRUSTED_REPOSITORY}/${ARTIFACT_ID}:${VERSION}
+        env:
+          TRUSTED_KEY: ${{ secrets.TRUSTED_KEY }}
+          TRUSTED_URL: ${{ secrets.TRUSTED_URL }}
+          TRUSTED_SERVER_URL: ${{ secrets.TRUSTED_SERVER_URL }}
+          TRUSTED_REPOSITORY: ${{ secrets.TRUSTED_REPOSITORY }}
+          TRUSTED_USER: ${{ secrets.TRUSTED_USER }}
+          TRUSTED_TOKEN: ${{ secrets.TRUSTED_TOKEN }}
+      - name: docker push new mtr
+        run: |
+          echo ${MTR_TOKEN} | docker login ${MTR_REPOSITORY} -u ${MTR_USER} --password-stdin
+          docker push ${MTR_REPOSITORY}/cwa-verification-server:${VERSION}
+          cosign sign --key env://MTR_PRIVATE_KEY ${MTR_REPOSITORY}/cwa-verification-server:${VERSION}
+        env:
+          MTR_REPOSITORY: ${{ secrets.MTR_REPOSITORY }}
+          MTR_USER: ${{ secrets.MTR_USER }}
+          MTR_TOKEN: ${{ secrets.MTR_TOKEN }}
+          MTR_PRIVATE_KEY: ${{ secrets.MTR_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.MTR_PRIVATE_KEY_PASSWORD }}

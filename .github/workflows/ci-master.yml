@@ -57,12 +57,9 @@ jobs:
         run: |
           docker build \
           --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION} \
-          --tag ${TRUSTED_URL}/${TRUSTED_REPOSITORY}/${ARTIFACT_ID}:${VERSION} \
           --tag ${MTR_REPOSITORY}/cwa-verification-server:${VERSION} \
           .
         env:
-          TRUSTED_URL: ${{ secrets.TRUSTED_URL }}
-          TRUSTED_REPOSITORY: ${{ secrets.TRUSTED_REPOSITORY }}
           MTR_REPOSITORY: ${{ secrets.MTR_REPOSITORY }}
       - name: docker push github
         run: |
@@ -70,27 +67,7 @@ jobs:
           docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: docker push trusted
-        run: |
-          echo ${TRUSTED_TOKEN} | docker login ${TRUSTED_URL} -u ${TRUSTED_USER} --password-stdin
-          export DOCKER_CONTENT_TRUST=1
-          export DOCKER_CONTENT_TRUST_SERVER=${TRUSTED_SERVER_URL}
-          export DOCKER_CONTENT_TRUST_ROOT_PASSPHRASE=${TRUSTED_TOKEN}
-          export DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE=${TRUSTED_TOKEN}
-          gpg --quiet --batch --yes --decrypt --passphrase=${TRUSTED_KEY} \
-          --output trusted.key trusted.key.gpg
-          chmod 600 trusted.key
-          docker trust key load trusted.key --name user
-          docker trust sign ${TRUSTED_URL}/${TRUSTED_REPOSITORY}/${ARTIFACT_ID}:${VERSION}
-          docker push ${TRUSTED_URL}/${TRUSTED_REPOSITORY}/${ARTIFACT_ID}:${VERSION}
-        env:
-          TRUSTED_KEY: ${{ secrets.TRUSTED_KEY }}
-          TRUSTED_URL: ${{ secrets.TRUSTED_URL }}
-          TRUSTED_SERVER_URL: ${{ secrets.TRUSTED_SERVER_URL }}
-          TRUSTED_REPOSITORY: ${{ secrets.TRUSTED_REPOSITORY }}
-          TRUSTED_USER: ${{ secrets.TRUSTED_USER }}
-          TRUSTED_TOKEN: ${{ secrets.TRUSTED_TOKEN }}
-      - name: docker push new mtr
+      - name: docker push mtr
         run: |
           echo ${MTR_TOKEN} | docker login ${MTR_REPOSITORY} -u ${MTR_USER} --password-stdin
           docker push ${MTR_REPOSITORY}/cwa-verification-server:${VERSION}

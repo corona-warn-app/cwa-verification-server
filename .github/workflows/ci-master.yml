@@ -57,12 +57,9 @@ jobs:
         run: |
           docker build \
           --tag docker.pkg.github.com/${GITHUB_REPOSITORY}/${ARTIFACT_ID}:${VERSION} \
-          --tag ${TRUSTED_URL}/${TRUSTED_REPOSITORY}/${ARTIFACT_ID}:${VERSION} \
           --tag ${MTR_REPOSITORY}/cwa-verification-server:${VERSION} \
           .
         env:
-          TRUSTED_URL: ${{ secrets.TRUSTED_URL }}
-          TRUSTED_REPOSITORY: ${{ secrets.TRUSTED_REPOSITORY }}
           MTR_REPOSITORY: ${{ secrets.MTR_REPOSITORY }}
       - name: docker push github
         run: |

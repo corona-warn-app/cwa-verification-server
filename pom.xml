@@ -27,7 +27,7 @@
   <parent>
     <groupId>app.coronawarn</groupId>
     <artifactId>cwa-parent</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
   </parent>
 
   <properties>

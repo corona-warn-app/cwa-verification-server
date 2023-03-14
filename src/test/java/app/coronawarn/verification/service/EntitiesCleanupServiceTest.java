@@ -41,7 +41,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import rx.Single;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("local")
@@ -70,7 +69,7 @@ public class EntitiesCleanupServiceTest {
   }
 
   @Test
-  public void cleanupDatabase() {
+  public void cleanupDatabase() throws InterruptedException {
     LocalDateTime testCreationTime = LocalDateTime.now().minus(Period.ofDays(21));
     // create repo 1
     VerificationAppSession session = appSessionRepository.save(getAppSessionTestData(testCreationTime));
@@ -91,7 +90,7 @@ public class EntitiesCleanupServiceTest {
     Assertions.assertEquals(TEST_HASHED_TAN, findTan.get().getTanHash());
     Assertions.assertEquals(testCreationTime.withNano(5), findTan.get().getCreatedAt().withNano(5));
     // wait
-    Single.fromCallable(() -> true).delay(1, TimeUnit.SECONDS).toBlocking().value();
+    TimeUnit.SECONDS.sleep(1);
     // find and check both repos clean up
     findSession = appSessionRepository.findByRegistrationTokenHash(TEST_REG_TOK_HASH);
     Assertions.assertFalse(findSession.isPresent());

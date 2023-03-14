@@ -26,6 +26,7 @@ import app.coronawarn.verification.model.TanSourceOfTrust;
 import app.coronawarn.verification.model.TanType;
 import app.coronawarn.verification.model.TeleTanType;
 import app.coronawarn.verification.repository.VerificationTanRepository;
+import jakarta.validation.constraints.NotNull;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -35,7 +36,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
-import javax.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TanService {
 
- 
+
   private final VerificationApplicationConfig verificationApplicationConfig;
 
   /**
@@ -60,14 +60,13 @@ public class TanService {
   private final HashingService hashingService;
 
   private final Pattern teleTanPattern;
-  private final int teleTanLength;
 
   /**
    * Constructor for the TanService that also builds the pattern for tele tan verification.
    *
    * @param verificationApplicationConfig the {@link VerificationApplicationConfig} with needed tan configurations
-   * @param tanRepository the {@link VerificationTanRepository} where tans are queried and inserted
-   * @param hashingService the {@link HashingService} implementation
+   * @param tanRepository                 the {@link VerificationTanRepository} where tans are queried and inserted
+   * @param hashingService                the {@link HashingService} implementation
    */
   public TanService(
     @NonNull VerificationApplicationConfig verificationApplicationConfig,
@@ -77,7 +76,6 @@ public class TanService {
     this.verificationApplicationConfig = verificationApplicationConfig;
     this.tanRepository = tanRepository;
     this.hashingService = hashingService;
-    this.teleTanLength = verificationApplicationConfig.getTan().getTele().getValid().getLength();
     this.teleTanPattern = Pattern.compile("^["
       + verificationApplicationConfig.getTan().getTele().getValid().getChars()
       + "]{"
@@ -156,8 +154,8 @@ public class TanService {
   /**
    * This method generates a {@link VerificationTan} - entity and saves it.
    *
-   * @param tan     the TAN
-   * @param tanType the TAN type
+   * @param tan         the TAN
+   * @param tanType     the TAN type
    * @param teleTanType type of the teleTan
    * @return the persisted TAN
    */
@@ -232,7 +230,7 @@ public class TanService {
    * This Method generates a valid TAN and persists it. Returns the generated TAN.
    *
    * @param sourceOfTrust sets the source of Trust for the Tan
-   * @param teleTanType type of the teleTan
+   * @param teleTanType   type of the teleTan
    * @return a valid tan with given source of Trust
    */
   public String generateVerificationTan(TanSourceOfTrust sourceOfTrust, TeleTanType teleTanType) {
@@ -243,8 +241,9 @@ public class TanService {
 
   /**
    * This method generates a valid TAN Object but doesn't persist it.
-   * @param tan alphanumeric tan
-   * @param tanType type of the tan
+   *
+   * @param tan           alphanumeric tan
+   * @param tanType       type of the tan
    * @param sourceOfTrust source of trust of the tan
    * @return Tan object
    */

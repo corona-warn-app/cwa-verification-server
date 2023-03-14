@@ -34,10 +34,10 @@ import app.coronawarn.verification.service.TanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -108,7 +108,7 @@ public class ExternalTokenController {
     DeferredResult<ResponseEntity<RegistrationToken>> deferredResult = new DeferredResult<>();
 
     switch (keyType) {
-      case GUID:
+      case GUID -> {
         ResponseEntity<RegistrationToken> responseEntity =
           appSessionService.generateRegistrationTokenByGuid(key, request.getKeyDob(), fake);
         stopWatch.stop();
@@ -116,14 +116,13 @@ public class ExternalTokenController {
         deferredResult.setResult(responseEntity);
         log.info("Returning the successfully generated RegistrationToken.");
         return deferredResult;
-      case TELETAN:
+      }
+      case TELETAN -> {
         Optional<VerificationTan> optional = tanService.getEntityByTan(key);
-
         ResponseEntity<RegistrationToken> response = appSessionService.generateRegistrationTokenByTeleTan(
           key,
           fake,
           optional.map(VerificationTan::getTeleTanType).orElse(null));
-
         if (optional.isPresent()) {
           VerificationTan teleTan = optional.get();
           teleTan.setRedeemed(true);
@@ -137,10 +136,12 @@ public class ExternalTokenController {
         }
         stopWatch.stop();
         throw new VerificationServerException(HttpStatus.BAD_REQUEST, "The teleTAN verification failed");
-      default:
+      }
+      default -> {
         stopWatch.stop();
         throw new VerificationServerException(HttpStatus.BAD_REQUEST,
           "Unknown registration key type for registration token");
+      }
     }
   }
 }

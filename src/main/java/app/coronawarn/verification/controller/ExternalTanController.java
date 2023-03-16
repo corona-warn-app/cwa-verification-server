@@ -40,11 +40,11 @@ import app.coronawarn.verification.service.TestResultServerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -119,7 +119,7 @@ public class ExternalTanController {
   )
   public DeferredResult<ResponseEntity<Tan>> generateTan(@Valid @RequestBody RegistrationToken registrationToken,
                                                          @RequestHeader(value = "cwa-fake", required = false)
-                                                           String fake) {
+                                                         String fake) {
     if ((fake != null) && (fake.equals("1"))) {
       return fakeRequestService.generateTan(registrationToken);
     }
@@ -134,7 +134,7 @@ public class ExternalTanController {
         AppSessionSourceOfTrust appSessionSourceOfTrust = appSession.getSourceOfTrust();
         TanSourceOfTrust tanSourceOfTrust = TanSourceOfTrust.CONNECTED_LAB;
         switch (appSessionSourceOfTrust) {
-          case HASHED_GUID:
+          case HASHED_GUID -> {
             TestResult covidTestResult = testResultServerService.result(new HashedGuid(appSession.getHashedGuid()));
             if (covidTestResult.getTestResult() != LabTestResult.POSITIVE.getTestResult()
               && covidTestResult.getTestResult() != LabTestResult.QUICK_POSITIVE.getTestResult()
@@ -143,14 +143,13 @@ public class ExternalTanController {
               throw new VerificationServerException(HttpStatus.BAD_REQUEST,
                 "Tan cannot be created, caused by the non positive result of the labserver");
             }
-            break;
-          case TELETAN:
-            tanSourceOfTrust = TanSourceOfTrust.TELETAN;
-            break;
-          default:
+          }
+          case TELETAN -> tanSourceOfTrust = TanSourceOfTrust.TELETAN;
+          default -> {
             stopWatch.stop();
             throw new VerificationServerException(HttpStatus.BAD_REQUEST,
               "Unknown source of trust inside the appsession for the registration token");
+          }
         }
         appSession.incrementTanCounter();
         appSession.setUpdatedAt(LocalDateTime.now());

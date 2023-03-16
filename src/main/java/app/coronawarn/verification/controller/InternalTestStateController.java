@@ -32,8 +32,8 @@ import app.coronawarn.verification.service.TestResultServerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.Optional;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -98,7 +98,7 @@ public class InternalTestStateController {
       AppSessionSourceOfTrust sourceOfTrust = appSession.get().getSourceOfTrust();
 
       switch (sourceOfTrust) {
-        case HASHED_GUID:
+        case HASHED_GUID -> {
           HashedGuid hash = new HashedGuid(appSession.get().getHashedGuid());
           TestResult testResult = testResultServerService.result(hash);
 
@@ -116,21 +116,20 @@ public class InternalTestStateController {
           }
           log.debug("Result {}", testResult);
           log.info("The result for registration token based on hashed Guid will be returned.");
-
           return ResponseEntity.ok(new InternalTestResult(
             testResult.getTestResult(),
             testResult.getSc(),
             testResult.getLabId(),
             testResult.getResponsePadding(),
             appSession.get().getHashedGuid()));
-
-        case TELETAN:
+        }
+        case TELETAN -> {
           log.info("Internal TestState is not allowed for TeleTan Token.");
           throw new VerificationServerException(HttpStatus.FORBIDDEN,
             "Internal TestState is not allowed for TeleTan Token.");
-        default:
-          throw new VerificationServerException(HttpStatus.BAD_REQUEST,
-            "Unknown source of trust inside the appsession for the registration token");
+        }
+        default -> throw new VerificationServerException(HttpStatus.BAD_REQUEST,
+          "Unknown source of trust inside the appsession for the registration token");
       }
     }
     log.info("The registration token doesn't exist.");

@@ -37,11 +37,11 @@ import app.coronawarn.verification.service.TestResultServerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -126,7 +126,7 @@ public class ExternalTestStateController {
       DeferredResult<ResponseEntity<TestResult>> deferredResult = new DeferredResult<>();
 
       switch (sourceOfTrust) {
-        case HASHED_GUID:
+        case HASHED_GUID -> {
           HashedGuid hash = new HashedGuid(appSession.get().getHashedGuid());
           TestResult testResult = testResultServerService.result(hash);
           testResult.setResponsePadding(RandomStringUtils.randomAlphanumeric(RESPONSE_PADDING_LENGTH));
@@ -143,7 +143,6 @@ public class ExternalTestStateController {
                 "TestResult of dob hash does not equal to TestResult of hash");
             }
           }
-
           log.debug("Result {}", testResult);
           log.info("The result for registration token based on hashed Guid will be returned.");
           stopWatch.stop();
@@ -151,7 +150,8 @@ public class ExternalTestStateController {
           deferredResult.setResult(ResponseEntity.ok(generateReturnTestResult(testResult.getTestResult(),
             testResult.getSc(), testResult.getLabId())));
           return deferredResult;
-        case TELETAN:
+        }
+        case TELETAN -> {
           log.info("The result for registration token based on teleTAN will be returned.");
           stopWatch.stop();
           fakeDelayService.updateFakeTestRequestDelay(stopWatch.getTotalTimeMillis());
@@ -160,10 +160,12 @@ public class ExternalTestStateController {
                 appSession.get().getCreatedAt().toEpochSecond(ZoneOffset.UTC), null))),
             fakeDelayService.realDelayTest(), MILLISECONDS);
           return deferredResult;
-        default:
+        }
+        default -> {
           stopWatch.stop();
           throw new VerificationServerException(HttpStatus.BAD_REQUEST,
             "Unknown source of trust inside the appsession for the registration token");
+        }
       }
     }
     log.info("The registration token doesn't exist.");

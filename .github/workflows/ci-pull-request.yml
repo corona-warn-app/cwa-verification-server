@@ -21,7 +21,7 @@ jobs:
         restore-keys: ${{ env.cache-name }}-
     - uses: actions/setup-java@v1
       with:
-        java-version: 11
+        java-version: 17
     - name: mvn package
       run: mvn --batch-mode package
       env:

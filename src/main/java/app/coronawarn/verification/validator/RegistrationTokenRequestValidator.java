@@ -24,8 +24,8 @@ import app.coronawarn.verification.model.RegistrationTokenKeyType;
 import app.coronawarn.verification.model.RegistrationTokenRequest;
 import app.coronawarn.verification.service.HashingService;
 import app.coronawarn.verification.service.TanService;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,13 +59,9 @@ public class RegistrationTokenRequestValidator
     if (key == null || keyType == null) {
       return false;
     }
-    switch (keyType) {
-      case GUID:
-        return hashingService.isHashValid(key);
-      case TELETAN: 
-        return tanService.verifyTeleTan(key);
-      default: 
-        return false;
-    }
+    return switch (keyType) {
+      case GUID -> hashingService.isHashValid(key);
+      case TELETAN -> tanService.verifyTeleTan(key);
+    };
   }
 }

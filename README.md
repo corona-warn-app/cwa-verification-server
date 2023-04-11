@@ -71,7 +71,7 @@ Please check, whether following prerequisites are installed on your machine:
 You can then open a terminal pointing to the root directory of the verification server and do the following:
 
     mvn package
-    java -jar target/cwa-verification-server-0.0.1-SNAPSHOT.jar --spring.profiles.active=local                                                     
+    java -jar target/cwa-verification-server-0.0.1-SNAPSHOT.jar --spring.profiles.active=local                               
 
 The verification server will start up and run locally on your machine available on port 8080.
 

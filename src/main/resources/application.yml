@@ -83,4 +83,3 @@ request:
 
 cwa-testresult-server:
   url: http://localhost:8088
-allowed-client-certificates:
